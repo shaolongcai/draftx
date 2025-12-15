@@ -1,3 +1,4 @@
+@config "../tailwind.config.ts";
 @import "tailwindcss";
 
 :root {
@@ -7,7 +8,173 @@
 }
 
 body {
-  margin: 0;
   min-width: 320px;
   min-height: 100vh;
+}
+
+
+
+/* 对应markdown的h1、h2...的标题 */
+h1 {
+  font-size: 24px;
+  color: rgba(0, 0, 0, 0.85);
+  font-weight: 700;
+}
+h2 {
+  font-size: 20px;
+  color: rgba(0, 0, 0, 0.85);
+  font-weight: 700;
+}
+h3 {
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.85);
+  font-weight: 500;
+}
+
+
+/* 列表 */
+.editor-nested-listitem {
+  list-style-type: none;
+}
+.editor-list-oll1 {
+  padding-left: 32px;
+  margin: 0;
+  list-style-type: decimal;  /* 编号的类型 */
+  list-style-position:inside; /* 编号的位置 */
+}
+.editor-list-ol2 {
+  margin: 0;
+  list-style-type: upper-alpha;
+  list-style-position: inside;
+   padding-left: 16px;
+}
+.editor-list-ol3 {
+  margin: 0;
+  list-style-type: lower-alpha;
+  list-style-position: inside;
+   padding-left: 16px;
+}
+.editor-list-ol4 {
+   padding-left: 16px;
+  margin: 0;
+  list-style-type: upper-roman;
+  list-style-position: inside;
+}
+.editor-list-ol5 {
+   padding-left: 16px;
+  margin: 0;
+  list-style-type: lower-roman;
+  list-style-position: inside;
+}
+
+/* 无序列表 */
+.editor-list-ul1 {
+  padding: 0;
+  margin: 0;
+  list-style-type: inherit;
+  list-style-position: inside;
+}
+.editor-list-ul2 {
+  padding-left: 16px;
+  margin: 0;
+  list-style-type:circle;
+  list-style-position: inside;
+}
+.editor-list-ul3 {
+  padding-left: 16px;
+  margin: 0;
+  list-style-type:square;
+  list-style-position: inside;
+}
+/* .editor-list-ul4 {
+  padding-left: 16px;
+  margin: 0;
+  list-style-position: inside;
+}
+.editor-list-ul5 {
+  padding: 0;
+  margin: 0;
+  list-style-type: lower-latin;  //编号的类型，可去掉，这里留作示例 
+  list-style-position: inside;
+} */
+.editor-listitem {
+  margin: 0 32px;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 1rem;
+  background-color: transparent;
+}
+.editor-listItem::marker {
+  color: var(--listitem-marker-color);
+  background-color: var(--listitem-marker-background-color);
+  font-family: var(--listitem-marker-font-family);
+  font-size: var(--listitem-marker-font-size);
+}
+
+.PlaygroundEditorTheme__listItemChecked,
+.PlaygroundEditorTheme__listItemUnchecked {
+  position: relative;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+  padding-left: 1.5em;
+  padding-right: 1.5em;
+  list-style-type: none;
+  outline: none;
+  display: block;
+  min-height: 1.5em;
+}
+
+.PlaygroundEditorTheme__listItemChecked>*,
+.PlaygroundEditorTheme__listItemUnchecked>* {
+  margin-left: 0.01em;
+}
+
+.PlaygroundEditorTheme__listItemUnchecked:before,
+.PlaygroundEditorTheme__listItemChecked:before {
+  content: '\200B';
+  width: 0.9em;
+  height: 0.9em;
+  top: 50%;
+  left: 0;
+  cursor: pointer;
+  display: block;
+  background-size: cover;
+  position: absolute;
+  transform: translateY(-50%);
+}
+
+.PlaygroundEditorTheme__listItemChecked {
+  text-decoration: line-through;
+}
+
+.PlaygroundEditorTheme__listItemUnchecked:focus:before,
+.PlaygroundEditorTheme__listItemChecked:focus:before {
+  box-shadow: 0 0 0 2px #a6cdfe;
+  border-radius: 2px;
+}
+
+.PlaygroundEditorTheme__listItemUnchecked:before {
+  border: 1px solid #999;
+  border-radius: 2px;
+}
+
+.PlaygroundEditorTheme__listItemChecked:before {
+  border: 1px solid rgb(61, 135, 245);
+  border-radius: 2px;
+  background-color: #3d87f5;
+  background-repeat: no-repeat;
+}
+
+.PlaygroundEditorTheme__listItemChecked:after {
+  content: '';
+  cursor: pointer;
+  border-color: #fff;
+  border-style: solid;
+  position: absolute;
+  display: block;
+  top: 45%;
+  width: 0.2em;
+  left: 0.35em;
+  height: 0.4em;
+  transform: translateY(-50%) rotate(45deg);
+  border-width: 0 0.1em 0.1em 0;
 }
