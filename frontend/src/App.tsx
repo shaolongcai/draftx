@@ -6,6 +6,7 @@ import { Search, Editor, SearchItem } from '@/components'
 import { ThemeProvider } from '@mui/material'
 import { theme } from './theme'
 import { NotificationsProvider } from '@toolpad/core/useNotifications';
+import { EventProvider, useEvent } from './contexts/EvenContext'
 
 function App() {
 
@@ -24,9 +25,6 @@ function App() {
     {
       ready: Boolean(debouncedValue),
       refreshDeps: [debouncedValue],
-      onSuccess: (res) => {
-        console.log('搜索结果', res);
-      }
     }
   );
 
@@ -41,20 +39,28 @@ function App() {
       },
     }} >
       <ThemeProvider theme={theme}>
-        <Stack spacing={2}>
-          <Search onSearch={setSearchValue} />
-          {
-            (data?.length > 0 && searchValue) &&
-            <Stack spacing={1}>
-              {
-                data.map(item => <SearchItem title={item.title} content={item.content} snippet={item.snippet} />)
-              }
-            </Stack>
-          }
-          <div className={searchValue ? 'hidden' : ''}>
-            {EditorMemo}
-          </div>
-        </Stack>
+        <EventProvider>
+          <Stack spacing={2}>
+            <Search onSearch={setSearchValue} />
+            {
+              (data?.length > 0 && searchValue) &&
+              <Stack spacing={1}>
+                {
+                  data.map(item => <SearchItem
+                    id={item.id}
+                    title={item.title}
+                    content={item.content}
+                    snippet={item.snippet}
+                    {...item}
+                  />)
+                }
+              </Stack>
+            }
+            <div className={searchValue ? 'hidden' : ''}>
+              <Editor />
+            </div>
+          </Stack>
+        </EventProvider>
       </ThemeProvider>
     </NotificationsProvider>
   )

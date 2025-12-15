@@ -14,13 +14,14 @@ import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { CodeHighlightNode, CodeNode } from '@lexical/code';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
-import { $getRoot, type EditorThemeClasses } from 'lexical';
+import { $createParagraphNode, $getRoot, type EditorThemeClasses } from 'lexical';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { useEffect, useRef, useState } from "react";
 import { useDebounceFn, useKeyPress, useMount } from "ahooks";
 import { v4 as uuidv4 } from 'uuid';
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useNotifications } from "@toolpad/core/useNotifications";
+import { useEvent } from "@/contexts/EvenContext";
 
 const theme: EditorThemeClasses = {
     paragraph: 'mb-2',
@@ -78,12 +79,35 @@ const EditorContext = () => {
     const lastSavedRef = useRef<{ title?: string; contentJson: string; contentText: string }>({ contentJson: '', contentText: '' }); // 上次已保存
 
     const [editor] = useLexicalComposerContext()
+    const { loadStickys$ } = useEvent();
     const notification = useNotifications();
 
     // 初始化uuid
     useEffect(() => {
         setCurrentUuid(uuidv4());
     }, []);
+
+    // 监听加载新的便利贴
+    loadStickys$.useSubscription((sticky) => {
+        // 清空编辑器内容
+        editor.update(() => {
+            const root = $getRoot();
+            root.clear();
+            // 插入新的便利贴内容
+            try {
+                // 创建root
+                const root = $getRoot();
+                root.append($createParagraphNode());
+                console.log('插入新内容', sticky);
+                const initialEditorState = editor.parseEditorState(sticky.content_string);
+                editor.setEditorState(initialEditorState);
+                setCurrentUuid(sticky.uuid);
+            } catch (error) {
+                root.append($createParagraphNode()); // 解析失败时兜底：新增空段落
+                console.log('解析失败，插入空段落', error);
+            }
+        });
+    })
 
     // 防抖保存
     const AUTOSAVE_WAIT_MS = 1000;
@@ -146,7 +170,7 @@ const EditorContext = () => {
         <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
         <OnChangePlugin onChange={(editorState) => {
             // 获取第一个 # 的标题
-            const firstHeading = editorState.read(() => $getRoot().getFirstChild().getTextContent());
+            const firstHeading = editorState.read(() => $getRoot().getFirstChild()?.getTextContent());
             // 判断类型是否为 HeadingNode
             // let title: string | undefined = undefined;
             // if (firstHeading?.getType() !== 'heading') {
@@ -155,7 +179,7 @@ const EditorContext = () => {
             // console.log('firstHeading', firstHeading);
             // 获取纯文本内容
             const plain = editorState.read(() => $getRoot().getTextContent());
-            const json = JSON.stringify(editorState.toJSON());
+            const json = editorState.toJSON();
             scheduleSave({ title: firstHeading, contentJson: json, contentText: plain });
         }} />
     </>

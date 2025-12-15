@@ -8,17 +8,7 @@ type StickyParmas = {
     contentString?: string;
 }
 
-// 搜索结果
-type SearchResult = {
-    id: number;
-    title: string;
-    content: string;
-    constent_string: string;
-    created_at: string;
-    modified_at: string;
-    score: number; //相关性
-    snippet?: string;
-}
+
 
 interface ElectronAPI {
 
@@ -27,7 +17,7 @@ interface ElectronAPI {
      * @param query 搜索词
      * @returns 便利贴列表
      */
-    searchSticky: (query: string) => Promise<SearchResult[]>;
+    searchSticky: (query: string) => Promise<StickyResult[]>;
 
     /**
      * 保存便利贴

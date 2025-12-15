@@ -1,3 +1,4 @@
+import { useEvent } from "@/contexts/EvenContext";
 import { Card, Paper, Stack, TextField } from "@mui/material"
 import { useEffect, useRef, useState } from "react";
 // import { useTranslation } from '@/contexts/I18nContext';
@@ -13,6 +14,12 @@ const Search: React.FC<Props> = ({
     const [searchValue, setSearchValue] = useState(''); //搜索的关键词
     // const { t } = useTranslation();
     const inputRef = useRef<HTMLInputElement | null>(null);
+    const { loadStickys$ } = useEvent();
+
+    loadStickys$.useSubscription(() => {
+        setSearchValue('');
+        onSearch('');
+    })
 
     // 处理搜索
     const handleSearch = (value: string) => {

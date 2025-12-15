@@ -13,7 +13,8 @@ const db = getDatabase()
 export const saveStickyNote = (stickyNote: StickyParmas) => {
     try {
         const now = new Date().toISOString();
-        const deletedAt = dayjs().add(30, 'day').toISOString();
+        // const deletedAt = dayjs().add(30, 'day').toISOString();
+        const deletedAt = dayjs().add(1, 'day').toISOString(); //测试用，只增加一天
         // 存在即更新，不存在则插入
         const upsertStmt = db.prepare(`
                 INSERT INTO stickys ( uuid, content, content_string, title, created_at, modified_at,deleted_at)
@@ -38,7 +39,6 @@ export const saveStickyNote = (stickyNote: StickyParmas) => {
  */
 export const searchStickyNote = (query: string, limit: number = 50) => {
     try {
-        console.log('搜索词', query);
         // 拆分为单字的方法（用于 FTS5 前缀查询，FTS5会把每个字作为一个 token，作为倒排）
         const buildFtsQuery = (input: string) => {
             const tokens = input
@@ -66,7 +66,7 @@ export const searchStickyNote = (query: string, limit: number = 50) => {
                 LIMIT ?
             )
             SELECT 
-                s.id, s.uuid, s.title, s.content, s.content_string, s.created_at, s.modified_at,
+                s.id, s.uuid, s.title, s.content, s.content_string, s.created_at, s.modified_at,s.deleted_at,
                 (
                     0.35 * CASE WHEN lower(s.title) LIKE q.query || '%' THEN CAST(length(q.query) AS REAL) / NULLIF(length(s.title), 0) ELSE 0 END
                     + 0.25 * CASE WHEN instr(lower(s.title), q.query) > 0 THEN 1 - (instr(lower(s.title), q.query) - 1) / CAST(length(s.title) AS REAL) ELSE 0 END
