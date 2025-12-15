@@ -14,15 +14,6 @@ const Search: React.FC<Props> = ({
     // const { t } = useTranslation();
     const inputRef = useRef<HTMLInputElement | null>(null);
 
-    // useEffect(() => {
-    //     if (typeof window === 'undefined' || !window.electronAPI) return;
-    //     window.electronAPI.onFocusSearchInput(() => {
-    //         console.log('聚焦到搜索框');
-    //         requestAnimationFrame(() => inputRef.current?.focus());
-    //     });
-    //     return () => window.electronAPI?.removeAllListeners('focus-search-input');
-    // }, []);
-
     // 处理搜索
     const handleSearch = (value: string) => {
         setSearchValue(value)

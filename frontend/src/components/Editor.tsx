@@ -68,9 +68,7 @@ function Placeholder() {
     }}>Enter some text...</Box>;
 }
 
-interface Props {
-    onSave: (content: string) => void;
-}
+
 /**
  * 内容编辑器
  */
@@ -165,9 +163,7 @@ const EditorContext = () => {
 
 
 
-const Editor: React.FC<Props> = ({
-    onSave,
-}) => {
+const Editor = () => {
 
     const initialConfig = {
         namespace: 'MyEditor',

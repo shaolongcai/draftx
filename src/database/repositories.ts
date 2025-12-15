@@ -29,3 +29,78 @@ export const saveStickyNote = (stickyNote: StickyParmas) => {
         logger.error(error)
     }
 };
+
+
+/**
+ * 搜索 stickyNote 从数据库
+ * @param query 
+ * @returns 
+ */
+export const searchStickyNote = (query: string, limit: number = 50) => {
+    try {
+        console.log('搜索词', query);
+        // 拆分为单字的方法（用于 FTS5 前缀查询，FTS5会把每个字作为一个 token，作为倒排）
+        const buildFtsQuery = (input: string) => {
+            const tokens = input
+                .toLowerCase()
+                .trim()
+                .split(/\s+/)
+                .filter(t => t.length > 0 && t.length <= 32)
+                .slice(0, 8); // 控制词数，避免过长导致性能问题
+            if (tokens.length === 0) return input.toLowerCase();
+            // 用 OR + 前缀匹配扩大召回（fts5 支持 token* 前缀查询）
+            return tokens.map(t => `${t}*`).join(' OR ');
+        };
+        const ftsQuery = buildFtsQuery(query);
+
+        const stmt = db.prepare(`
+            WITH q(query) AS (SELECT lower(?)),
+            ftsHits AS (
+                SELECT 
+                    rowid,
+                    snippet(stickys_fts, 0, '<mark>', '</mark>', '...', 16) AS snippet,
+                    bm25(stickys_fts) AS fts_score
+                FROM stickys_fts
+                WHERE stickys_fts MATCH ?
+                ORDER BY bm25(stickys_fts)
+                LIMIT ?
+            )
+            SELECT 
+                s.id, s.uuid, s.title, s.content, s.content_string, s.created_at, s.modified_at,
+                (
+                    0.35 * CASE WHEN lower(s.title) LIKE q.query || '%' THEN CAST(length(q.query) AS REAL) / NULLIF(length(s.title), 0) ELSE 0 END
+                    + 0.25 * CASE WHEN instr(lower(s.title), q.query) > 0 THEN 1 - (instr(lower(s.title), q.query) - 1) / CAST(length(s.title) AS REAL) ELSE 0 END
+                    + 0.18 * COALESCE(1.0 / (ftsHits.fts_score + 1.0), 0.0)
+                    + 0.10 * (1.0 - 1.0 / (COALESCE(s.click_count, 0) + 1))
+                    + 0.06 * (
+                        CASE 
+                            WHEN s.last_access_time IS NULL THEN 0
+                            ELSE 
+                                CASE 
+                                    WHEN (julianday('now') - julianday(s.last_access_time)) <= 0.5 THEN 1.0
+                                    WHEN (julianday('now') - julianday(s.last_access_time)) >= 90.0 THEN 0.0
+                                    ELSE 1.0 - ((julianday('now') - julianday(s.last_access_time)) - 0.5) / (90.0 - 0.5)
+                                END
+                        END
+                    )
+                    + 0.04 * (1.0 - MIN(length(s.title), 255) / 255.0)
+                ) AS score,
+                ftsHits.snippet AS snippet
+            FROM stickys s
+            LEFT JOIN ftsHits ON ftsHits.rowid = s.id
+            CROSS JOIN q
+            WHERE (
+                lower(s.title) LIKE '%' || q.query || '%'
+                OR lower(s.content) LIKE '%' || q.query || '%'
+                OR ftsHits.rowid IS NOT NULL
+            )
+            ORDER BY score DESC, s.title
+            LIMIT ?
+        `);
+        const rows = stmt.all(query, ftsQuery, limit, limit);
+        return rows;
+    } catch (error) {
+        logger.error(error)
+        return []
+    }
+}

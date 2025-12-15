@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Stack } from '@mui/material'
-import { useLocalStorageState } from 'ahooks'
+import { useDebounce, useLocalStorageState, useRequest } from 'ahooks'
 import './App.css'
-import { Search, Editor } from '@/components'
+import { Search, Editor, SearchItem } from '@/components'
 import { ThemeProvider } from '@mui/material'
 import { theme } from './theme'
 import { NotificationsProvider } from '@toolpad/core/useNotifications';
@@ -10,11 +10,28 @@ import { NotificationsProvider } from '@toolpad/core/useNotifications';
 function App() {
 
 
-  const [inputValue, setInputValue] = useState('')
-  const [storedValue, setStoredValue] = useLocalStorageState('app-name', {
-    defaultValue: 'Electron React App',
-  })
+  const [searchValue, setSearchValue] = useState('')
+  const debouncedValue = useDebounce(searchValue, { wait: 200 })
 
+  // const [storedValue, setStoredValue] = useLocalStorageState('app-name', {
+  //   defaultValue: 'Electron React App',
+  // })
+
+
+  // 搜索
+  const { data } = useRequest(
+    () => window.electronAPI.searchSticky(debouncedValue),
+    {
+      ready: Boolean(debouncedValue),
+      refreshDeps: [debouncedValue],
+      onSuccess: (res) => {
+        console.log('搜索结果', res);
+      }
+    }
+  );
+
+
+  const EditorMemo = useMemo(() => <Editor />, []);
 
   return (
     <NotificationsProvider slotProps={{
@@ -25,8 +42,18 @@ function App() {
     }} >
       <ThemeProvider theme={theme}>
         <Stack spacing={2}>
-          <Search onSearch={setInputValue} />
-          <Editor onSave={setStoredValue} />
+          <Search onSearch={setSearchValue} />
+          {
+            (data?.length > 0 && searchValue) &&
+            <Stack spacing={1}>
+              {
+                data.map(item => <SearchItem title={item.title} content={item.content} snippet={item.snippet} />)
+              }
+            </Stack>
+          }
+          <div className={searchValue ? 'hidden' : ''}>
+            {EditorMemo}
+          </div>
         </Stack>
       </ThemeProvider>
     </NotificationsProvider>

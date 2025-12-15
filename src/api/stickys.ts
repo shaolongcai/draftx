@@ -1,16 +1,18 @@
 import { ipcMain } from "electron";
-import { saveStickyNote } from "../database/repositories.js";
+import { saveStickyNote, searchStickyNote } from "../database/repositories.js";
 
 
 
 export function initializeStickyApi() {
 
-    /**
-     * 保存 stickyNote 到数据库
-     * @param stickyNote 
-     */
+    // 保存 stickyNote 到数据库
     ipcMain.on('save-sticky', (event, stickyNote: StickyParmas) => {
         saveStickyNote(stickyNote);
     });
 
+    // 搜索 stickyNote 从数据库
+    ipcMain.handle('search-sticky', (event, query: string) => {
+        const stickys = searchStickyNote(query);
+        return stickys;
+    });
 }
