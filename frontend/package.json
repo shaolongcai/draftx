@@ -21,6 +21,7 @@
     "@mui/icons-material": "^7.3.6",
     "@mui/material": "^7.3.6",
     "@tailwindcss/vite": "^4.1.18",
+    "@toolpad/core": "^0.16.0",
     "ahooks": "^3.9.6",
     "lexical": "^0.39.0",
     "react": "^19.2.0",

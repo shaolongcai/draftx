@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "better-sqlite3": "^12.5.0",
+    "dayjs": "^1.11.19",
     "sqlite3": "^5.1.6"
   }
 }

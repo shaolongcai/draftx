@@ -1,4 +1,4 @@
-import { Box, Card } from "@mui/material"
+import { Box, Card, Stack, Typography } from "@mui/material"
 
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
@@ -17,15 +17,17 @@ import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin
 import { $getRoot, type EditorThemeClasses } from 'lexical';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { useEffect, useRef, useState } from "react";
-import { useDebounceFn } from "ahooks";
+import { useDebounceFn, useKeyPress, useMount } from "ahooks";
 import { v4 as uuidv4 } from 'uuid';
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { useNotifications } from "@toolpad/core/useNotifications";
 
 const theme: EditorThemeClasses = {
     paragraph: 'mb-2',
     heading: {
-        h1: 'text-3xl! font-bold mt-4 mb-2', //这个失效
-        h2: 'text-xl font-semibold mt-3 mb-2',
-        h3: 'text-lg font-semibold mt-2 mb-1',
+        h1: 'editor-h1',
+        h2: 'editor-h2',
+        h3: 'editor-h3',
     },
     list: {
         nested: {
@@ -77,6 +79,9 @@ const EditorContext = () => {
     const [currentUuid, setCurrentUuid] = useState<string>('');
     const lastSavedRef = useRef<{ title?: string; contentJson: string; contentText: string }>({ contentJson: '', contentText: '' }); // 上次已保存
 
+    const [editor] = useLexicalComposerContext()
+    const notification = useNotifications();
+
     // 初始化uuid
     useEffect(() => {
         setCurrentUuid(uuidv4());
@@ -93,7 +98,7 @@ const EditorContext = () => {
             if (payload.contentJson === lastSavedRef.current.contentJson) return
             try {
                 window.electronAPI.saveSticky({
-                    uuid: currentUuid ,
+                    uuid: currentUuid,
                     title: payload.title,
                     content: payload.contentText,
                     contentString: JSON.stringify(payload.contentJson),
@@ -109,6 +114,20 @@ const EditorContext = () => {
         { wait: AUTOSAVE_WAIT_MS }
     );
 
+    // 注册Shitf+A 新建便利贴
+    useKeyPress('shift.enter', () => {
+        scheduleSave(lastSavedRef.current);
+        setCurrentUuid(uuidv4());
+        // 清空编辑器内容
+        editor.update(() => {
+            const root = $getRoot();
+            root.clear();
+        });
+
+        notification.show('The sticky has been saved', {
+            severity: 'success',
+        });
+    })
 
     return <>
         <RichTextPlugin
@@ -170,6 +189,23 @@ const Editor: React.FC<Props> = ({
         <LexicalComposer initialConfig={initialConfig}>
             <EditorContext />
         </LexicalComposer>
+        <Stack direction='row' justifyContent='space-between' alignItems="center">
+            <Typography variant="bodySmall" color="textSecondary">
+                Deleted after 90 days
+            </Typography>
+            <Stack direction="row" spacing={0.5} alignItems="center" >
+                <span className="border border-text-secondary border-gray-300  rounded px-2 py-1 text-xs leading-none">
+                    ⇧
+                </span>
+                <Typography variant="bodySmall" color="textSecondary">+</Typography>
+                <span className="border border-gray-300 rounded px-2 py-1 text-xs leading-none">
+                    ↵
+                </span>
+                <Typography variant="bodySmall" color="textSecondary" className="pl-1">
+                    to new Stickys
+                </Typography>
+            </Stack>
+        </Stack>
     </Card>
 }
 

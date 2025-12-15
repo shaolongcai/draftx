@@ -15,20 +15,20 @@ body {
 
 
 /* 对应markdown的h1、h2...的标题 */
-h1 {
+.editor-h1 {
   font-size: 24px;
   color: rgba(0, 0, 0, 0.85);
   font-weight: 700;
 }
-h2 {
+.editor-h2 {
   font-size: 20px;
   color: rgba(0, 0, 0, 0.85);
   font-weight: 700;
 }
-h3 {
+.editor-h3 {
   font-size: 16px;
   color: rgba(0, 0, 0, 0.85);
-  font-weight: 500;
+  font-weight: 700;
 }
 
 
