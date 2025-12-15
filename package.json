@@ -1,5 +1,5 @@
 {
-  "name": "electron-react-app",
+  "name": "osticky",
   "type": "module",
   "version": "1.0.0",
   "description": "Electron app with React frontend and Node.js backend",
@@ -20,11 +20,13 @@
     "cross-env": "^10.1.0",
     "electron": "^28.0.0",
     "electron-builder": "^24.0.0",
+    "electron-rebuild": "^3.2.9",
     "rimraf": "^5.0.0",
     "typescript": "^5.0.0",
     "wait-on": "^9.0.3"
   },
   "dependencies": {
+    "better-sqlite3": "^12.5.0",
     "sqlite3": "^5.1.6"
   }
 }

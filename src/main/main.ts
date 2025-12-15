@@ -1,47 +1,57 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, Tray, globalShortcut } from 'electron';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
-
-
+import { getConfig, initializeDatabase, setConfig } from '../database/sqlite.js';
+import { initializeStickyApi } from '../api/stickys.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-let mainWindow: BrowserWindow | null = null;
+let tray: Tray | null = null;
+let mainWindow: BrowserWindow | null;
+let settingsWindow: BrowserWindow | null;
 
-function createWindow(): void {
-  mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
-    webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true,
-      preload: path.join(__dirname, 'preload.js'),
-    },
+// 广播事件到所有窗口
+export const sendToRenderer = (channel: ChannelType, data: any) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send(channel, data);
+  }
+  if (settingsWindow && !settingsWindow.isDestroyed()) {
+    settingsWindow.webContents.send(channel, data);
+  }
+};
+
+// 注册全局快捷键
+const registerGlobalShortcut = () => {
+  globalShortcut.register('Escape', () => {
+    mainWindow.hide();
+    settingsWindow.hide();
   });
 
-  // 开发环境加载 Vite 开发服务器
-  if (process.env.NODE_ENV === 'development') {
-    mainWindow.loadURL('http://localhost:5173');
-    mainWindow.webContents.openDevTools();
-  } else {
-    // 生产环境加载构建后的文件
-    mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
-  }
-
-  mainWindow.on('closed', () => {
-    mainWindow = null;
+  // 触发：显示/隐藏主窗口
+  globalShortcut.register('Alt + z', () => {
+    // 触发：显示/隐藏主窗口
+    if (mainWindow?.isVisible()) {
+      mainWindow.hide();
+    } else {
+      mainWindow?.show();
+      mainWindow?.focus();
+    }
   });
 }
 
-app.whenReady().then(() => {
-  createWindow();
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
-  });
+app.whenReady().then(async () => {
+  // 准备窗口
+  const { windowManager } = await import('../core/windowManager.js');
+  mainWindow = windowManager.mainWindow;
+  settingsWindow = windowManager.settingsWindow;
+  // 初始化数据库
+  initializeDatabase();
+  // 注册全局快捷键
+  registerGlobalShortcut();
+  // 初始化 API
+  initializeStickyApi();
 });
 
 app.on('window-all-closed', () => {
@@ -50,7 +60,13 @@ app.on('window-all-closed', () => {
   }
 });
 
+app.on('will-quit', () => {
+  globalShortcut.unregisterAll();
+});
+
 // IPC 通信处理
 ipcMain.handle('get-app-version', () => {
   return app.getVersion();
 });
+
+

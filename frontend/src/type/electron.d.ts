@@ -1,7 +1,19 @@
 
 
+// 保存便利贴参数
+type StickyParmas = {
+    uuid: string;
+    title?: string;
+    content?: string;
+    contentString?: string;
+}
+
 interface ElectronAPI {
 
+    /**
+     * 保存便利贴
+     */
+    saveSticky: (params: StickyParmas) => void;
 
 }
 

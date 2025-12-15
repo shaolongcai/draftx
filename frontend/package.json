@@ -24,7 +24,8 @@
     "ahooks": "^3.9.6",
     "lexical": "^0.39.0",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

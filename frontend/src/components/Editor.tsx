@@ -14,7 +14,11 @@ import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { CodeHighlightNode, CodeNode } from '@lexical/code';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
-import type { EditorThemeClasses } from 'lexical';
+import { $getRoot, type EditorThemeClasses } from 'lexical';
+import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
+import { useEffect, useRef, useState } from "react";
+import { useDebounceFn } from "ahooks";
+import { v4 as uuidv4 } from 'uuid';
 
 const theme: EditorThemeClasses = {
     paragraph: 'mb-2',
@@ -51,10 +55,10 @@ const theme: EditorThemeClasses = {
 
 function Placeholder() {
     return <Box sx={{
-        color: '#999',
+        color: '#ccc',
         // overflow: 'hidden',
         position: 'absolute',
-        top: '32px',
+        top: '24px',
         fontSize: '16px',
         userSelect: 'none',
         display: 'inline-block',
@@ -69,13 +73,50 @@ interface Props {
  * 内容编辑器
  */
 const EditorContext = () => {
+
+    const [currentUuid, setCurrentUuid] = useState<string>('');
+    const lastSavedRef = useRef<{ title?: string; contentJson: string; contentText: string }>({ contentJson: '', contentText: '' }); // 上次已保存
+
+    // 初始化uuid
+    useEffect(() => {
+        setCurrentUuid(uuidv4());
+    }, []);
+
+    // 防抖保存
+    const AUTOSAVE_WAIT_MS = 1000;
+    const { run: scheduleSave } = useDebounceFn(
+        async (payload: { title?: string; contentJson: string; contentText: string }) => {
+
+            // 内容为空则跳过
+            if (!payload.contentText) return;
+            // 若无变更则跳过
+            if (payload.contentJson === lastSavedRef.current.contentJson) return
+            try {
+                window.electronAPI.saveSticky({
+                    uuid: currentUuid ,
+                    title: payload.title,
+                    content: payload.contentText,
+                    contentString: JSON.stringify(payload.contentJson),
+                });
+                lastSavedRef.current = payload;
+                console.log('已自动保存', payload);
+                // 如需提示可开启：message.success('已自动保存');
+            } catch (error) {
+                const msg = error instanceof Error ? error.message : '保存失败';
+                console.error(msg);
+            }
+        },
+        { wait: AUTOSAVE_WAIT_MS }
+    );
+
+
     return <>
         <RichTextPlugin
             contentEditable={
                 <ContentEditable style={{
-                    minHeight: '480px',
+                    height: '432px',
                     outline: 'none',
-                    marginTop: '8px',
+                    boxSizing: 'border-box',
                 }} />
             }
             ErrorBoundary={LexicalErrorBoundary}
@@ -86,6 +127,20 @@ const EditorContext = () => {
         <ListPlugin />
         <TabIndentationPlugin />
         <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+        <OnChangePlugin onChange={(editorState) => {
+            // 获取第一个 # 的标题
+            const firstHeading = editorState.read(() => $getRoot().getFirstChild().getTextContent());
+            // 判断类型是否为 HeadingNode
+            // let title: string | undefined = undefined;
+            // if (firstHeading?.getType() !== 'heading') {
+            //     title = firstHeading?.getTextContent();
+            // };
+            // console.log('firstHeading', firstHeading);
+            // 获取纯文本内容
+            const plain = editorState.read(() => $getRoot().getTextContent());
+            const json = JSON.stringify(editorState.toJSON());
+            scheduleSave({ title: firstHeading, contentJson: json, contentText: plain });
+        }} />
     </>
 }
 

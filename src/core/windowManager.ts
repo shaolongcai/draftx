@@ -11,14 +11,13 @@ const isDev = process.env.NODE_ENV === 'development';
 /**
  * 管理窗口
  * 左窗口：设置
- * 中窗口：搜索
- * 右窗口：文件内容
+ * 中窗口：便利贴
  */
 class WindowManager {
 
     private static instance: WindowManager;
     // 这里应该要私有化，提供get方法，暂时公开
-    public searchWindow: BrowserWindow; //search 窗口
+    public mainWindow: BrowserWindow; //search 窗口
     public settingsWindow: BrowserWindow; //settings 窗口
 
 
@@ -29,14 +28,14 @@ class WindowManager {
 
     // 初始化所有窗口
     private initAllWindows() {
-        this.initSearchWindow();
+        this.initMainWindow();
         this.initSettingsWindow();
         this.loadWindows();
     }
 
-    // 初始化search窗口
-    private initSearchWindow() {
-        this.searchWindow = new BrowserWindow({
+    // 初始化main窗口
+    private initMainWindow() {
+        this.mainWindow = new BrowserWindow({
             width: 480,
             height: 700,
             x: 0,               // 后面会计算居中
@@ -61,11 +60,11 @@ class WindowManager {
         });
 
         // 生產環境：屏蔽開發者工具快捷鍵
-        this.searchWindow.webContents.on('before-input-event', this.disableDevTools);
+        this.mainWindow.webContents.on('before-input-event', this.disableDevTools);
 
         // 窗口加载完成后(同时所有窗口变更)
-        this.searchWindow.once('ready-to-show', () => {
-            if (this.searchWindow && this.settingsWindow) {
+        this.mainWindow.once('ready-to-show', () => {
+            if (this.mainWindow && this.settingsWindow) {
                 // 檢查是否為開機自動啟動
                 const loginItemSettings = app.getLoginItemSettings();
                 const isAutoLaunch = loginItemSettings.wasOpenedAtLogin || loginItemSettings.wasOpenedAsHidden;
@@ -73,10 +72,9 @@ class WindowManager {
                 if (isAutoLaunch) {
                     logger.info('檢測到開機自動啟動，主窗口將保持隱藏狀態');
                     // 開機自動啟動時，不顯示主窗口，只顯示在托盤
-                    this.hideAllWindows();
                 } else {
                     // 正常啟動時，先显示搜索窗口以显示加载状态
-                    this.searchWindow.show();
+                    this.mainWindow.show();
                 }
             }
         });
@@ -119,10 +117,10 @@ class WindowManager {
     // 为窗口加载内容
     private loadWindows() {
         if (isDev) {
-            this.searchWindow.loadURL('http://localhost:5173');   // 加载搜索条HTML
-            this.settingsWindow.loadURL('http://localhost:5173/setting.html');   // 加载设置条HTML
-            this.searchWindow.webContents.openDevTools(); //打开开发者工具
-            this.settingsWindow.webContents.openDevTools(); //打开开发者工具
+            this.mainWindow.loadURL('http://localhost:5173');   // 加载搜索条HTML
+            // this.settingsWindow.loadURL('http://localhost:5173/setting.html');   // 加载设置条HTML
+            this.mainWindow.webContents.openDevTools(); //打开开发者工具        
+            // this.settingsWindow.webContents.openDevTools(); //打开开发者工具
         } else {
             const searchBarPath = path.join(__dirname, '../frontend/dist/search-bar.html');
             const settingPath = path.join(__dirname, '../frontend/dist/setting.html');
@@ -131,7 +129,7 @@ class WindowManager {
             if (!existsSync(searchBarPath)) {
                 logger.error(`搜索窗口文件不存在: ${searchBarPath}`);
             } else {
-                this.searchWindow.loadFile(searchBarPath).catch((error) => {
+                this.mainWindow.loadFile(searchBarPath).catch((error) => {
                     logger.error(`加載搜索窗口文件失敗: ${error}`);
                 });
             }
@@ -158,9 +156,9 @@ class WindowManager {
     private centerOnCurrentDisplay = () => {
         const cursor = screen.getCursorScreenPoint();
         const dist = screen.getDisplayNearestPoint(cursor).workArea;
-        const { width, height } = this.searchWindow.getBounds();
+        const { width, height } = this.mainWindow.getBounds();
         const { width: settingsWidth, height: settingsHeight } = this.settingsWindow.getBounds();
-        this.searchWindow.setBounds({
+        this.mainWindow.setBounds({
             x: Math.round(dist.x + (dist.width - width) / 2),
             y: Math.round(dist.y + dist.height * 0.25)   // 屏幕 1/4 处
         });
@@ -191,10 +189,10 @@ class WindowManager {
     // 变更窗口大小
     resizeWindow(windowName: 'searchWindow' | 'settingsWindow', size: { width: number, height: number }) {
         if (!size.height || !size.width) return;
-        let window = this.searchWindow;
+        let window = this.mainWindow;
         switch (windowName) {
             case 'searchWindow':
-                window = this.searchWindow;
+                window = this.mainWindow;
                 break;
             case 'settingsWindow':
                 window = this.settingsWindow;
@@ -209,20 +207,8 @@ class WindowManager {
     }
 
     destroy() {
-        this.searchWindow.destroy();
+        this.mainWindow.destroy();
         this.settingsWindow.destroy();
-    }
-
-    // 隐藏所有窗口
-    hideAllWindows() {
-        this.searchWindow.hide();
-        this.settingsWindow.hide();
-    }
-
-    // 显示所有窗口
-    showAllWindows() {
-        this.searchWindow.show();
-        this.settingsWindow.show();
     }
 }
 

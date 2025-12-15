@@ -8,16 +8,14 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "declaration": true,
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
   },
   "include": [
-    "src/**/*"
-, "frontend/src/theme.ts"  ],
+    "src/**/*",
+    "frontend/src/theme.ts"
+  ],
   "exclude": [
     "node_modules",
-    "dist",
-    "frontend"
   ]
 }
