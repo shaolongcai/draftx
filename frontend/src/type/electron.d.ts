@@ -28,6 +28,11 @@ interface ElectronAPI {
      * 增加删除时间
      */
     addDeleteDay: (id: number) => void;
+
+    /**
+     * 变更窗口大小
+     */
+    resizeWindow: (size: { width: number, height: number }) => Promise<void>;
 }
 
 

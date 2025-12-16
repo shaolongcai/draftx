@@ -189,22 +189,12 @@ class WindowManager {
     }
 
     // 变更窗口大小
-    resizeWindow(windowName: 'searchWindow' | 'settingsWindow', size: { width: number, height: number }) {
+    public resizeWindow(size: { width: number, height: number }) {
         if (!size.height || !size.width) return;
-        let window = this.mainWindow;
-        switch (windowName) {
-            case 'searchWindow':
-                window = this.mainWindow;
-                break;
-            case 'settingsWindow':
-                window = this.settingsWindow;
-                break;
-            default:
-                break;
-        }
-        window.setBounds({
-            width: size.width,
-            height: size.height || window.getBounds().height
+        // 暂时固定窗口伸展大小,(暂时不更改宽度)
+        this.mainWindow.setBounds({
+            // width: size.width,
+            height: size.height || this.mainWindow.getBounds().height
         });
     }
 

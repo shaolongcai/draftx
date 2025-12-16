@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { Stack } from '@mui/material'
-import { useDebounce, useLocalStorageState, useRequest } from 'ahooks'
+import { useDebounce, useLocalStorageState, useRequest, useSize } from 'ahooks'
 import './App.css'
 import { Search, Editor, SearchItem } from '@/components'
 import { ThemeProvider } from '@mui/material'
@@ -13,11 +13,15 @@ function App() {
 
   const [searchValue, setSearchValue] = useState('')
   const debouncedValue = useDebounce(searchValue, { wait: 200 })
+  const rootRef = useRef(null)
+  const size = useSize(rootRef)
 
-  // const [storedValue, setStoredValue] = useLocalStorageState('app-name', {
-  //   defaultValue: 'Electron React App',
-  // })
 
+  // 触发变更窗口大小
+  useRequest(() => window.electronAPI.resizeWindow(size), {
+    ready: Boolean(size),
+    refreshDeps: [size],
+  })
 
   // 搜索
   const { data } = useRequest(
@@ -29,8 +33,6 @@ function App() {
   );
 
 
-  const EditorMemo = useMemo(() => <Editor />, []);
-
   return (
     <NotificationsProvider slotProps={{
       snackbar: {
@@ -40,7 +42,19 @@ function App() {
     }} >
       <ThemeProvider theme={theme}>
         <EventProvider>
-          <Stack spacing={2}>
+          <Stack spacing={2} ref={rootRef} >
+            <style>{`
+                /* root隐藏滚动条但保持可滚动 */
+                ::-webkit-scrollbar {
+                    display: none;
+                }
+                
+                /* 适用于Firefox */
+                * {
+                    scrollbar-width: none;
+                    -ms-overflow-style: none;
+                }
+            `}</style>
             <Search onSearch={setSearchValue} />
             {
               (data?.length > 0 && searchValue) &&

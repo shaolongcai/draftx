@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import { getConfig, initializeDatabase, setConfig } from '../database/sqlite.js';
 import { initializeStickyApi } from '../api/stickys.js';
 import { deleteExpiredStickys } from '../database/repositories.js';
+import { initializeSystemApi } from '../api/system.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,7 +31,9 @@ const registerGlobalShortcut = () => {
   });
 
   // 触发：显示/隐藏主窗口
-  globalShortcut.register('Alt + z', () => {
+  const isDev = process.env.NODE_ENV === 'development';
+  const shortcut = isDev ? 'Alt+Shift+Z' : 'Alt+Z';
+  globalShortcut.register(shortcut, () => {
     // 触发：显示/隐藏主窗口
     if (mainWindow?.isVisible()) {
       mainWindow.hide();
@@ -53,6 +56,7 @@ app.whenReady().then(async () => {
   registerGlobalShortcut();
   // 初始化 API
   initializeStickyApi();
+  initializeSystemApi();
   // 删除所有过期的便利贴
   deleteExpiredStickys();
 });

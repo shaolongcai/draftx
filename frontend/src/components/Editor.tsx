@@ -17,7 +17,7 @@ import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin
 import { $createParagraphNode, $getRoot, type EditorThemeClasses } from 'lexical';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { useEffect, useRef, useState } from "react";
-import { useDebounceFn, useKeyPress, useMount } from "ahooks";
+import { useDebounceFn, useKeyPress } from "ahooks";
 import { v4 as uuidv4 } from 'uuid';
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useNotifications } from "@toolpad/core/useNotifications";
@@ -68,7 +68,7 @@ function Placeholder() {
         userSelect: 'none',
         display: 'inline-block',
         pointerEvents: 'none',
-    }}>Enter some text...</Box>;
+    }}>支持markdown格式输入...</Box>;
 }
 
 
@@ -108,7 +108,7 @@ const EditorContext: React.FC<EditorContextProps> = ({
                 // 创建root
                 const root = $getRoot();
                 root.append($createParagraphNode());
-                console.log('插入新内容', sticky);
+                // console.log('插入新内容', sticky);
                 const initialEditorState = editor.parseEditorState(sticky.content_string);
                 editor.setEditorState(initialEditorState);
                 setCurrentUuid(sticky.uuid);
@@ -161,13 +161,18 @@ const EditorContext: React.FC<EditorContextProps> = ({
         });
     })
 
-    return <>
+    return <div className="scrollbar-thin!">
         <RichTextPlugin
             contentEditable={
                 <ContentEditable style={{
-                    height: '432px',
+                    maxHeight: '600px',
+                    minHeight: '240px',
+                    overflow: 'auto',
                     outline: 'none',
                     boxSizing: 'border-box',
+                    scrollbarColor: 'rgba(0, 0, 0, 0.25) transparent',
+                    scrollbarWidth: 'thin',
+                    // scrollbarColor: '#888 #f1f1f1',
                 }} />
             }
             ErrorBoundary={LexicalErrorBoundary}
@@ -192,7 +197,7 @@ const EditorContext: React.FC<EditorContextProps> = ({
             const json = editorState.toJSON();
             scheduleSave({ title: firstHeading, contentJson: json, contentText: plain });
         }} />
-    </>
+    </div>
 }
 
 
@@ -230,7 +235,7 @@ const Editor = () => {
             <Stack direction="row" spacing={0.5} alignItems="center" >
                 <Typography variant="bodySmall" color="textSecondary">
                     {/* 删除的天数，+3天是因为点击后会加3天删除时间，修改增加的删除时间时，需要同步更改这里 */}
-                    Deleted after {deletedAt ? deletedAt + 3 : 7} days
+                    {deletedAt ? deletedAt + 3 : 7} 天后删除
                 </Typography>
                 <Tooltip title="Each view adds 3 days to deletion">
                     <HelpOutline fontSize="small" className="cursor-pointer" color='action' />
@@ -245,7 +250,7 @@ const Editor = () => {
                     ↵
                 </span>
                 <Typography variant="bodySmall" color="textSecondary" className="pl-1">
-                    to new Stickys
+                    新的便利贴
                 </Typography>
             </Stack>
         </Stack>
