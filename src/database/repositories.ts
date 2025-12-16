@@ -104,3 +104,31 @@ export const searchStickyNote = (query: string, limit: number = 50) => {
         return []
     }
 }
+
+
+/**
+ * 增加天数
+ */
+export const addDeleteDay = (id: number) => {
+    try {
+        console.log('id', id);
+        // 取出deleted_at
+        const stmt = db.prepare(`
+            SELECT deleted_at FROM stickys WHERE id = ?
+        `);
+        const row = stmt.get(id);
+        if (!row) {
+            logger.error('sticky note not found');
+            return;
+        }
+        const deletedAt = row.deleted_at;
+        // 增加3天，并更新数据库
+        const newDeletedAt = dayjs(deletedAt).add(3, 'day').toISOString(); // 转换为 ISO 字符串
+        const updateStmt = db.prepare(`
+            UPDATE stickys SET deleted_at = ? WHERE id = ?
+        `);
+        updateStmt.run(newDeletedAt, id);
+    } catch (error) {
+        logger.error(error)
+    }
+}

@@ -22,6 +22,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useNotifications } from "@toolpad/core/useNotifications";
 import { useEvent } from "@/contexts/EvenContext";
+import dayjs from "dayjs";
 
 const theme: EditorThemeClasses = {
     paragraph: 'mb-2',
@@ -70,10 +71,15 @@ function Placeholder() {
 }
 
 
+interface EditorContextProps {
+    getDeleteDay: (date: string) => void;
+}
 /**
  * 内容编辑器
  */
-const EditorContext = () => {
+const EditorContext: React.FC<EditorContextProps> = ({
+    getDeleteDay,
+}) => {
 
     const [currentUuid, setCurrentUuid] = useState<string>('');
     const lastSavedRef = useRef<{ title?: string; contentJson: string; contentText: string }>({ contentJson: '', contentText: '' }); // 上次已保存
@@ -89,6 +95,9 @@ const EditorContext = () => {
 
     // 监听加载新的便利贴
     loadStickys$.useSubscription((sticky) => {
+        // 新增天数
+        window.electronAPI.addDeleteDay(sticky.id);
+        getDeleteDay(sticky.deleted_at)
         // 清空编辑器内容
         editor.update(() => {
             const root = $getRoot();
@@ -189,6 +198,8 @@ const EditorContext = () => {
 
 const Editor = () => {
 
+    const [deletedAt, setDeletedAt] = useState<number>();
+
     const initialConfig = {
         namespace: 'MyEditor',
         theme: theme,
@@ -207,11 +218,17 @@ const Editor = () => {
 
     return <Card className="relative">
         <LexicalComposer initialConfig={initialConfig}>
-            <EditorContext />
+            <EditorContext getDeleteDay={(deletedAt) => {
+                // 换成与今天的差距
+                const diff = dayjs(deletedAt).diff(dayjs(), 'day');
+                console.log('diff', diff);
+                setDeletedAt(diff);
+            }} />
         </LexicalComposer>
         <Stack direction='row' justifyContent='space-between' alignItems="center">
             <Typography variant="bodySmall" color="textSecondary">
-                Deleted after 90 days
+                {/* 删除的天数，+3天是因为点击后会加3天删除时间，修改增加的删除时间时，需要同步更改这里 */}
+                Deleted after {deletedAt + 3} days
             </Typography>
             <Stack direction="row" spacing={0.5} alignItems="center" >
                 <span className="border border-text-secondary border-gray-300  rounded px-2 py-1 text-xs leading-none">

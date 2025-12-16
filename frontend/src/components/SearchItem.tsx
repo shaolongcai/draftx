@@ -23,7 +23,7 @@ const SearchItem: React.FC<Props> = ({
 
     // 点击卡片
     const handleClick = () => {
-        loadStickys$.emit({ ...rest } as StickyResult)
+        loadStickys$.emit({ ...rest,id } as StickyResult)
     }
 
     return <Card className="cursor-pointer" onClick={handleClick} >

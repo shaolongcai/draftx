@@ -1,5 +1,5 @@
 import { ipcMain } from "electron";
-import { saveStickyNote, searchStickyNote } from "../database/repositories.js";
+import { addDeleteDay, saveStickyNote, searchStickyNote } from "../database/repositories.js";
 
 
 
@@ -14,5 +14,10 @@ export function initializeStickyApi() {
     ipcMain.handle('search-sticky', (event, query: string) => {
         const stickys = searchStickyNote(query);
         return stickys;
+    });
+
+    // 点击增加天数
+    ipcMain.on('add-delete-day', (event, id: number) => {
+        addDeleteDay(id);
     });
 }

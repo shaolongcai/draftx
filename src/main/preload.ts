@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // 便利贴相关
   saveSticky: (stickyNote: StickyParmas) => ipcRenderer.send('save-sticky', stickyNote), // 保存 stickyNote API
   searchSticky: (query: string) => ipcRenderer.invoke('search-sticky', query),   // 搜索 stickyNote API
+  addDeleteDay: (id: number) => ipcRenderer.send('add-delete-day', id), // 点击增加天数
 });
 
 

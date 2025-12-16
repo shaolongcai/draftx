@@ -11,4 +11,5 @@ type StickyResult = {
     modified_at: string;
     score: number; //相关性
     snippet?: string;
+    deleted_at: string;
 }

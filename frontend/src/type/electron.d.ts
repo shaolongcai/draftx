@@ -24,6 +24,10 @@ interface ElectronAPI {
      */
     saveSticky: (params: StickyParmas) => void;
 
+    /**
+     * 增加删除时间
+     */
+    addDeleteDay: (id: number) => void;
 }
 
 
