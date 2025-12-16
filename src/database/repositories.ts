@@ -5,7 +5,6 @@ import dayjs from 'dayjs';
 const db = getDatabase()
 
 
-
 /**
  * 保存 stickyNote 到数据库
  * @param stickyNote 
@@ -14,7 +13,7 @@ export const saveStickyNote = (stickyNote: StickyParmas) => {
     try {
         const now = new Date().toISOString();
         // const deletedAt = dayjs().add(30, 'day').toISOString();
-        const deletedAt = dayjs().add(1, 'day').toISOString(); //测试用，只增加一天
+        const deletedAt = dayjs().add(7, 'day').toISOString(); //测试用，只增加一天
         // 存在即更新，不存在则插入
         const upsertStmt = db.prepare(`
                 INSERT INTO stickys ( uuid, content, content_string, title, created_at, modified_at,deleted_at)

@@ -122,24 +122,26 @@ class WindowManager {
             this.mainWindow.webContents.openDevTools(); //打开开发者工具        
             // this.settingsWindow.webContents.openDevTools(); //打开开发者工具
         } else {
-            const searchBarPath = path.join(__dirname, '../frontend/dist/search-bar.html');
-            const settingPath = path.join(__dirname, '../frontend/dist/setting.html');
+            // 获取应用根目录
+            const appPath = app.getAppPath();
+            const mainPath = path.join(appPath, 'frontend/dist/index.html');
+            // const settingPath = path.join(__dirname, '../frontend/dist/setting.html');
 
             // 檢查文件是否存在
-            if (!existsSync(searchBarPath)) {
-                logger.error(`搜索窗口文件不存在: ${searchBarPath}`);
+            if (!existsSync(mainPath)) {
+                logger.error(`主窗口窗口文件不存在: ${mainPath}`);
             } else {
-                this.mainWindow.loadFile(searchBarPath).catch((error) => {
-                    logger.error(`加載搜索窗口文件失敗: ${error}`);
+                this.mainWindow.loadFile(mainPath).catch((error) => {
+                    logger.error(`加載主窗口文件失敗: ${error}`);
                 });
             }
-            if (!existsSync(settingPath)) {
-                logger.error(`設置窗口文件不存在: ${settingPath}`);
-            } else {
-                this.settingsWindow.loadFile(settingPath).catch((error) => {
-                    logger.error(`加載設置窗口文件失敗: ${error}`);
-                });
-            }
+            // if (!existsSync(settingPath)) {
+            //     logger.error(`設置窗口文件不存在: ${settingPath}`);
+            // } else {
+            //     this.settingsWindow.loadFile(settingPath).catch((error) => {
+            //         logger.error(`加載設置窗口文件失敗: ${error}`);
+            //     });
+            // }
         }
 
         // 當搜索框失去焦點時自動隱藏（開發模式下禁用，避免與開發者工具衝突）
