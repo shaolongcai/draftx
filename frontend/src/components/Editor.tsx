@@ -1,4 +1,4 @@
-import { Box, Card, Stack, Typography } from "@mui/material"
+import { Box, Card, Stack, Tooltip, Typography } from "@mui/material"
 
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
@@ -22,6 +22,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useNotifications } from "@toolpad/core/useNotifications";
 import { useEvent } from "@/contexts/EvenContext";
+import { HelpOutline } from "@mui/icons-material";
 import dayjs from "dayjs";
 
 const theme: EditorThemeClasses = {
@@ -226,10 +227,15 @@ const Editor = () => {
             }} />
         </LexicalComposer>
         <Stack direction='row' justifyContent='space-between' alignItems="center">
-            <Typography variant="bodySmall" color="textSecondary">
-                {/* 删除的天数，+3天是因为点击后会加3天删除时间，修改增加的删除时间时，需要同步更改这里 */}
-                Deleted after {deletedAt + 3} days
-            </Typography>
+            <Stack direction="row" spacing={0.5} alignItems="center" >
+                <Typography variant="bodySmall" color="textSecondary">
+                    {/* 删除的天数，+3天是因为点击后会加3天删除时间，修改增加的删除时间时，需要同步更改这里 */}
+                    Deleted after {deletedAt ? deletedAt + 3 : 7} days
+                </Typography>
+                <Tooltip title="Each view adds 3 days to deletion">
+                    <HelpOutline fontSize="small" className="cursor-pointer" color='action' />
+                </Tooltip>
+            </Stack>
             <Stack direction="row" spacing={0.5} alignItems="center" >
                 <span className="border border-text-secondary border-gray-300  rounded px-2 py-1 text-xs leading-none">
                     ⇧

@@ -13,7 +13,6 @@
   },
   "include": [
     "src/**/*",
-    "frontend/src/theme.ts"
   ],
   "exclude": [
     "node_modules",

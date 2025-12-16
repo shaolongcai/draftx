@@ -111,7 +111,6 @@ export const searchStickyNote = (query: string, limit: number = 50) => {
  */
 export const addDeleteDay = (id: number) => {
     try {
-        console.log('id', id);
         // 取出deleted_at
         const stmt = db.prepare(`
             SELECT deleted_at FROM stickys WHERE id = ?
@@ -128,6 +127,35 @@ export const addDeleteDay = (id: number) => {
             UPDATE stickys SET deleted_at = ? WHERE id = ?
         `);
         updateStmt.run(newDeletedAt, id);
+    } catch (error) {
+        logger.error(error)
+    }
+}
+
+
+/**
+ * 删除过期的便利贴
+ */
+export const deleteExpiredStickys = () => {
+    try {
+        // 取出所有过期的便利贴
+        const stmt = db.prepare(`
+            SELECT id FROM stickys WHERE deleted_at IS NOT NULL AND deleted_at <= datetime('now')
+        `);
+        const rows = stmt.all();
+        if (rows.length === 0) {
+            logger.info('no expired sticky notes found');
+            return;
+        }
+
+        // 删除过期的便利贴
+        const deleteStmt = db.prepare(`
+            DELETE FROM stickys WHERE id = ?
+        `);
+        rows.forEach(row => {
+            logger.info(`删除了过期的便利贴 ${row.id}`);
+            deleteStmt.run(row.id);
+        });
     } catch (error) {
         logger.error(error)
     }

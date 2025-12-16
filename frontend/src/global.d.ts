@@ -50,6 +50,8 @@ declare module '@mui/material/styles' {
         labelSmall: React.CSSProperties;
         bodySmall: React.CSSProperties;
     }
+
+    // 允许icon使用
 }
 
 // Update the Typography's variant prop options
@@ -69,4 +71,12 @@ declare module '@mui/material/Typography' {
         bodySmall: true;
     }
 }
+
+// 更新icon组件的color
+declare module '@mui/material/SvgIcon' {
+    interface SvgIconPropsColorOverrides {
+        tips: true;
+    }
+}
+
 

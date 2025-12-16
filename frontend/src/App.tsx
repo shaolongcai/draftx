@@ -6,7 +6,7 @@ import { Search, Editor, SearchItem } from '@/components'
 import { ThemeProvider } from '@mui/material'
 import { theme } from './theme'
 import { NotificationsProvider } from '@toolpad/core/useNotifications';
-import { EventProvider, useEvent } from './contexts/EvenContext'
+import { EventProvider } from './contexts/EvenContext'
 
 function App() {
 

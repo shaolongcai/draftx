@@ -3,6 +3,7 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { getConfig, initializeDatabase, setConfig } from '../database/sqlite.js';
 import { initializeStickyApi } from '../api/stickys.js';
+import { deleteExpiredStickys } from '../database/repositories.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -52,6 +53,8 @@ app.whenReady().then(async () => {
   registerGlobalShortcut();
   // 初始化 API
   initializeStickyApi();
+  // 删除所有过期的便利贴
+  deleteExpiredStickys();
 });
 
 app.on('window-all-closed', () => {
