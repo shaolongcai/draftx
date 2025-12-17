@@ -1,10 +1,11 @@
-import { app, BrowserWindow, ipcMain, Tray, globalShortcut } from 'electron';
+import { app, BrowserWindow, nativeImage, Tray, globalShortcut, Menu } from 'electron';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { getConfig, initializeDatabase, setConfig } from '../database/sqlite.js';
 import { initializeStickyApi } from '../api/stickys.js';
 import { deleteExpiredStickys } from '../database/repositories.js';
 import { initializeSystemApi } from '../api/system.js';
+import { logger } from '../core/logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -12,6 +13,7 @@ const __dirname = path.dirname(__filename);
 let tray: Tray | null = null;
 let mainWindow: BrowserWindow | null;
 let settingsWindow: BrowserWindow | null;
+const isDev = process.env.NODE_ENV === 'development';
 
 // 广播事件到所有窗口
 export const sendToRenderer = (channel: ChannelType, data: any) => {
@@ -31,7 +33,6 @@ const registerGlobalShortcut = () => {
   });
 
   // 触发：显示/隐藏主窗口
-  const isDev = process.env.NODE_ENV === 'development';
   const shortcut = isDev ? 'Alt+Shift+Z' : 'Alt+Z';
   globalShortcut.register(shortcut, () => {
     // 触发：显示/隐藏主窗口
@@ -42,6 +43,79 @@ const registerGlobalShortcut = () => {
       mainWindow?.focus();
     }
   });
+}
+
+// 創建系統托盤
+function createTray() {
+  // 獲取當前語言
+  // const language = getAppLanguage();
+  // // 加載翻譯
+  // const t = loadTrayTranslations(language); 
+
+  try {
+    // 獲取托盤圖標路徑
+    const iconPath = isDev
+      ? path.join(__dirname, '../../electron/resources/assets/logo.png')
+      : path.join(__dirname, 'resources/assets/logo.png');
+
+    // 創建托盤圖標
+    const icon = nativeImage.createFromPath(iconPath);
+    tray = new Tray(icon.resize({ width: 16, height: 16 }));
+
+    // 設置托盤提示文本
+    // tray.setToolTip(t.tooltip);
+
+    // 創建托盤菜單
+    const contextMenu = Menu.buildFromTemplate([
+      {
+        label: '便利贴（Alt + Z）',
+        click: () => {
+          const isVisible = mainWindow?.isVisible();
+          isVisible ? mainWindow.hide() : mainWindow.show();
+          mainWindow.focus();
+        }
+      },
+      {
+        type: 'separator'
+      },
+      // {
+      //   label: t.settings,
+      //   click: () => {
+      //     searchWindow.hide();
+      //     settingsWindow.focus();
+      //     const isVisible = settingsWindow?.isVisible();
+      //     isVisible ? settingsWindow.hide() : settingsWindow.show();
+      //   }
+      // },
+      {
+        label: '重新启动',
+        click: () => {
+          // 重新啟動應用
+          app.relaunch();
+          app.exit(0);
+        }
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: '退出',
+        accelerator: 'CommandOrControl+Q',
+        click: () => {
+          app.quit();
+        }
+      }
+    ]);
+    // 設置托盤菜單
+    tray.setContextMenu(contextMenu);
+    // 雙擊托盤圖標顯示主窗口
+    tray.on('double-click', () => {
+      mainWindow?.show();
+      mainWindow?.focus();
+    });
+  } catch (error) {
+    logger.error(`创建托盘中失败:${error}`);
+  }
 }
 
 
@@ -57,6 +131,8 @@ app.whenReady().then(async () => {
   // 初始化 API
   initializeStickyApi();
   initializeSystemApi();
+  // 创建托盘
+  createTray();
   // 删除所有过期的便利贴
   deleteExpiredStickys();
 });
@@ -69,11 +145,6 @@ app.on('window-all-closed', () => {
 
 app.on('will-quit', () => {
   globalShortcut.unregisterAll();
-});
-
-// IPC 通信处理
-ipcMain.handle('get-app-version', () => {
-  return app.getVersion();
 });
 
 
