@@ -53,10 +53,8 @@ function createTray() {
   // const t = loadTrayTranslations(language); 
 
   try {
-    // 獲取托盤圖標路徑
-    const iconPath = isDev
-      ? path.join(__dirname, '../../electron/resources/assets/logo.png')
-      : path.join(__dirname, 'resources/assets/logo.png');
+    // 獲取托盤圖標路徑,现在的项目结构，icon位置与开发是一样的
+    const iconPath = path.join(__dirname, '../../electron/resources/assets/logo.png')
 
     // 創建托盤圖標
     const icon = nativeImage.createFromPath(iconPath);

@@ -35,20 +35,6 @@ call npx tsc -p tsconfig.json --outDir dist
 echo [SUCCESS] Main process compilation completed.
 
 
-REM --- 复制资源 ---
-echo [INFO] Copying resources to dist-electron...
-if exist "electron\resources" (
-    xcopy "electron\resources" "dist-electron\resources" /E /I /Y >nul
-    if %errorlevel% equ 0 (
-        echo [SUCCESS] Resources copied successfully.
-    ) else (
-        echo [WARNING] Failed to copy some resources, but continuing...
-    )
-) else (
-    echo [WARNING] electron/resources directory not found, skipping copy.
-)
-
-
 :: 构建前端
 echo [INFO] Building frontend...
 cd frontend
