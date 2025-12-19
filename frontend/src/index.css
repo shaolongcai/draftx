@@ -11,6 +11,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
 }
+
 /* 自定义滚动条 */
 .scrollbar-thin {
   scrollbar-width: thin;
@@ -38,11 +39,13 @@ body {
   color: rgba(0, 0, 0, 0.85);
   font-weight: 700;
 }
+
 .editor-h2 {
   font-size: 20px;
   color: rgba(0, 0, 0, 0.85);
   font-weight: 700;
 }
+
 .editor-h3 {
   font-size: 16px;
   color: rgba(0, 0, 0, 0.85);
@@ -54,32 +57,39 @@ body {
 .editor-nested-listitem {
   list-style-type: none;
 }
+
 .editor-list-oll1 {
   padding-left: 32px;
   margin: 0;
-  list-style-type: decimal;  /* 编号的类型 */
-  list-style-position:inside; /* 编号的位置 */
+  list-style-type: decimal;
+  /* 编号的类型 */
+  list-style-position: inside;
+  /* 编号的位置 */
 }
+
 .editor-list-ol2 {
   margin: 0;
   list-style-type: upper-alpha;
   list-style-position: inside;
-   padding-left: 16px;
+  padding-left: 16px;
 }
+
 .editor-list-ol3 {
   margin: 0;
   list-style-type: lower-alpha;
   list-style-position: inside;
-   padding-left: 16px;
+  padding-left: 16px;
 }
+
 .editor-list-ol4 {
-   padding-left: 16px;
+  padding-left: 16px;
   margin: 0;
   list-style-type: upper-roman;
   list-style-position: inside;
 }
+
 .editor-list-ol5 {
-   padding-left: 16px;
+  padding-left: 16px;
   margin: 0;
   list-style-type: lower-roman;
   list-style-position: inside;
@@ -92,18 +102,21 @@ body {
   list-style-type: inherit;
   list-style-position: inside;
 }
+
 .editor-list-ul2 {
   padding-left: 16px;
   margin: 0;
-  list-style-type:circle;
+  list-style-type: circle;
   list-style-position: inside;
 }
+
 .editor-list-ul3 {
   padding-left: 16px;
   margin: 0;
-  list-style-type:square;
+  list-style-type: square;
   list-style-position: inside;
 }
+
 /* .editor-list-ul4 {
   padding-left: 16px;
   margin: 0;
@@ -121,6 +134,7 @@ body {
   font-size: 1rem;
   background-color: transparent;
 }
+
 .editor-listItem::marker {
   color: var(--listitem-marker-color);
   background-color: var(--listitem-marker-background-color);
@@ -195,4 +209,172 @@ body {
   height: 0.4em;
   transform: translateY(-50%) rotate(45deg);
   border-width: 0 0.1em 0.1em 0;
+}
+
+/* 引用塊樣式 */
+.editor-quote {
+  margin: 0;
+  margin-left: 20px;
+  margin-bottom: 10px;
+  padding-left: 16px;
+  border-left: 4px solid #ddd;
+  color: rgba(0, 0, 0, 0.68);
+  font-style: italic;
+}
+
+/* 代碼塊樣式（多行代碼） */
+.editor-code {
+  background-color: #96969640;
+  font-family: 'Courier New', Courier, monospace;
+  padding: 16px;
+  margin: 8px 0;
+  border-radius: 8px;
+  font-size: 0.9em;
+  color: #000000;
+  display: block;
+  overflow-x: auto;
+  white-space: pre;
+  tab-size: 2;
+  line-height: 1.5;
+  position: relative;
+}
+
+/* 顯示代碼語言標籤 */
+.editor-code[data-highlight-language]:after {
+  content: attr(data-highlight-language);
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(200, 200, 200, 0.3);
+  border-top-left-radius: 4px;
+  text-transform: uppercase;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* 內聯代碼樣式 */
+.editor-text-code {
+  background-color: #96969640;
+  font-family: 'Courier New', Courier, monospace;
+  padding: 2px 6px;
+  margin: 0 2px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+/* 代碼高亮樣式 */
+.editor-tokenComment {
+  color: #6a737d;
+  font-style: italic;
+}
+
+.editor-tokenPunctuation {
+  color: #999;
+}
+
+.editor-tokenProperty {
+  color: #005cc5;
+}
+
+.editor-tokenSelector {
+  color: #22863a;
+}
+
+.editor-tokenOperator {
+  color: #d73a49;
+}
+
+.editor-tokenAttr {
+  color: #6f42c1;
+}
+
+.editor-tokenVariable {
+  color: #e36209;
+}
+
+.editor-tokenFunction {
+  color: #6f42c1;
+}
+
+/* 水平線樣式 */
+hr {
+  border: none;
+  border-top: 2px solid #e1e4e8;
+  margin: 20px 0;
+}
+
+/* 表格樣式 */
+.editor-table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  overflow: hidden;
+  table-layout: fixed;
+  width: max-content;
+  max-width: 100%;
+  margin: 10px 0;
+}
+
+.editor-tableCell {
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  min-width: 75px;
+  vertical-align: top;
+  text-align: left;
+  position: relative;
+  outline: none;
+  background-color: #fff;
+}
+
+.editor-tableCellHeader {
+  background-color: #f6f8fa;
+  font-weight: 600;
+  text-align: left;
+}
+
+.editor-tableCell:focus {
+  background-color: #f0f0f0;
+}
+
+.editor-tableCell:focus::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  border: 2px solid #3d87f5;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 表格選區高亮樣式 */
+.editor-tableCell.editor-tableCellSelected {
+  background-color: rgba(172, 206, 247, 0.7) !important;
+  caret-color: transparent;
+}
+
+/* 表格選中時的邊框 */
+.editor-tableCellSelected::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(172, 206, 247, 0.4);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 表格拖拽選擇時的樣式 */
+.editor-tableSelection {
+  background-color: rgba(172, 206, 247, 0.7);
+}
+
+/* 禁用表格選區時的默認選區顏色 */
+.editor-table ::selection {
+  background-color: transparent;
 }

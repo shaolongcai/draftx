@@ -1,19 +1,27 @@
 import { Box, Card, Stack, Tooltip, Typography } from "@mui/material"
 
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
+import { CodeHighlightPlugin } from '@/plugin/CodeHighlightPlugin';
+import { CodeActionPlugin } from '@/plugin/CodeActionPlugin';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
-import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
-import { TRANSFORMERS } from '@lexical/markdown'
+import { MarkdownShortcutPlugin } from "@/plugin/MarkdownShortcutPlugin";
+import { MarkdownPastePlugin } from "@/plugin/MarkdownPastePlugin";
+import { TableKeyboardPlugin } from "@/plugin/TableKeyboardPlugin";
+import { MermaidPlugin } from "@/plugin/MermaidPlugin";
+import { mermaidNode } from "@/nodes/MermaidNode";
 import { ListItemNode, ListNode } from '@lexical/list';
 import { AutoLinkNode, LinkNode } from '@lexical/link';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { CodeHighlightNode, CodeNode } from '@lexical/code';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
+import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
+import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
+import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { $createParagraphNode, $getRoot, type EditorThemeClasses } from 'lexical';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { useEffect, useRef, useState } from "react";
@@ -32,13 +40,48 @@ const theme: EditorThemeClasses = {
         h2: 'editor-h2',
         h3: 'editor-h3',
     },
+    quote: 'editor-quote',
+    code: 'editor-code',
+    text: {
+        code: 'editor-text-code',
+    },
+    codeHighlight: {
+        atrule: 'editor-tokenAttr',
+        attr: 'editor-tokenAttr',
+        boolean: 'editor-tokenProperty',
+        builtin: 'editor-tokenSelector',
+        cdata: 'editor-tokenComment',
+        char: 'editor-tokenSelector',
+        class: 'editor-tokenFunction',
+        'class-name': 'editor-tokenFunction',
+        comment: 'editor-tokenComment',
+        constant: 'editor-tokenProperty',
+        deleted: 'editor-tokenProperty',
+        doctype: 'editor-tokenComment',
+        entity: 'editor-tokenOperator',
+        function: 'editor-tokenFunction',
+        important: 'editor-tokenVariable',
+        inserted: 'editor-tokenSelector',
+        keyword: 'editor-tokenAttr',
+        namespace: 'editor-tokenVariable',
+        number: 'editor-tokenProperty',
+        operator: 'editor-tokenOperator',
+        prolog: 'editor-tokenComment',
+        property: 'editor-tokenProperty',
+        punctuation: 'editor-tokenPunctuation',
+        regex: 'editor-tokenVariable',
+        selector: 'editor-tokenSelector',
+        string: 'editor-tokenSelector',
+        symbol: 'editor-tokenProperty',
+        tag: 'editor-tokenProperty',
+        url: 'editor-tokenOperator',
+        variable: 'editor-tokenVariable',
+    },
     list: {
         nested: {
             listitem: 'editor-nested-listitem',
         },
         ol: 'editor-list-ol',
-        // ul: 'editor-list-ul',
-        // listitem: 'editor-listItem',
         listitemChecked: 'editor-listItemChecked',
         listitemUnchecked: 'editor-listItemUnchecked',
         olDepth: [
@@ -56,6 +99,11 @@ const theme: EditorThemeClasses = {
             'editor-list-ul5',
         ],
     },
+    table: 'editor-table',
+    tableCell: 'editor-tableCell',
+    tableCellHeader: 'editor-tableCellHeader',
+    tableCellSelected: 'editor-tableCellSelected',
+    tableSelection: 'editor-tableSelection',
 }
 
 function Placeholder() {
@@ -172,6 +220,7 @@ const EditorContext: React.FC<EditorContextProps> = ({
                     boxSizing: 'border-box',
                     scrollbarColor: 'rgba(0, 0, 0, 0.25) transparent',
                     scrollbarWidth: 'thin',
+                    paddingBottom: '40px', // 增加底部內邊距，方便點擊跳出代碼塊
                     // scrollbarColor: '#888 #f1f1f1',
                 }} />
             }
@@ -182,7 +231,14 @@ const EditorContext: React.FC<EditorContextProps> = ({
         <AutoFocusPlugin />
         <ListPlugin />
         <TabIndentationPlugin />
-        <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+        <TablePlugin />
+        <TableKeyboardPlugin />
+
+        <MarkdownShortcutPlugin />
+        <MarkdownPastePlugin />
+        <CodeHighlightPlugin />
+        <CodeActionPlugin />
+        <MermaidPlugin />
         <OnChangePlugin onChange={(editorState) => {
             // 获取第一个 # 的标题
             const firstHeading = editorState.read(() => $getRoot().getFirstChild()?.getTextContent());
@@ -218,7 +274,14 @@ const Editor = () => {
             ListNode,
             ListItemNode,
             CodeNode,
+            CodeHighlightNode,
             LinkNode,
+            AutoLinkNode,
+            HorizontalRuleNode,
+            TableNode,
+            TableCellNode,
+            TableRowNode,
+            mermaidNode,
         ]
     };
 
