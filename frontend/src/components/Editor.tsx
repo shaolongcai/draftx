@@ -222,7 +222,7 @@ const Editor = () => {
         ]
     };
 
-    return <Card className="relative">
+    return <Card className="relative" >
         <LexicalComposer initialConfig={initialConfig}>
             <EditorContext getDeleteDay={(deletedAt) => {
                 // 换成与今天的差距

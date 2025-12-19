@@ -11,13 +11,12 @@ export const theme = createTheme({
         MuiCard: {
             styleOverrides: {
                 root: {
-                    borderRadius: '16px',
+                     borderRadius: '16px',
                     padding: '24px',
-                    border: '1px solid rgba(0, 0, 0, 0.25)',
-                    // 变体为elevation时  阴影
-                    '&.MuiCard-elevation': {
-                        boxShadow: '0px 2px 4px 0px rgba(0, 0, 0, 0.08)',
-                    }
+                    backgroundColor: '#F9F3E5',
+                    border: '4px solid #33322E',
+                    boxShadow: '12px 12px 0px #33322E',
+                    margin: '12px'
                 }
             }
         },

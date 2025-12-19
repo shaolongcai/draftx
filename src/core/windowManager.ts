@@ -36,7 +36,7 @@ class WindowManager {
     // 初始化main窗口
     private initMainWindow() {
         this.mainWindow = new BrowserWindow({
-            width: 480,
+            width: 504,
             height: 700,
             x: 0,               // 后面会计算居中
             y: 0,
@@ -194,7 +194,7 @@ class WindowManager {
         // 暂时固定窗口伸展大小,(暂时不更改宽度)
         this.mainWindow.setBounds({
             // width: size.width,
-            height: size.height || this.mainWindow.getBounds().height
+            height: size.height + 8 || this.mainWindow.getBounds().height + 8
         });
     }
 
