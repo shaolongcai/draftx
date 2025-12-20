@@ -38,20 +38,6 @@ import "vditor/dist/index.css";
 
 
 
-function Placeholder() {
-    return <Box sx={{
-        color: '#ccc',
-        // overflow: 'hidden',
-        position: 'absolute',
-        top: '24px',
-        fontSize: '16px',
-        userSelect: 'none',
-        display: 'inline-block',
-        pointerEvents: 'none',
-    }}>支持markdown格式输入...</Box>;
-}
-
-
 interface EditorContextProps {
     getDeleteDay: (date: string) => void;
 }
@@ -64,28 +50,39 @@ const EditorContext: React.FC<EditorContextProps> = ({
 
     const [currentUuid, setCurrentUuid] = useState<string>('');
     const [vd, setVd] = useState<Vditor>();
-    const lastSavedRef = useRef<{ title?: string; contentJson: string; contentText: string }>({ contentJson: '', contentText: '' }); // 上次已保存
+    const lastSavedRef = useRef<{ title?: string; contentText: string }>({ title: '', contentText: '' }); // 上次已保存
 
     const [editor] = useLexicalComposerContext()
     const { loadStickys$ } = useEvent();
     const notification = useNotifications();
 
-
-
     // 监听粘贴事件
     useEffect(() => {
         const vditor = new Vditor('vditor', {
-            toolbar:[],
-            minHeight:320,
-            preview:{
-                theme:{
-                    current:'editorTheme', // 文件名称
-                    path:'/src/assets/content-theme/',
+            toolbar: [],
+            toolbarConfig: {
+                hide: true
+            },
+            minHeight: 320,
+            // typewriterMode: true,
+            placeholder: '支持markdown格式输入...',
+            input: (value: string) => {
+
+                // 提取标题：从第一个 # 到下一个换行
+                const titleMatch = value.match(/^#\s*(.*?)\s*$/m);
+                const title = titleMatch ? titleMatch[1].trim() : undefined;
+                // 触发保存
+                save(title, value);
+            },
+            preview: {
+                theme: {
+                    current: 'editorTheme', // 文件名称
+                    path: '/src/assets/content-theme/',
                 }
             },
             after: () => {
                 // vditor.setValue("`Vditor` 最小代码示例");
-                // setVd(vditor);
+                setVd(vditor);
             },
         });
         // Clear the effect
@@ -127,36 +124,30 @@ const EditorContext: React.FC<EditorContextProps> = ({
         });
     })
 
-    // 防抖保存
-    const AUTOSAVE_WAIT_MS = 1000;
-    const { run: scheduleSave } = useDebounceFn(
-        async (payload: { title?: string; contentJson: string; contentText: string }) => {
-
-            // 内容为空则跳过
-            if (!payload.contentText) return;
-            // 若无变更则跳过
-            if (payload.contentJson === lastSavedRef.current.contentJson) return
-            try {
-                window.electronAPI.saveSticky({
-                    uuid: currentUuid,
-                    title: payload.title,
-                    content: payload.contentText,
-                    contentString: JSON.stringify(payload.contentJson),
-                });
-                lastSavedRef.current = payload;
-                // console.log('已自动保存', payload);
-                // 如需提示可开启：message.success('已自动保存');
-            } catch (error) {
-                const msg = error instanceof Error ? error.message : '保存失败';
-                console.error(msg);
-            }
-        },
-        { wait: AUTOSAVE_WAIT_MS }
-    );
+    const save = async (contentText: string, title?: string) => {
+        // 内容为空则跳过
+        if (!contentText) return;
+        console.log('save')
+        // 若无变更则跳过
+        if (contentText === lastSavedRef.current.contentText) return
+        try {
+            //@todo 更改数据库
+            window.electronAPI.saveSticky({
+                uuid: currentUuid,
+                title: title,
+                content: contentText,
+            });
+            console.log('已自动保存', { title, contentText });
+            // 如需提示可开启：message.success('已自动保存');
+        } catch (error) {
+            const msg = error instanceof Error ? error.message : '保存失败';
+            console.error(msg);
+        }
+    }
 
     // 注册Shitf+A 新建便利贴
     useKeyPress('shift.enter', () => {
-        scheduleSave(lastSavedRef.current);
+        save(lastSavedRef.current.contentText, lastSavedRef.current.title);
         setCurrentUuid(uuidv4());
         // 清空编辑器内容
         editor.update(() => {
