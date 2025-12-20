@@ -33,81 +33,10 @@ import { useEvent } from "@/contexts/EvenContext";
 import { HelpOutline } from "@mui/icons-material";
 import dayjs from "dayjs";
 import { $convertFromMarkdownString, TRANSFORMERS } from "@lexical/markdown";
+import Vditor from "vditor";
+import "vditor/dist/index.css";
 
-const theme: EditorThemeClasses = {
-    paragraph: 'editor-paragraph',
-    heading: {
-        h1: 'editor-h1',
-        h2: 'editor-h2',
-        h3: 'editor-h3',
-    },
-    quote: 'editor-quote',
-    code: 'editor-code',
-    text: {
-        code: 'editor-text-code',
-        bold: 'editor-text-bold',
-    },
-    codeHighlight: {
-        atrule: 'editor-tokenAttr',
-        attr: 'editor-tokenAttr',
-        boolean: 'editor-tokenProperty',
-        builtin: 'editor-tokenSelector',
-        cdata: 'editor-tokenComment',
-        char: 'editor-tokenSelector',
-        class: 'editor-tokenFunction',
-        'class-name': 'editor-tokenFunction',
-        comment: 'editor-tokenComment',
-        constant: 'editor-tokenProperty',
-        deleted: 'editor-tokenProperty',
-        doctype: 'editor-tokenComment',
-        entity: 'editor-tokenOperator',
-        function: 'editor-tokenFunction',
-        important: 'editor-tokenVariable',
-        inserted: 'editor-tokenSelector',
-        keyword: 'editor-tokenAttr',
-        namespace: 'editor-tokenVariable',
-        number: 'editor-tokenProperty',
-        operator: 'editor-tokenOperator',
-        prolog: 'editor-tokenComment',
-        property: 'editor-tokenProperty',
-        punctuation: 'editor-tokenPunctuation',
-        regex: 'editor-tokenVariable',
-        selector: 'editor-tokenSelector',
-        string: 'editor-tokenSelector',
-        symbol: 'editor-tokenProperty',
-        tag: 'editor-tokenProperty',
-        url: 'editor-tokenOperator',
-        variable: 'editor-tokenVariable',
-    },
-    list: {
-        nested: {
-            listitem: 'editor-nested-listitem',
-        },
-        ol: 'editor-list-ol',
-        listitemChecked: 'editor-listItemChecked',
-        listitemUnchecked: 'editor-listItemUnchecked',
-        olDepth: [
-            'editor-list-oll1',
-            'editor-list-ol2',
-            'editor-list-ol3',
-            'editor-list-ol4',
-            'editor-list-ol5',
-        ],
-        ulDepth: [
-            'editor-list-ul1',
-            'editor-list-ul2',
-            'editor-list-ul3',
-            'editor-list-ul4',
-            'editor-list-ul5',
-        ],
-    },
-    table: 'editor-table',
-    tableCell: 'editor-tableCell',
-    tableCellHeader: 'editor-tableCellHeader',
-    tableCellSelected: 'editor-tableCellSelected',
-    tableSelection: 'editor-tableSelection',
 
-}
 
 function Placeholder() {
     return <Box sx={{
@@ -134,6 +63,7 @@ const EditorContext: React.FC<EditorContextProps> = ({
 }) => {
 
     const [currentUuid, setCurrentUuid] = useState<string>('');
+    const [vd, setVd] = useState<Vditor>();
     const lastSavedRef = useRef<{ title?: string; contentJson: string; contentText: string }>({ contentJson: '', contentText: '' }); // 上次已保存
 
     const [editor] = useLexicalComposerContext()
@@ -143,38 +73,27 @@ const EditorContext: React.FC<EditorContextProps> = ({
 
 
     // 监听粘贴事件
-    // useEffect(() => {
-    //     return editor.registerCommand(
-    //         PASTE_COMMAND,
-    //         (event: ClipboardEvent) => {
-    //             event.preventDefault(); // 阻止默认行为
-    //             event.stopPropagation();
-    //             const pastedText = event.clipboardData?.getData('text');
-    //             console.log('粘贴文本', pastedText);
-
-    //             // 手动插入到编辑器
-    //             if (pastedText) {
-    //                 editor.update(() => {
-    //                     // 获取当前选择范围
-    //                     const selection = $getSelection();
-    //                     if ($isRangeSelection(selection)) {
-    //                         const { anchor, focus } = selection;
-    //                         // 获取光标位置
-    //                         const cursorNode = anchor.getNode();
-    //                         // 在selection后面创建新段落
-    //                         const temp = $createParagraphNode();
-    //                         // 光标位置插入temp
-    //                         cursorNode.insertAfter(temp);
-    //                         temp.selectEnd();
-    //                         $convertFromMarkdownString(pastedText, TRANSFORMERS, temp);
-    //                     }
-    //                 });
-    //             }
-    //             return true; // 📌 关键：命令已消费，让后面的插件不再触发
-    //         },
-    //         COMMAND_PRIORITY_CRITICAL // 最高优先级
-    //     )
-    // }, [editor]);
+    useEffect(() => {
+        const vditor = new Vditor('vditor', {
+            toolbar:[],
+            minHeight:320,
+            preview:{
+                theme:{
+                    current:'editorTheme', // 文件名称
+                    path:'/src/assets/content-theme/',
+                }
+            },
+            after: () => {
+                // vditor.setValue("`Vditor` 最小代码示例");
+                // setVd(vditor);
+            },
+        });
+        // Clear the effect
+        return () => {
+            vd?.destroy();
+            setVd(undefined);
+        };
+    }, []);
 
 
 
@@ -250,61 +169,19 @@ const EditorContext: React.FC<EditorContextProps> = ({
         });
     })
 
-    return <div className="scrollbar-thin!">
-        <RichTextPlugin
-            contentEditable={
-                <ContentEditable style={{
-                    maxHeight: '600px',
-                    minHeight: '240px',
-                    overflow: 'auto',
-                    outline: 'none',
-                    boxSizing: 'border-box',
-                    scrollbarColor: 'rgba(0, 0, 0, 0.5) transparent',
-                    scrollbarWidth: 'none',
-                    paddingBottom: '40px', // 增加底部內邊距，方便點擊跳出代碼塊
-                    // scrollbarColor: '#888 #f1f1f1',
-                }} />
-            }
-            ErrorBoundary={LexicalErrorBoundary}
-            placeholder={Placeholder}
-        />
-        <HistoryPlugin />
-        <AutoFocusPlugin />
-        <ListPlugin />
-        <TabIndentationPlugin />
-        <TablePlugin />
-        <TableKeyboardPlugin />
-        <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
-        <MarkdownPastePlugin />
-        <CodeHighlightPlugin />
-        <CodeActionPlugin />
-        <MermaidPlugin />
-        <OnChangePlugin onChange={(editorState) => {
-            // 获取第一个 # 的标题
-            const firstHeading = editorState.read(() => $getRoot().getFirstChild()?.getTextContent());
-            // 判断类型是否为 HeadingNode
-            // let title: string | undefined = undefined;
-            // if (firstHeading?.getType() !== 'heading') {
-            //     title = firstHeading?.getTextContent();
-            // };
-            // console.log('firstHeading', firstHeading);
-            // 获取纯文本内容
-            const plain = editorState.read(() => $getRoot().getTextContent());
-            const json = editorState.toJSON();
-            scheduleSave({ title: firstHeading, contentJson: json, contentText: plain });
-        }} />
-    </div>
+    return <div id="vditor" className="vditor" />
+
 }
 
 
 
-const Editor = () => {
+const Editor2 = () => {
 
     const [deletedAt, setDeletedAt] = useState<number>();
 
     const initialConfig = {
         namespace: 'MyEditor',
-        theme: theme,
+        theme: {},
         onError: (error: Error) => {
             console.error(error);
         },
@@ -360,4 +237,4 @@ const Editor = () => {
     </Card>
 }
 
-export default Editor
+export default Editor2

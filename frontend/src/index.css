@@ -41,7 +41,7 @@ body {
 
 /* 自定义滚动条 */
 .scrollbar-thin {
-  scrollbar-width: thin;
+  scrollbar-width:none;
   scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
 }
 
@@ -79,6 +79,16 @@ body {
   font-weight: 700;
 }
 
+/* 普通段落文本 */
+.editor-paragraph {
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.85);
+  font-weight: 400;
+}
+
+.editor-text-bold{
+  font-weight: bold;
+}
 
 /* 列表 */
 .editor-nested-listitem {
@@ -143,6 +153,8 @@ body {
   list-style-type: square;
   list-style-position: inside;
 }
+
+
 
 /* .editor-list-ul4 {
   padding-left: 16px;

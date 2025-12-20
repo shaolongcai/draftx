@@ -1,8 +1,10 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $convertFromMarkdownString } from '@lexical/markdown';
+import { $convertFromMarkdownString, TRANSFORMERS } from '@lexical/markdown';
 import {
+  $createParagraphNode,
   $getSelection,
   $isRangeSelection,
+  COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_LOW,
   PASTE_COMMAND
 } from 'lexical';
@@ -39,20 +41,10 @@ export function MarkdownPastePlugin(): null {
     return editor.registerCommand(
       PASTE_COMMAND,
       (event: ClipboardEvent) => {
-        const clipboardData = event.clipboardData;
-        if (!clipboardData) {
-          return false;
-        }
+        event.preventDefault(); // 阻止默认行为
+        event.stopPropagation();
 
-        // 檢查是否為純文本（markdown）
-        const text = clipboardData.getData('text/plain');
-        const html = clipboardData.getData('text/html');
-
-        // 如果有 HTML 內容，讓默認處理（可能是從其他編輯器粘貼的富文本）
-        if (html && html.trim().length > 0) {
-          return false;
-        }
-
+        const text = event.clipboardData?.getData('text');
         // 如果是純文本，嘗試轉換為 markdown
         if (text && text.trim().length > 0) {
           // 檢查是否包含 markdown 語法特徵
@@ -77,18 +69,24 @@ export function MarkdownPastePlugin(): null {
             event.preventDefault();
             event.stopPropagation();
 
+            console.log('原始 Markdown 文本:', text);
             // 預處理 Markdown 文本
             const processedText = preprocessMarkdown(text);
-
+            // @todo 如果复制时选中行的内容为空，则删掉
             editor.update(() => {
+              // 获取当前选择范围
               const selection = $getSelection();
               if ($isRangeSelection(selection)) {
-                // 刪除選中的內容
-                selection.removeText();
+                const { anchor, focus } = selection;
+                // 获取光标位置
+                const cursorNode = anchor.getNode();
+                // 在selection后面创建新段落
+                const temp = $createParagraphNode();
+                // 光标位置插入temp
+                cursorNode.insertAfter(temp);
+                temp.selectEnd();
+                $convertFromMarkdownString(processedText, TRANSFORMERS, temp);
               }
-
-              // 轉換 markdown 文本為編輯器節點
-              $convertFromMarkdownString(processedText, DEFAULT_TRANSFORMERS);
             });
             return true;
           }
@@ -96,7 +94,7 @@ export function MarkdownPastePlugin(): null {
 
         return false;
       },
-      COMMAND_PRIORITY_LOW
+      COMMAND_PRIORITY_CRITICAL
     );
   }, [editor]);
 

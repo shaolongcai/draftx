@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import { Stack } from '@mui/material'
 import { useDebounce, useLocalStorageState, useRequest, useSize } from 'ahooks'
 import './App.css'
-import { Search, Editor, SearchItem } from '@/components'
+import { Search, Editor, SearchItem, Editor2 } from '@/components'
 import { ThemeProvider } from '@mui/material'
 import { theme } from './theme'
 import { NotificationsProvider } from '@toolpad/core/useNotifications';
@@ -71,7 +71,7 @@ function App() {
               </Stack>
             }
             <div className={searchValue ? 'hidden' : ''}>
-              <Editor />
+              <Editor2 />  
             </div>
           </Stack>
         </EventProvider>

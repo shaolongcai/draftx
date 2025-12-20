@@ -1,0 +1,49 @@
+/* 编辑器主题 */
+.vditor {
+    /* 编辑器背景颜色 */
+
+    --toolbar-background-color: #F9F3E5;
+    /* 编辑器边框 */
+    --border-color: #F9F3E5;
+
+
+}
+
+
+
+/* 内容主题 */
+.vditor-reset {
+    /* 谷歌字体 */
+    font-family: 'Roboto', 'Noto Sans SC', system-ui, Avenir, Helvetica, Arial, sans-serif;
+    background-color: #F9F3E5 !important;
+    max-height: 600px;
+    overflow-y: auto;
+    padding: 0px !important;
+}
+
+.vditor-reset h1 {
+    font-size: 24px;
+    color: rgba(0, 0, 0, 0.85);
+    font-weight: 700;
+    margin-top: 0px;
+}
+
+.vditor-reset h2 {
+    font-size: 20px;
+    color: rgba(0, 0, 0, 0.85);
+    font-weight: 700;
+    margin-top: 0px;
+}
+
+.vditor-reset h3 {
+    font-size: 16px;
+    color: rgba(0, 0, 0, 0.85);
+    font-weight: 700;
+    margin-top: 0px;
+}
+
+.vditor-reset p {
+    line-height: 1.6;
+    color: rgba(0, 0, 0, 0.85);
+    font-weight: 400;
+}
