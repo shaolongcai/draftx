@@ -5,7 +5,6 @@ type StickyParmas = {
     uuid: string;
     title?: string;
     content?: string;
-    contentString?: string;
 }
 
 

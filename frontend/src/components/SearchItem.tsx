@@ -23,14 +23,14 @@ const SearchItem: React.FC<Props> = ({
 
     // 点击卡片
     const handleClick = () => {
-        loadStickys$.emit({ ...rest,id } as StickyResult)
+        loadStickys$.emit({ ...rest, content, id } as StickyResult)
     }
 
-    return <Card className="cursor-pointer" onClick={handleClick} >
-        <Stack spacing={1}>
-            <Typography variant='bodyMedium'>
+    return <Card className="cursor-pointer h-[160px] " onClick={handleClick} >
+        <Stack spacing={1} >
+            {/* <Typography variant='bodyMedium'>
                 {title}
-            </Typography>
+            </Typography> */}
             <Typography variant='bodyMedium'
                 className="line-clamp-2 text-ellipsis overflow-hidden"
             >

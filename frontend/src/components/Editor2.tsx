@@ -1,41 +1,13 @@
-import { Box, Card, Stack, Tooltip, Typography } from "@mui/material"
-
-import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
-import { CodeHighlightPlugin } from '@/plugin/CodeHighlightPlugin';
-import { CodeActionPlugin } from '@/plugin/CodeActionPlugin';
-import { LexicalComposer } from '@lexical/react/LexicalComposer';
-import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
-import { ContentEditable } from '@lexical/react/LexicalContentEditable';
-import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
-import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
-import { MarkdownShortcutPlugin } from "@/plugin/MarkdownShortcutPlugin";
-import { MarkdownPastePlugin } from "@/plugin/MarkdownPastePlugin";
-import { TableKeyboardPlugin } from "@/plugin/TableKeyboardPlugin";
-import { MermaidPlugin } from "@/plugin/MermaidPlugin";
-import { mermaidNode } from "@/nodes/MermaidNode";
-import { ListItemNode, ListNode } from '@lexical/list';
-import { AutoLinkNode, LinkNode } from '@lexical/link';
-import { HeadingNode, QuoteNode } from '@lexical/rich-text';
-import { CodeHighlightNode, CodeNode } from '@lexical/code';
-import { ListPlugin } from '@lexical/react/LexicalListPlugin';
-import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
-import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
-import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
-import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
-import { $createParagraphNode, $getRoot, $getSelection, $isRangeSelection, COMMAND_PRIORITY_CRITICAL, type EditorThemeClasses, PASTE_COMMAND } from 'lexical';
-import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
+import { Card, Stack, Tooltip, Typography } from "@mui/material"
 import { useEffect, useRef, useState } from "react";
-import { useDebounceFn, useKeyPress, useUpdateEffect } from "ahooks";
+import { useDebounceFn, useKeyPress } from "ahooks";
 import { v4 as uuidv4 } from 'uuid';
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useNotifications } from "@toolpad/core/useNotifications";
 import { useEvent } from "@/contexts/EvenContext";
 import { HelpOutline } from "@mui/icons-material";
 import dayjs from "dayjs";
-import { $convertFromMarkdownString, TRANSFORMERS } from "@lexical/markdown";
 import Vditor from "vditor";
 import "vditor/dist/index.css";
-
 
 
 interface EditorContextProps {
@@ -48,11 +20,10 @@ const EditorContext: React.FC<EditorContextProps> = ({
     getDeleteDay,
 }) => {
 
-    const [currentUuid, setCurrentUuid] = useState<string>('');
     const [vd, setVd] = useState<Vditor>();
     const lastSavedRef = useRef<{ title?: string; contentText: string }>({ title: '', contentText: '' }); // 上次已保存
+    const currentUuidRef = useRef<string>('')
 
-    const [editor] = useLexicalComposerContext()
     const { loadStickys$ } = useEvent();
     const notification = useNotifications();
 
@@ -72,7 +43,7 @@ const EditorContext: React.FC<EditorContextProps> = ({
                 const titleMatch = value.match(/^#\s*(.*?)\s*$/m);
                 const title = titleMatch ? titleMatch[1].trim() : undefined;
                 // 触发保存
-                save(title, value);
+                save(value, title);
             },
             preview: {
                 theme: {
@@ -96,7 +67,8 @@ const EditorContext: React.FC<EditorContextProps> = ({
 
     // 初始化uuid
     useEffect(() => {
-        setCurrentUuid(uuidv4());
+        // setCurrentUuid(uuidv4());
+        currentUuidRef.current = uuidv4()
     }, []);
 
     // 监听加载新的便利贴
@@ -104,24 +76,19 @@ const EditorContext: React.FC<EditorContextProps> = ({
         // 新增天数
         window.electronAPI.addDeleteDay(sticky.id);
         getDeleteDay(sticky.deleted_at)
-        // 清空编辑器内容
-        editor.update(() => {
-            const root = $getRoot();
-            root.clear();
-            // 插入新的便利贴内容
-            try {
-                // 创建root
-                const root = $getRoot();
-                root.append($createParagraphNode());
-                // console.log('插入新内容', sticky);
-                const initialEditorState = editor.parseEditorState(sticky.content_string);
-                editor.setEditorState(initialEditorState);
-                setCurrentUuid(sticky.uuid);
-            } catch (error) {
-                root.append($createParagraphNode()); // 解析失败时兜底：新增空段落
-                console.log('解析失败，插入空段落', error);
-            }
-        });
+
+        // 插入新的便利贴内容
+        try {
+            console.log('sticky.content', sticky.content);
+            // 清空编辑器内容
+            vd?.setValue('');
+            // 创建root
+            vd.insertMD(sticky.content);
+            // setCurrentUuid(sticky.uuid);
+            currentUuidRef.current = sticky.uuid
+        } catch (error) {
+            console.log('解析失败，插入空段落', error);
+        }
     })
 
     const save = async (contentText: string, title?: string) => {
@@ -131,9 +98,8 @@ const EditorContext: React.FC<EditorContextProps> = ({
         // 若无变更则跳过
         if (contentText === lastSavedRef.current.contentText) return
         try {
-            //@todo 更改数据库
             window.electronAPI.saveSticky({
-                uuid: currentUuid,
+                uuid: currentUuidRef.current,
                 title: title,
                 content: contentText,
             });
@@ -148,13 +114,12 @@ const EditorContext: React.FC<EditorContextProps> = ({
     // 注册Shitf+A 新建便利贴
     useKeyPress('shift.enter', () => {
         save(lastSavedRef.current.contentText, lastSavedRef.current.title);
-        setCurrentUuid(uuidv4());
+        const newUuid = uuidv4();
+        // setCurrentUuid(newUuid);
+        currentUuidRef.current = newUuid
+        console.log('保存ID', newUuid);   // 立即用 newId
         // 清空编辑器内容
-        editor.update(() => {
-            const root = $getRoot();
-            root.clear();
-        });
-
+        vd?.setValue('');
         notification.show('The sticky has been saved', {
             severity: 'success',
         });
@@ -170,38 +135,12 @@ const Editor2 = () => {
 
     const [deletedAt, setDeletedAt] = useState<number>();
 
-    const initialConfig = {
-        namespace: 'MyEditor',
-        theme: {},
-        onError: (error: Error) => {
-            console.error(error);
-        },
-        nodes: [
-            HeadingNode,
-            QuoteNode,
-            ListNode,
-            ListItemNode,
-            CodeNode,
-            CodeHighlightNode,
-            LinkNode,
-            AutoLinkNode,
-            TableNode,
-            TableCellNode,
-            HorizontalRuleNode,
-            TableRowNode,
-            mermaidNode,
-        ]
-    };
-
     return <Card className="relative" >
-        <LexicalComposer initialConfig={initialConfig}>
-            <EditorContext getDeleteDay={(deletedAt) => {
-                // 换成与今天的差距
-                const diff = dayjs(deletedAt).diff(dayjs(), 'day');
-                console.log('diff', diff);
-                setDeletedAt(diff);
-            }} />
-        </LexicalComposer>
+        <EditorContext getDeleteDay={(deletedAt) => {
+            // 换成与今天的差距
+            const diff = dayjs(deletedAt).diff(dayjs(), 'day');
+            setDeletedAt(diff);
+        }} />
         <Stack direction='row' justifyContent='space-between' alignItems="center">
             <Stack direction="row" spacing={0.5} alignItems="center" >
                 <Typography variant="bodySmall" color="textSecondary">

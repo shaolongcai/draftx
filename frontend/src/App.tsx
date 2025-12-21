@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
-import { Stack } from '@mui/material'
+import { Grid, Stack } from '@mui/material'
 import { useDebounce, useLocalStorageState, useRequest, useSize } from 'ahooks'
 import './App.css'
 import { Search, Editor, SearchItem, Editor2 } from '@/components'
@@ -58,17 +58,21 @@ function App() {
             <Search onSearch={setSearchValue} />
             {
               (data?.length > 0 && searchValue) &&
-              <Stack spacing={1}>
+              <Grid container columns={2} >
                 {
-                  data.map(item => <SearchItem
+                  data.map(item => 
+                  <Grid key={item.id} size={1} >
+                  <SearchItem
                     id={item.id}
                     title={item.title}
                     content={item.content}
                     snippet={item.snippet}
                     {...item}
-                  />)
+                  />
+                  </Grid>
+                  )
                 }
-              </Stack>
+              </Grid>
             }
             <div className={searchValue ? 'hidden' : ''}>
               <Editor2 />  
