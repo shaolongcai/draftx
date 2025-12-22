@@ -1,7 +1,7 @@
 {
   "name": "osticky",
   "type": "module",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Electron app with React frontend and Node.js backend",
   "main": "dist/main/main.js",
   "scripts": {

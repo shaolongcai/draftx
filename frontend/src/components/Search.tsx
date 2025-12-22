@@ -42,7 +42,7 @@ const Search: React.FC<Props> = ({
                     }
                 }}
                 fullWidth
-                placeholder='搜索'
+                placeholder='Input any keyword'
                 variant="outlined"
                 value={searchValue}
                 onChange={(event) => handleSearch(event.target.value)}

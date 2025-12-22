@@ -32,6 +32,12 @@ interface ElectronAPI {
      * 变更窗口大小
      */
     resizeWindow: (size: { width: number, height: number }) => Promise<void>;
+
+    /**
+     * 获取最近的项目
+     * @param limit 获取最近的项目数
+     */
+    getRecentStickys: (limit: number) => Promise<StickyResult[]>
 }
 
 

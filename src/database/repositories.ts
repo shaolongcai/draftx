@@ -158,3 +158,22 @@ export const deleteExpiredStickys = () => {
         logger.error(error)
     }
 }
+
+
+/**
+ * 获取最近的便利贴
+ */
+export const getRecentStickys = (limit: number = 12) => {
+    try {
+        const stmt = db.prepare(`
+            SELECT id, uuid, title, content, created_at, modified_at, deleted_at
+            FROM stickys
+            ORDER BY modified_at DESC
+            LIMIT ?
+        `);
+        return stmt.all(limit);
+    } catch (error) {
+        logger.error(error);
+        return [];
+    }
+};

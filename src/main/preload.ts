@@ -8,6 +8,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   saveSticky: (stickyNote: StickyParmas) => ipcRenderer.send('save-sticky', stickyNote), // 保存 stickyNote API
   searchSticky: (query: string) => ipcRenderer.invoke('search-sticky', query),   // 搜索 stickyNote API
   addDeleteDay: (id: number) => ipcRenderer.send('add-delete-day', id), // 点击增加天数
+  getRecentStickys: (limit: number) => ipcRenderer.invoke('get-recent-stickys', limit), // 获取最近的便利贴
 
   // 系统相关
   resizeWindow: (size: { width: number, height: number }) => ipcRenderer.send('resize-window', size), // 变更窗口大小

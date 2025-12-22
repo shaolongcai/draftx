@@ -1,5 +1,5 @@
 import { ipcMain } from "electron";
-import { addDeleteDay, saveStickyNote, searchStickyNote } from "../database/repositories.js";
+import { addDeleteDay, getRecentStickys, saveStickyNote, searchStickyNote } from "../database/repositories.js";
 
 
 
@@ -20,4 +20,9 @@ export function initializeStickyApi() {
     ipcMain.on('add-delete-day', (event, id: number) => {
         addDeleteDay(id);
     });
+
+    // 获取最近的便利贴
+    ipcMain.handle('get-recent-stickys', async (event, limit: number = 12) => {
+        return getRecentStickys(limit);
+    })
 }

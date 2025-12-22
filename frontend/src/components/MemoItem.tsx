@@ -2,20 +2,35 @@ import { useEvent } from "@/contexts/EvenContext"
 import { Card, Stack, Typography } from "@mui/material"
 
 
+// 截断行数的映射
+const lineClampMap = {
+    5: 'line-clamp-5',
+    6: 'line-clamp-6',
+    7: 'line-clamp-7',
+    8: 'line-clamp-8',
+};
+
+
 interface Props {
     id: number,
-    title: string,
+    title?: string,
     content: string,
     snippet?: string,
+    height?: string,
+    onClick?: (id: number) => void,
+    lineClamp?: number
 }
 /**
  * 搜索结果
  */
-const SearchItem: React.FC<Props> = ({
+const MemoItem: React.FC<Props> = ({
     id,
     title,
     content,
     snippet,
+    height = '160px',
+    onClick,
+    lineClamp = 6,
     ...rest
 }) => {
 
@@ -23,16 +38,23 @@ const SearchItem: React.FC<Props> = ({
 
     // 点击卡片
     const handleClick = () => {
+        console.log('点击了便利贴', id)
         loadStickys$.emit({ ...rest, content, id } as StickyResult)
+        onClick?.(id)
     }
 
-    return <Card className="cursor-pointer h-[160px] " onClick={handleClick} >
+    return <Card className="cursor-pointer  "
+        onClick={handleClick}
+        sx={{
+            height
+        }}
+    >
         <Stack spacing={1} >
             {/* <Typography variant='bodyMedium'>
                 {title}
             </Typography> */}
             <Typography variant='bodyMedium'
-                className="line-clamp-2 text-ellipsis overflow-hidden"
+                className={`${lineClampMap[lineClamp]} text-ellipsis overflow-hidden`}
             >
                 {snippet ? (
                     <span
@@ -49,4 +71,4 @@ const SearchItem: React.FC<Props> = ({
 }
 
 
-export default SearchItem
+export default MemoItem

@@ -27,7 +27,7 @@ const EditorContext: React.FC<EditorContextProps> = ({
     const { loadStickys$ } = useEvent();
     const notification = useNotifications();
 
-    // 监听粘贴事件
+    // 初始化编辑器
     useEffect(() => {
         const vditor = new Vditor('vditor', {
             toolbar: [],
@@ -117,9 +117,9 @@ const EditorContext: React.FC<EditorContextProps> = ({
         const newUuid = uuidv4();
         // setCurrentUuid(newUuid);
         currentUuidRef.current = newUuid
-        console.log('保存ID', newUuid);   // 立即用 newId
         // 清空编辑器内容
         vd?.setValue('');
+        vd.blur();
         notification.show('The sticky has been saved', {
             severity: 'success',
         });
@@ -145,7 +145,7 @@ const Editor2 = () => {
             <Stack direction="row" spacing={0.5} alignItems="center" >
                 <Typography variant="bodySmall" color="textSecondary">
                     {/* 删除的天数，+3天是因为点击后会加3天删除时间，修改增加的删除时间时，需要同步更改这里 */}
-                    {deletedAt ? deletedAt + 3 : 7} 天后删除
+                    Deleted in {deletedAt ? deletedAt + 3 : 7} days 
                 </Typography>
                 <Tooltip title="Each view adds 3 days to deletion">
                     <HelpOutline fontSize="small" className="cursor-pointer" color='action' />
@@ -160,7 +160,7 @@ const Editor2 = () => {
                     ↵
                 </span>
                 <Typography variant="bodySmall" color="textSecondary" className="pl-1">
-                    新的便利贴
+                    New memo
                 </Typography>
             </Stack>
         </Stack>
