@@ -222,7 +222,6 @@ const EditorContext: React.FC<EditorContextProps> = ({
                     uuid: currentUuid,
                     title: payload.title,
                     content: payload.contentText,
-                    contentString: JSON.stringify(payload.contentJson),
                 });
                 lastSavedRef.current = payload;
                 // console.log('已自动保存', payload);

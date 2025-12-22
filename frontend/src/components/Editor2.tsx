@@ -30,13 +30,14 @@ const EditorContext: React.FC<EditorContextProps> = ({
     // 初始化编辑器
     useEffect(() => {
         const vditor = new Vditor('vditor', {
-            toolbar: [],
+            toolbar:[],
             toolbarConfig: {
-                hide: true
+                hide: true,
+                pin:true
             },
             minHeight: 320,
             // typewriterMode: true,
-            placeholder: '支持markdown格式输入...',
+            placeholder: 'Markdown input supported...',
             input: (value: string) => {
 
                 // 提取标题：从第一个 # 到下一个换行
@@ -48,7 +49,7 @@ const EditorContext: React.FC<EditorContextProps> = ({
             preview: {
                 theme: {
                     current: 'editorTheme', // 文件名称
-                    path: '/src/assets/content-theme/',
+                    path: './content-theme/',
                 }
             },
             after: () => {
@@ -118,8 +119,8 @@ const EditorContext: React.FC<EditorContextProps> = ({
         // setCurrentUuid(newUuid);
         currentUuidRef.current = newUuid
         // 清空编辑器内容
-        vd?.setValue('');
-        vd.blur();
+        vd?.setValue(''); 
+        vd.blur(); // 要失焦，否则会多一个空格
         notification.show('The sticky has been saved', {
             severity: 'success',
         });

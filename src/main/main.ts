@@ -33,7 +33,7 @@ const registerGlobalShortcut = () => {
   });
 
   // 触发：显示/隐藏主窗口
-  const shortcut = isDev ? 'Alt+Shift+Z' : 'Alt+Shift+Z';
+  const shortcut = isDev ? 'Alt+Shift+Z' : 'Alt+Z';
   globalShortcut.register(shortcut, () => {
     // 触发：显示/隐藏主窗口
     if (mainWindow?.isVisible()) {
@@ -66,7 +66,7 @@ function createTray() {
     // 創建托盤菜單
     const contextMenu = Menu.buildFromTemplate([
       {
-        label: '便利贴（Alt + Shift + Z）',
+        label: isDev ? '便利贴（Alt + Shift + Z）' : '便利贴（Alt + Z）',
         click: () => {
           const isVisible = mainWindow?.isVisible();
           isVisible ? mainWindow.hide() : mainWindow.show();
