@@ -69,6 +69,7 @@ const EditorContext: React.FC<EditorContextProps> = ({
     // 初始化uuid
     useEffect(() => {
         // setCurrentUuid(uuidv4());
+        console.log('初始化了新的uuid')
         currentUuidRef.current = uuidv4()
     }, []);
 
@@ -80,12 +81,13 @@ const EditorContext: React.FC<EditorContextProps> = ({
 
         // 插入新的便利贴内容
         try {
-            console.log('sticky.content', sticky.content);
+            console.log('sticky.content', sticky);
             // 清空编辑器内容
             vd?.setValue('');
             // 创建root
             vd.insertMD(sticky.content);
             // setCurrentUuid(sticky.uuid);
+             console.log('当前的uuid',sticky.uuid)
             currentUuidRef.current = sticky.uuid
         } catch (error) {
             console.log('解析失败，插入空段落', error);
