@@ -297,12 +297,24 @@ body {
 
 /* 內聯代碼樣式 */
 .editor-text-code {
-  background-color: #96969640;
-  font-family: 'Courier New', Courier, monospace;
-  padding: 2px 6px;
+  background-color: #96969640 !important;
+  font-family: 'Courier New', Courier, monospace !important;
+  padding: 2px 6px !important;
   margin: 0 2px;
-  border-radius: 4px;
+  border-radius: 4px !important;
   font-size: 0.9em;
+  color: inherit;
+}
+
+/* 確保編輯器內的行內程式碼有背景 - 覆蓋所有可能的標籤 */
+[contenteditable="true"] code,
+[contenteditable="true"] .editor-text-code,
+.editor-paragraph code,
+.editor-paragraph .editor-text-code {
+  background-color: #96969640 !important;
+  font-family: 'Courier New', Courier, monospace !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
 }
 
 /* 代碼高亮樣式 */

@@ -49,9 +49,9 @@
     global-agent "^3.0.0"
 
 "@electron/node-gyp@https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2":
-  version "10.2.0-electron.2"
-  resolved "git+ssh://git@github.com/electron/node-gyp.git"
-  integrity sha512-PHYkJYOKzMUq8xNp+DDQzk8LZVrisUwuKOQPdZbSdwmY4DsIzZx8cbBJTrcTHkexyyseBBeM9sa/SY6xXECGUg==
+  version "10.2.0-electron.1"
+  resolved "git+ssh://git@github.com/electron/node-gyp.git#06b29aafb7708acef8b3669835c8a7857ebc92d2"
+  integrity sha512-4MSBTT8y07YUDqf69/vSh80Hh791epYqGtWHO3zSKhYFwQg+gx9wi1PqbqP6YqC4WMsNxZ5l9oDmnWdK5pfCKQ==
   dependencies:
     env-paths "^2.2.0"
     exponential-backoff "^3.1.1"
@@ -1412,7 +1412,7 @@ glob@^8.0.1:
 
 glob@^8.1.0:
   version "8.1.0"
-  resolved "https://registry.npmmirror.com/glob/-/glob-8.1.0.tgz"
+  resolved "https://registry.npmjs.org/glob/-/glob-8.1.0.tgz"
   integrity sha512-r8hpEjiQEYlF2QU0df3dS+nxxSIreXQS1qRhMJM0Q5NDdR386C7jb7Hwwod8Fgiuex+k0GFjgft18yvxm5XoCQ==
   dependencies:
     fs.realpath "^1.0.0"
