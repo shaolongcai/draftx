@@ -91,6 +91,15 @@ if %errorlevel% equ 0 (
         
         %log_success% TypeScript compilation completed
         
+        REM --- 重新編譯 native 模塊 ---
+        %log_info% Rebuilding native modules for Electron...
+        call npm run rebuild
+        if %errorlevel% neq 0 (
+            %log_warning% Failed to rebuild native modules, but continuing...
+        ) else (
+            %log_success% Native modules rebuilt successfully
+        )
+        
         REM --- 复制resources目录到dist ---
         %log_info% Copying resources to dist...
         
