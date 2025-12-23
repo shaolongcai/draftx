@@ -20,18 +20,12 @@
 
 ## 2. 文字樣式 (Text Styling)
 
-|
-
 | 樣式 | 語法 | 顯示效果 |
-
+| ----- | ----- | ----- |
 | 粗體 | **粗體** 或 __粗體__ | 粗體 |
-
 | 斜體 | *斜體* 或 _斜體_ | 斜體 |
-
 | 粗斜體 | ***粗斜體*** | 粗斜體 |
-
 | ~~刪除線~~ | ~~刪除線~~ | ~~刪除線~~ |
-
 | 行內程式碼 | `行內程式碼` | 行內程式碼 |
 
 ## 3. 列表 (Lists)
@@ -60,17 +54,8 @@
 
 用來製作待辦清單。
 
-- $$x$$
-
-   已完成的項目
-
-- $$ $$
-
-   未完成的項目
-
-- $$ $$
-
-   另一個未完成項目
+- [x] 已完成的項目
+- [ ] 未完成的項目
 
 ## 4. 引用 (Blockquotes)
 
@@ -117,9 +102,8 @@ console.log(message);
 使用 `|` 分隔欄位，使用 `-` 分隔標題列。 冒號 `:` 可用來控制對齊方向。
 
 | 左對齊 | 置中對齊 | 右對齊 |
-
+| :----- | :-----:| -----: |
 | 內容 A | 內容 B | 內容 C |
-
 | 靠左 | 居中 | 靠右 |
 
 語法範例：
@@ -152,40 +136,194 @@ $$
 
 Markdown 支援使用 Mermaid 語法來繪製各種圖表。請使用程式碼區塊並指定語言為 `mermaid`。
 
-### 流程圖 (Flowchart)
+### 流程圖 (Flowchat)  
+```
+graph TD;
+    程序A-->程序B;
+    程序A-->程序C;
+    程序B-->程序D;
+    程序C-->程序D;
+```
 
 ```mermaid
 graph TD;
-    A[開始] --> B{是否順利?};
-    B -- 是 --> C[繼續下一步];
-    B -- 否 --> D[重試];
-    C --> E[結束];
-    D --> B;
+    程序A-->程序B;
+    程序A-->程序C;
+    程序B-->程序D;
+    程序C-->程序D;
 ```
 
-語法範例：
-
-### 循序圖 (Sequence Diagram)
-
-```sequenceDiagram
-    participant 使用者
-    participant 系統
-    使用者->>系統: 發送請求
-    系統-->>使用者: 回傳資料
+### 時序圖 (Sequence Diagram)
+```
+sequenceDiagram
+    participant 小美
+    participant 小明    
+    小美->>小華: Hi, 小華早呀！
+    loop 腦中不斷思考
+        小華->>小華: 輕聲唸到「怎麼辦」
+    end
+    Note right of 小華: 下定決心 <br/>就這麼回吧!
+    小華-->>小美: 早呀！你今天看起來心情不錯噢！
+    小華->>小明: 小明，今天怎麼這麼早？
+    小明-->>小華: 你猜？
 ```
 
-### 甘特圖 (Gantt Chart)
-
-```gantt
-    title 專案開發時程
-    dateFormat  YYYY-MM-DD
-    section 設計
-    需求分析       :a1, 2023-10-01, 5d
-    UI 設計       :after a1, 3d
-    section 開發
-    後端開發       :2023-10-10, 5d
-    前端開發       :5d
+```mermaid
+sequenceDiagram
+    participant 小美
+    participant 小明    
+    小美->>小華: Hi, 小華早呀！
+    loop 腦中不斷思考
+        小華->>小華: 輕聲唸到「怎麼辦」
+    end
+    Note right of 小華: 下定決心 <br/>就這麼回吧!
+    小華-->>小美: 早呀！你今天看起來心情不錯噢！
+    小華->>小明: 小明，今天怎麼這麼早？
+    小明-->>小華: 你猜？
 ```
+
+### 甘特圖 (Gantt Diagram)
+```
+gantt
+dateFormat  YYYY-MM-DD
+title 專題製作時程表
+excludes weekdays 2014-01-10
+
+section A分項
+已完成項目   :done,    des1, 2014-01-06,2014-01-08
+工作中項目   :active,  des2, 2014-01-09, 3d
+未完成項目一 :         des3, after des2, 5d
+未完成項目二 :         des4, after des3, 5d
+```
+
+```mermaid
+gantt
+dateFormat  YYYY-MM-DD
+title 專題製作時程表
+excludes weekdays 2014-01-10
+
+section A分項
+已完成項目   :done,    des1, 2014-01-06,2014-01-08
+工作中項目   :active,  des2, 2014-01-09, 3d
+未完成項目一 :         des3, after des2, 5d
+未完成項目二 :         des4, after des3, 5d
+```
+
+### 程式類別圖 (Class Diagram)
+```
+classDiagram
+分類01 <|-- AveryLongClass : Cool
+分類03 *-- 分類04
+分類05 o-- 分類06
+分類07 .. 分類08
+分類09 --> C2 : Where am i?
+分類09 --* C3
+分類09 --|> 分類07
+分類07 : equals()
+分類07 : Object[] elementData
+分類01 : size()
+分類01 : int chimp
+分類01 : int gorilla
+分類08 <--> C2: Cool label
+```
+
+```mermaid
+classDiagram
+分類01 <|-- AveryLongClass : Cool
+分類03 *-- 分類04
+分類05 o-- 分類06
+分類07 .. 分類08
+分類09 --> C2 : Where am i?
+分類09 --* C3
+分類09 --|> 分類07
+分類07 : equals()
+分類07 : Object[] elementData
+分類01 : size()
+分類01 : int chimp
+分類01 : int gorilla
+分類08 <--> C2: Cool label
+```
+
+### Git分支圖 （Mermaid實驗中）
+```
+gitGraph:
+options
+{
+    "nodeSpacing": 150,
+    "nodeRadius": 10
+}
+end
+commit
+branch newbranch
+checkout newbranch
+commit
+commit
+checkout master
+commit
+commit
+merge newbranch
+```
+
+```mermaid
+gitGraph:
+options
+{
+    "nodeSpacing": 150,
+    "nodeRadius": 10
+}
+end
+commit
+branch newbranch
+checkout newbranch
+commit
+commit
+checkout master
+commit
+commit
+merge newbranch
+```
+
+### 實體關係圖 (Entity Relationship Diagram)  （Mermaid實驗中）
+```
+erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    ORDER ||--|{ LINE-ITEM : contains
+    CUSTOMER }|..|{ DELIVERY-ADDRESS : uses
+```
+
+```mermaid
+erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    ORDER ||--|{ LINE-ITEM : contains
+    CUSTOMER }|..|{ DELIVERY-ADDRESS : uses
+```
+
+### 使用者旅程圖 (User Journey Diagram)
+**使用者名稱只能用英文**
+```
+journey
+    title 我的工作行程
+    section 上班
+      泡茶: 3: Me
+      準備: 2: Me
+      開會: 1: Me, Jack
+    section 回家
+      搭車: 4: Me
+      吃飯: 5: Me
+```
+
+```mermaid
+journey
+    title 我的工作行程
+    section 上班
+      泡茶: 3: Me
+      準備: 2: Me
+      開會: 1: Me, Jack
+    section 回家
+      搭車: 4: Me
+      吃飯: 5: Me
+```
+
 
 ## 11. 其他 (Others)
 
