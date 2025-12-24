@@ -150,6 +150,7 @@ const EditorContext: React.FC<EditorContextProps> = ({
         notification.show('The sticky has been saved', {
             severity: 'success',
         });
+        getDeleteDay(null); //重置删除天数
     })
 
     return <div id="vditor" className="vditor" />
