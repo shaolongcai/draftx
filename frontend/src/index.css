@@ -1,6 +1,22 @@
 @config "../tailwind.config.ts";
 @import "tailwindcss";
 
+/* 有序列表 */
+.vditor-reset ol,
+.vditor-wysiwyg ol,
+.vditor-ir ol {
+  list-style: decimal;
+  list-style-position: outside;
+  padding-left: 1.25rem;
+}
+
+/* .vditor-reset ul,
+.vditor-wysiwyg ul,
+.vditor-ir ul {
+  list-style: disc;
+  list-style-position: inside;
+  padding-left: 1.25rem;
+} */
 
 /* 字体定义 */
 @font-face {
@@ -61,113 +77,8 @@ body {
 
 
 
-/* 对应markdown的h1、h2...的标题 */
-.editor-h1 {
-  font-size: 24px;
-  color: rgba(0, 0, 0, 0.85);
-  font-weight: 700;
-}
-
-.editor-h2 {
-  font-size: 20px;
-  color: rgba(0, 0, 0, 0.85);
-  font-weight: 700;
-}
-
-.editor-h3 {
-  font-size: 16px;
-  color: rgba(0, 0, 0, 0.85);
-  font-weight: 700;
-}
-
-/* 普通段落文本 */
-.editor-paragraph {
-  line-height: 1.6;
-  color: rgba(0, 0, 0, 0.85);
-  font-weight: 400;
-}
-
-.editor-text-bold{
-  font-weight: bold;
-}
-
-/* 列表 */
-.editor-nested-listitem {
-  list-style-type: none;
-}
-
-.editor-list-oll1 {
-  padding-left: 32px;
-  margin: 0;
-  list-style-type: decimal;
-  /* 编号的类型 */
-  list-style-position: inside;
-  /* 编号的位置 */
-}
-
-.editor-list-ol2 {
-  margin: 0;
-  list-style-type: upper-alpha;
-  list-style-position: inside;
-  padding-left: 16px;
-}
-
-.editor-list-ol3 {
-  margin: 0;
-  list-style-type: lower-alpha;
-  list-style-position: inside;
-  padding-left: 16px;
-}
-
-.editor-list-ol4 {
-  padding-left: 16px;
-  margin: 0;
-  list-style-type: upper-roman;
-  list-style-position: inside;
-}
-
-.editor-list-ol5 {
-  padding-left: 16px;
-  margin: 0;
-  list-style-type: lower-roman;
-  list-style-position: inside;
-}
-
-/* 无序列表 */
-.editor-list-ul1 {
-  padding: 0;
-  margin: 0;
-  list-style-type: inherit;
-  list-style-position: inside;
-}
-
-.editor-list-ul2 {
-  padding-left: 16px;
-  margin: 0;
-  list-style-type: circle;
-  list-style-position: inside;
-}
-
-.editor-list-ul3 {
-  padding-left: 16px;
-  margin: 0;
-  list-style-type: square;
-  list-style-position: inside;
-}
 
 
-
-/* .editor-list-ul4 {
-  padding-left: 16px;
-  margin: 0;
-  list-style-position: inside;
-}
-.editor-list-ul5 {
-  padding: 0;
-  margin: 0;
-  list-style-type: lower-latin;  //编号的类型，可去掉，这里留作示例 
-  list-style-position: inside;
-} */
 .editor-listitem {
   margin: 0 32px;
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;

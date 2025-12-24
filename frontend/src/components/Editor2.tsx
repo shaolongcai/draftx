@@ -34,7 +34,6 @@ const EditorContext: React.FC<EditorContextProps> = ({
             toolbar: [],
             toolbarConfig: {
                 hide: true,
-                pin: true
             },
             minHeight: 320,
             // typewriterMode: true,

@@ -43,7 +43,8 @@
 }
 
 .vditor-reset p {
-    line-height: 1.6;
+    line-height: 1.5;
     color: rgba(0, 0, 0, 0.85);
     font-weight: 400;
+    margin-bottom: 8px;
 }
