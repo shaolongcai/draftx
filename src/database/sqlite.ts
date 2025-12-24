@@ -102,7 +102,7 @@ export function getConfig(key: ConfigName | string): any {
  * @param value 配置值
  * @param type 数据类型
  */
-export function setConfig(key: string, value: any, type: string = 'string'): boolean {
+export function setConfig(key: string, value: any, type: 'boolean' | 'string' | 'number' | 'json'  = 'string'): boolean {
     try {
         const db = getDatabase()
         let configValue: string

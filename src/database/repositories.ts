@@ -177,3 +177,22 @@ export const getRecentStickys = (limit: number = 12) => {
         return [];
     }
 };
+
+
+/**
+ * 获取UUID为guid 的便利贴
+ */
+export const getGuideMemo = () => {
+    try {
+        const stmt = db.prepare(`
+            SELECT id, uuid, title, content, created_at, modified_at, deleted_at
+            FROM stickys
+            WHERE uuid = ?
+            LIMIT 1
+        `);
+        return stmt.get('guide');
+    } catch (error) {
+        logger.error(error);
+        return null;
+    }
+}

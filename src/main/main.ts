@@ -3,9 +3,10 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { getConfig, initializeDatabase, setConfig } from '../database/sqlite.js';
 import { initializeStickyApi } from '../api/stickys.js';
-import { deleteExpiredStickys } from '../database/repositories.js';
+import { deleteExpiredStickys, getGuideMemo, saveStickyNote } from '../database/repositories.js';
 import { initializeSystemApi } from '../api/system.js';
 import { logger } from '../core/logger.js';
+import { GuidMarkdown } from '../data/data.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -117,6 +118,20 @@ function createTray() {
 }
 
 
+// 初始化引导的memo
+const initializeGuideMemo = () => {
+  //查询是否已经有引导memo
+  const guideMemo = getGuideMemo();
+  if (!guideMemo) {
+    // 没有引导memo，创建一个
+    saveStickyNote({
+      uuid: 'guide',
+      content: GuidMarkdown,
+    });
+  }
+}
+
+
 app.whenReady().then(async () => {
   // 准备窗口
   const { windowManager } = await import('../core/windowManager.js');
@@ -131,6 +146,8 @@ app.whenReady().then(async () => {
   initializeSystemApi();
   // 创建托盘
   createTray();
+  // 初始化引导memo
+  initializeGuideMemo()
   // 删除所有过期的便利贴
   deleteExpiredStickys();
 });

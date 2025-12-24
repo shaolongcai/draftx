@@ -1,5 +1,5 @@
 import { ipcMain } from "electron";
-import { addDeleteDay, getRecentStickys, saveStickyNote, searchStickyNote } from "../database/repositories.js";
+import { addDeleteDay, getGuideMemo, getRecentStickys, saveStickyNote, searchStickyNote } from "../database/repositories.js";
 
 
 
@@ -24,5 +24,10 @@ export function initializeStickyApi() {
     // 获取最近的便利贴
     ipcMain.handle('get-recent-stickys', async (event, limit: number = 12) => {
         return getRecentStickys(limit);
+    })
+
+    // 获取引导memo
+    ipcMain.handle('get-guide-memo', async (event) => {
+        return getGuideMemo();
     })
 }

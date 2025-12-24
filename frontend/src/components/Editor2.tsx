@@ -5,9 +5,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { useNotifications } from "@toolpad/core/useNotifications";
 import { useEvent } from "@/contexts/EvenContext";
 import { HelpOutline } from "@mui/icons-material";
-import dayjs from "dayjs";
+import dayjs, { ConfigType } from "dayjs";
 import Vditor from "vditor";
 import "vditor/dist/index.css";
+import { ConfigParams } from "@/type/electron";
 
 
 interface EditorContextProps {
@@ -30,10 +31,10 @@ const EditorContext: React.FC<EditorContextProps> = ({
     // 初始化编辑器
     useEffect(() => {
         const vditor = new Vditor('vditor', {
-            toolbar:[],
+            toolbar: [],
             toolbarConfig: {
                 hide: true,
-                pin:true
+                pin: true
             },
             minHeight: 320,
             // typewriterMode: true,
@@ -65,13 +66,38 @@ const EditorContext: React.FC<EditorContextProps> = ({
     }, []);
 
 
-
-    // 初始化uuid
+    // 决定展示guide的meomo，还是初始化uuid
     useEffect(() => {
-        // setCurrentUuid(uuidv4());
-        console.log('初始化了新的uuid')
-        currentUuidRef.current = uuidv4()
-    }, []);
+        const getGuideMemo = async () => {
+            // 是否完成引导
+            const isFinishGuide = await window.electronAPI.getConfig('isFinishGuide')
+            console.log('isFinishGuide', isFinishGuide)
+            if (!isFinishGuide) {
+                //展示引导memo
+                const guideMemo = await window.electronAPI.getGuideMemo()
+                getDeleteDay(guideMemo.deleted_at)
+                // 清空编辑器内容
+                vd?.setValue('');
+                // 创建root
+                vd.insertMD(guideMemo.content);
+                currentUuidRef.current = guideMemo.uuid
+                // 设置为已引导
+                const configParams: ConfigParams = {
+                    key: 'isFinishGuide',
+                    value: true,
+                    type: 'boolean'
+                }
+                window.electronAPI.setConfig(configParams)
+            }
+            else {
+                // 清空编辑器，初始化uuid
+                vd?.setValue('');
+                currentUuidRef.current = uuidv4()
+            }
+        }
+        if (!vd) return
+        getGuideMemo()
+    }, [vd]);
 
     // 监听加载新的便利贴
     loadStickys$.useSubscription((sticky) => {
@@ -81,13 +107,12 @@ const EditorContext: React.FC<EditorContextProps> = ({
 
         // 插入新的便利贴内容
         try {
-            console.log('sticky.content', sticky);
             // 清空编辑器内容
             vd?.setValue('');
             // 创建root
             vd.insertMD(sticky.content);
             // setCurrentUuid(sticky.uuid);
-             console.log('当前的uuid',sticky.uuid)
+            console.log('当前的uuid', sticky.uuid)
             currentUuidRef.current = sticky.uuid
         } catch (error) {
             console.log('解析失败，插入空段落', error);
@@ -121,7 +146,7 @@ const EditorContext: React.FC<EditorContextProps> = ({
         // setCurrentUuid(newUuid);
         currentUuidRef.current = newUuid
         // 清空编辑器内容
-        vd?.setValue(''); 
+        vd?.setValue('');
         vd.blur(); // 要失焦，否则会多一个空格
         notification.show('The sticky has been saved', {
             severity: 'success',
@@ -148,7 +173,7 @@ const Editor2 = () => {
             <Stack direction="row" spacing={0.5} alignItems="center" >
                 <Typography variant="bodySmall" color="textSecondary">
                     {/* 删除的天数，+3天是因为点击后会加3天删除时间，修改增加的删除时间时，需要同步更改这里 */}
-                    Deleted in {deletedAt ? deletedAt + 3 : 7} days 
+                    Deleted in {deletedAt ? deletedAt + 3 : 7} days
                 </Typography>
                 <Tooltip title="Each view adds 3 days to deletion">
                     <HelpOutline fontSize="small" className="cursor-pointer" color='action' />

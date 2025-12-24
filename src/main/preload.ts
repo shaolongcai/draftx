@@ -9,8 +9,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
   searchSticky: (query: string) => ipcRenderer.invoke('search-sticky', query),   // 搜索 stickyNote API
   addDeleteDay: (id: number) => ipcRenderer.send('add-delete-day', id), // 点击增加天数
   getRecentStickys: (limit: number) => ipcRenderer.invoke('get-recent-stickys', limit), // 获取最近的便利贴
+  getGuideMemo: () => ipcRenderer.invoke('get-guide-memo'), // 获取引导memo
 
   // 系统相关
+  setConfig: (params: ConfigParams) => ipcRenderer.invoke('set-config', params.key, params.value, params.type), // 设置用户配置
+  getConfig: (key?: string) => ipcRenderer.invoke('get-config', key),  // 获取用户配置
   resizeWindow: (size: { width: number, height: number }) => ipcRenderer.send('resize-window', size), // 变更窗口大小
 
 });
