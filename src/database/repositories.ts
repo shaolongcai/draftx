@@ -56,7 +56,7 @@ export const searchStickyNote = (query: string, limit: number = 50) => {
             ftsHits AS (
                 SELECT 
                     rowid,
-                    snippet(stickys_fts, 0, '<mark>', '</mark>', '...', 16) AS snippet,
+                    snippet(stickys_fts, 0, '<mark>', '</mark>', '...', 32) AS snippet,
                     bm25(stickys_fts) AS fts_score
                 FROM stickys_fts
                 WHERE stickys_fts MATCH ?

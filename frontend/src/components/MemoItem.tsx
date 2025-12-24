@@ -30,15 +30,16 @@ const MemoItem: React.FC<Props> = ({
     snippet,
     height = '160px',
     onClick,
-    lineClamp = 6,
+    lineClamp = 8,
     ...rest
 }) => {
 
     const { loadStickys$ } = useEvent()
 
+    const clampClass = (lineClampMap as Record<number, string>)[lineClamp] ?? 'line-clamp-6'
+
     // 点击卡片
     const handleClick = () => {
-        console.log('点击了便利贴', id)
         loadStickys$.emit({ ...rest, content, id } as StickyResult)
         onClick?.(id)
     }
@@ -54,16 +55,17 @@ const MemoItem: React.FC<Props> = ({
                 {title}
             </Typography> */}
             <Typography variant='bodyMedium'
-                className={`${lineClampMap[lineClamp]} text-ellipsis overflow-hidden`}
+                className={`${clampClass} overflow-hidden`}
             >
                 {snippet ? (
+                    // 这里要注意，显示的是snippet片段，而不是content，内容数量要在搜索器中调整
                     <span
                         dangerouslySetInnerHTML={{
                             __html: snippet.replace(/<mark>/g, '<mark class="bg-yellow-200 text-gray-900 font-medium px-1">')
                         }}
                     />
                 ) : (
-                    <span className="truncate block">{content}</span>
+                    <span className="block">{content}</span>
                 )}
             </Typography>
         </Stack>

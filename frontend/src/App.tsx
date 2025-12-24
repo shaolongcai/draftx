@@ -75,6 +75,7 @@ function App() {
                           title={item.title}
                           content={item.content}
                           snippet={item.snippet}
+                          lineClamp={5}
                           {...item}
                         />
                       </Grid>

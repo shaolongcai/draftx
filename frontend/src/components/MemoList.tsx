@@ -63,6 +63,7 @@ const MemoList: React.FC<Props> = ({
                                 content={item.content}
                                 height='200px'
                                 onClick={(id) => handleChooseMemo()}
+                                lineClamp={8}
                                 {...item}
                             />
                         </Grid>
