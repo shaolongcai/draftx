@@ -1,7 +1,7 @@
 {
-  "name": "osticky",
+  "name": "altmo",
   "type": "module",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Electron app with React frontend and Node.js backend",
   "main": "dist/main/main.js",
   "scripts": {
@@ -34,8 +34,8 @@
     "electronDownload": {
       "mirror": "https://npmmirror.com/mirrors/electron/"
     },
-    "appId": "com.osticky.app",
-    "productName": "OSticky",
+    "appId": "com.altmo.app",
+    "productName": "Altmo",
     "files": [
       "!*.traineddata",
       "dist/**/*",
@@ -95,7 +95,7 @@
       "allowElevation": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "OSticky",
+      "shortcutName": "Altmo",
       "installerIcon": "./electron/resources/assets/logo-256.ico",
       "uninstallerIcon": "./electron/resources/assets/logo-256.ico",
       "installerHeaderIcon": "./electron/resources/assets/logo-256.ico",

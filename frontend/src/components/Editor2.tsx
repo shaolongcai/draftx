@@ -1,4 +1,4 @@
-import { Card, Stack, Tooltip, Typography } from "@mui/material"
+import { Button, Card, Stack, Tooltip, Typography } from "@mui/material"
 import { useEffect, useRef, useState } from "react";
 import { useDebounceFn, useKeyPress } from "ahooks";
 import { v4 as uuidv4 } from 'uuid';
@@ -50,11 +50,15 @@ const EditorContext: React.FC<EditorContextProps> = ({
                 theme: {
                     current: 'editorTheme', // 文件名称
                     path: './content-theme/',
+                },
+                markdown: {
+                    mark: true,
                 }
             },
             after: () => {
                 // vditor.setValue("`Vditor` 最小代码示例");
                 setVd(vditor);
+                getGuideMemo(vditor)
             },
         });
         // Clear the effect
@@ -65,38 +69,34 @@ const EditorContext: React.FC<EditorContextProps> = ({
     }, []);
 
 
-    // 决定展示guide的meomo，还是初始化uuid
-    useEffect(() => {
-        const getGuideMemo = async () => {
-            // 是否完成引导
-            const isFinishGuide = await window.electronAPI.getConfig('isFinishGuide')
-            console.log('isFinishGuide', isFinishGuide)
-            if (!isFinishGuide) {
-                //展示引导memo
-                const guideMemo = await window.electronAPI.getGuideMemo()
-                getDeleteDay(guideMemo.deleted_at)
-                // 清空编辑器内容
-                vd?.setValue('');
-                // 创建root
-                vd.insertMD(guideMemo.content);
-                currentUuidRef.current = guideMemo.uuid
-                // 设置为已引导
-                const configParams: ConfigParams = {
-                    key: 'isFinishGuide',
-                    value: true,
-                    type: 'boolean'
-                }
-                window.electronAPI.setConfig(configParams)
+    // 决定展示guide的meomo，还是初始化uuid;由于setData 异步，所以这里需要直接传入实例
+    const getGuideMemo = async (vd: Vditor) => {
+        // 是否完成引导
+        const isFinishGuide = await window.electronAPI.getConfig('isFinishGuide')
+        console.log('isFinishGuide', isFinishGuide)
+        if (!isFinishGuide) {
+            //展示引导memo
+            const guideMemo = await window.electronAPI.getGuideMemo()
+            getDeleteDay(guideMemo.deleted_at)
+            // 清空编辑器内容
+            vd?.setValue('');
+            // 创建root
+            vd.insertMD(guideMemo.content);
+            currentUuidRef.current = guideMemo.uuid
+            // 设置为已引导
+            const configParams: ConfigParams = {
+                key: 'isFinishGuide',
+                value: true,
+                type: 'boolean'
             }
-            else {
-                // 清空编辑器，初始化uuid
-                vd?.setValue('');
-                currentUuidRef.current = uuidv4()
-            }
+            window.electronAPI.setConfig(configParams)
         }
-        if (!vd) return
-        getGuideMemo()
-    }, [vd]);
+        else {
+            // 清空编辑器，初始化uuid
+            vd?.setValue('');
+            currentUuidRef.current = uuidv4()
+        }
+    }
 
     // 监听加载新的便利贴
     loadStickys$.useSubscription((sticky) => {
@@ -159,11 +159,26 @@ const EditorContext: React.FC<EditorContextProps> = ({
 
 
 
-const Editor2 = () => {
+interface EditorProps {
+    handleAITools: () => void;
+    showAITools: boolean;
+}
+const Editor2: React.FC<EditorProps> = ({
+    handleAITools,
+    showAITools,
+}) => {
 
     const [deletedAt, setDeletedAt] = useState<number>();
 
     return <Card className="relative" >
+        {/* AI工具入口 */}
+        <Button variant='contained'
+            size='medium'
+            className="absolute right-4 z-10 text-white opacity-25 hover:opacity-100"
+            onClick={handleAITools}
+        >
+            {showAITools ? 'Close' : 'AI Tools'}
+        </Button>
         <EditorContext getDeleteDay={(deletedAt) => {
             // 换成与今天的差距
             const diff = dayjs(deletedAt).diff(dayjs(), 'day');
