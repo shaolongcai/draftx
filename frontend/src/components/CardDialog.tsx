@@ -1,5 +1,6 @@
 import { Button, Card, IconButton, Stack, Typography } from "@mui/material"
 import { Close as CloseIcon } from '@mui/icons-material';
+import { useState } from "react";
 
 
 interface Props {
@@ -26,6 +27,8 @@ const CardDialog: React.FC<Props> = ({
     secondaryAction,
     secondaryBtn
 }) => {
+
+
     return <Card className="w-100">
         <Stack spacing={2} >
             <Stack direction='row' alignItems='center' justifyContent='space-between'>

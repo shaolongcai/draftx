@@ -21,6 +21,20 @@ export const theme = createTheme({
             }
         },
 
+        // 按钮
+        MuiButton: {
+            styleOverrides: {
+                contained: {
+                    backgroundColor: '#000000',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    '&:hover': {
+                        backgroundColor: '#333333',
+                    }
+                }
+            }
+        },
+
         MuiChip: {
             styleOverrides: {
                 colorPrimary: {

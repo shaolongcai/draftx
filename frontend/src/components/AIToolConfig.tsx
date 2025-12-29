@@ -1,4 +1,4 @@
-import { Button, Stack, TextField } from "@mui/material"
+import { Button, Stack, TextField, Typography } from "@mui/material"
 import CardDialog from "./CardDialog"
 import { useState } from "react";
 
@@ -27,6 +27,7 @@ const AIToolConfig: React.FC<Props> = ({
 }) => {
 
     const [deleteText, setDeleteText] = useState('Delete');
+    const [isReadyAi, setIsReadyAi] = useState(true); //是否已经配置好AI
 
     // 删除工具
     const handleDeleteTool = () => {
@@ -38,7 +39,7 @@ const AIToolConfig: React.FC<Props> = ({
     return <CardDialog
         title="AI Tool"
         onClose={onClose}
-        primaryBtnLabel="save"
+        primaryBtnLabel={isReadyAi ? 'Save' : ''}
         secondaryBtn={
             mode === 'edit' &&
             <Button variant='outlined' color='error'
@@ -48,10 +49,28 @@ const AIToolConfig: React.FC<Props> = ({
             </Button>
         }
     >
-        <Stack component="form" spacing={1}>
-            <TextField label="Name" required />
-            <TextField label="Prompt" required />
-        </Stack>
+        {
+            isReadyAi ?
+                <Stack component="form" spacing={1}>
+                    <TextField label="Tool name" required size='small' />
+                    <TextField multiline minRows={3} maxRows={5} label="Prompt" required size='small' />
+                </Stack>
+                :
+                <Stack spacing={2}>
+                    <Typography variant='bodyMedium'>
+                        Please
+                        {' '}
+                        <Typography component="span" color="primary"
+                            className="cursor-pointer font-bold"
+                        >add AI configuration</Typography>
+                        {' '}
+                        first
+                    </Typography>
+                    <Typography variant='bodyMedium'>
+                        After adding, you can use AI to organize your memos or any custom AI behavior
+                    </Typography>
+                </Stack>
+        }
     </CardDialog>
 }
 
