@@ -18,12 +18,12 @@ export const useChat = (options?: UseChatOptions) => {
     useEffect(() => {
         // 监听流式数据
         const unsubscribeData = window.electronAPI.onChatStream((chunk: string) => {
-            console.log('流式数据',chunk)
+            console.log('流式数据', chunk)
             currentMessageRef.current += chunk;
             setMessages(prev => {
                 const newMessages = [...prev];
                 const lastMessage = newMessages[newMessages.length - 1];
-                
+
                 if (lastMessage && lastMessage.role === 'assistant') {
                     lastMessage.content = currentMessageRef.current;
                 } else {
@@ -32,7 +32,7 @@ export const useChat = (options?: UseChatOptions) => {
                         content: currentMessageRef.current
                     });
                 }
-                
+
                 return newMessages;
             });
         });
@@ -58,8 +58,8 @@ export const useChat = (options?: UseChatOptions) => {
         };
     }, []);
 
-    const sendMessage = useCallback((message: string) => {
-        if (!message.trim() || isLoading) return;
+    const sendMessage = useCallback(( message?: string) => {
+        if (isLoading) return;
 
         setError(null);
         setIsLoading(true);

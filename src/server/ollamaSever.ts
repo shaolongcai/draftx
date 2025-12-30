@@ -1,8 +1,9 @@
-import { spawn, ChildProcess } from 'child_process';
+import { ChildProcess } from 'child_process';
 import * as path from 'path';
 import { logger } from '../core/logger.js';
 import { Worker } from 'worker_threads';
 import { fileURLToPath } from 'url';
+import { getConfig } from '../database/sqlite.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -11,13 +12,13 @@ class OllamaService {
     private process: ChildProcess | null = null;
     private isRunning = false;
     private aiWorker: Worker | null = null;
-    private pendingAiRequests: Map<string, { resolve: Function; reject: Function, params: GenerateRequest }>
+    private pendingAiRequests: Map<string, { resolve: Function; reject: Function, params: GenerateRequest, onStream?: (chunk: string) => void }>
     private isProcessingQueue = false; // 用于标记是否正在处理队列中的请求
 
 
     constructor() {
         this.pendingAiRequests = new Map()
-        // this.initializeAiWorker()
+        this.initializeAiWorker()
     }
 
 
@@ -26,27 +27,41 @@ class OllamaService {
         try {
             this.aiWorker = new Worker(path.join(__dirname, '../workers/ai.worker.js'));
 
+            // 从数据库获取 Ollama 配置并发送给 Worker
+            const aiProvider = getConfig('ai_provider')
+            const host = JSON.parse(aiProvider).host
+            const model = JSON.parse(aiProvider).model
+
+            //初始化请求
+            this.aiWorker.postMessage({
+                type: 'init',
+                config: { host, model }
+            });
+
             // 监听Worker消息
             this.aiWorker.on('message', (response: any) => {
-                const { requestId, success, result, error, needRestartOllama } = response;
+                const { requestId, type, chunk, success, result, error } = response;
                 const pending = this.pendingAiRequests.get(requestId);
 
-                if (pending) {
+                if (!pending) return;
+
+                // 处理流式数据块
+                if (type === 'stream' && chunk) {
+                    console.log('chunk', chunk)
+                    if (pending.onStream) {
+                        pending.onStream(chunk);
+                    }
+                    return;
+                }
+
+                // 处理最终响应
+                if (success !== undefined) {
                     this.pendingAiRequests.delete(requestId);
                     this.isProcessingQueue = false;
                     if (success) {
                         pending.resolve(result);
                     } else {
-                        pending.reject(new Error(error)); //这里reject到file.ts 然后报错
-
-                        // 暂时废弃
-                        // if (needRestartOllama) {
-                        //     // this.restartOllamaService(pending, error);
-                        //     logger.error(`重试请求: ${error}`);
-                        //     // 重试处理，重新添加到队列
-                        //     this.pendingAiRequests.set(requestId, pending);
-                        //     this.handleQueue();
-                        // }
+                        pending.reject(new Error(error));
                     }
                 }
             });
@@ -109,7 +124,7 @@ class OllamaService {
     }
 
     // 使用线程生成文本
-    public async generate(params: GenerateRequest): Promise<string> {
+    public async generate(params: GenerateRequest, onStream?: (chunk: string) => void): Promise<string> {
         return new Promise((resolve, reject) => {
             if (!this.aiWorker) {
                 reject(new Error('文档处理Worker未初始化'));
@@ -117,7 +132,7 @@ class OllamaService {
             }
             const requestId = `doc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
             // 添加到请求队列中
-            this.pendingAiRequests.set(requestId, { resolve, reject, params });
+            this.pendingAiRequests.set(requestId, { resolve, reject, params, onStream });
             if (!this.isProcessingQueue) {
                 this.handleQueue();
             }

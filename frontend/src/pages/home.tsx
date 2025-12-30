@@ -81,9 +81,7 @@ function Home() {
                 <MemoList handleChooseMemo={() => setShowMemoList(false)} isOpen={showMemoList} />
             </div>
             {/* AI工具 */}
-            {showAITools &&
-                <AITools />
-            }
+            <AITools open={showAITools} mode='add' />
         </Stack>
     )
 }

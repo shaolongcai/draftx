@@ -1,5 +1,5 @@
 import { ipcMain, BrowserWindow } from "electron";
-import { addDeleteDay, getAITools, getGuideMemo, getRecentStickys, saveAITool, saveStickyNote, searchStickyNote } from "../database/repositories.js";
+import { addDeleteDay, getAITools, getGuideMemo, getRecentStickys, getStickyById, saveAITool, saveStickyNote, searchStickyNote } from "../database/repositories.js";
 import { ollamaService } from "../server/ollamaSever.js";
 import { logger } from "../core/logger.js";
 
@@ -43,11 +43,15 @@ export function initializeAIApi() {
     })
 
     // AI流式对话
-    ipcMain.on('chat-stream', async (event, message: string = '很高兴认识你', toolId?: number) => {
+    ipcMain.on('chat-stream', async (event, message?: string, toolId?: number) => {
+
+        logger.info(`对话参数:${message},工具ID：${toolId}`)
+
+        // 向发送者回复消息,只会发到请求窗口的那个
         const sender = event.sender;
 
         try {
-            // 如果有 toolId，获取对应的工具配置
+            //如果有 toolId，获取对应的工具配置
             let systemPrompt = '';
             if (toolId) {
                 const tool = getAITools(toolId) as AITool;
@@ -56,59 +60,26 @@ export function initializeAIApi() {
                 }
             }
 
-            // 调用 Ollama API 进行流式请求
-            const response = await fetch('http://127.0.0.1:11434/api/generate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
+            logger.info('准备调用AI')
+
+            // 调用 ollamaService.generate 并传入流式回调
+            await ollamaService.generate(
+                {
+                    prompt: systemPrompt,
+                    content: message,
                 },
-                body: JSON.stringify({
-                    model: 'qwen2.5vl:3b', // 使用的模型
-                    prompt: systemPrompt ? `${systemPrompt}\n\n${message}` : message,
-                    stream: true,
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error(`Ollama API 请求失败: ${response.statusText}`);
-            }
-
-            // 读取流式响应
-            const reader = response.body?.getReader();
-            const decoder = new TextDecoder();
-
-            if (!reader) {
-                throw new Error('无法获取响应流');
-            }
-
-            while (true) {
-                const { done, value } = await reader.read();
-
-                if (done) {
-                    sender.send('chat-stream-end');
-                    break;
+                // 流式回调函数
+                (chunk: string) => {
+                    sender.send('chat-stream-data', chunk);
                 }
+            );
 
-                const chunk = decoder.decode(value, { stream: true });
-                const lines = chunk.split('\n').filter(line => line.trim());
-
-                for (const line of lines) {
-                    try {
-                        const json = JSON.parse(line);
-                        if (json.response) {
-                            sender.send('chat-stream-data', json.response);
-                        }
-                        if (json.done) {
-                            sender.send('chat-stream-end');
-                        }
-                    } catch (e) {
-                        // 忽略 JSON 解析错误
-                    }
-                }
-            }
+            // 流式完成后发送结束信号
+            sender.send('chat-stream-end');
         } catch (error: any) {
             logger.error(`流式对话错误: ${error.message || error}`);
             sender.send('chat-stream-error', error.message || '未知错误');
         }
+
     })
 }

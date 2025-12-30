@@ -1,20 +1,25 @@
 import { useState, useRef, useEffect } from "react"
 import CardDialog from "./CardDialog"
-import { Box, TextField, IconButton, Stack, Typography, CircularProgress } from "@mui/material"
-import { Send as SendIcon } from "@mui/icons-material"
+import { Box, Stack, Typography, CircularProgress } from "@mui/material"
 import { useChat, Message } from "../hooks/useChat"
+import { useEvent } from "@/contexts/EvenContext"
 
 interface ChatProps {
-    toolId?: number;
+    toolId?: number; // 使用的技能
     onClose: () => void;
-    open:boolean
+    currentStickyId?: number // 当前便利贴id
+    open: boolean,
+    currentContent: string
 }
 
-export const Chat: React.FC<ChatProps> = ({ 
-    toolId, onClose,
-    open
- }) => {
-    const [inputMessage, setInputMessage] = useState('');
+export const Chat: React.FC<ChatProps> = ({
+    toolId,
+    onClose,
+    currentStickyId,
+    open,
+    currentContent
+}) => {
+
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const { messages, isLoading, error, sendMessage } = useChat({ toolId });
 
@@ -22,23 +27,17 @@ export const Chat: React.FC<ChatProps> = ({
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
+    // 使用工具
+    useEffect(() => {
+        if (open && currentContent) {
+            sendMessage(currentContent)
+        }
+    }, [open, currentContent])
+
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
 
-    const handleSend = () => {
-        if (inputMessage.trim() && !isLoading) {
-            sendMessage(inputMessage);
-            setInputMessage('');
-        }
-    };
-
-    const handleKeyPress = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSend();
-        }
-    };
 
     return (
         <CardDialog
@@ -57,11 +56,6 @@ export const Chat: React.FC<ChatProps> = ({
                         borderRadius: 1,
                     }}
                 >
-                    {messages.length === 0 && (
-                        <Typography color="text.secondary" align="center">
-                            开始对话...
-                        </Typography>
-                    )}
                     {messages.map((msg: Message, index: number) => (
                         <Box
                             key={index}
@@ -101,28 +95,6 @@ export const Chat: React.FC<ChatProps> = ({
                         </Typography>
                     )}
                     <div ref={messagesEndRef} />
-                </Box>
-
-                {/* 输入框 */}
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                    <TextField
-                        fullWidth
-                        multiline
-                        maxRows={3}
-                        value={inputMessage}
-                        onChange={(e) => setInputMessage(e.target.value)}
-                        onKeyPress={handleKeyPress}
-                        placeholder="输入消息..."
-                        disabled={isLoading}
-                        size="small"
-                    />
-                    <IconButton
-                        color="primary"
-                        onClick={handleSend}
-                        disabled={!inputMessage.trim() || isLoading}
-                    >
-                        <SendIcon />
-                    </IconButton>
                 </Box>
             </Stack>
         </CardDialog>

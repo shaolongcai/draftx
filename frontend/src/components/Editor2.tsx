@@ -9,6 +9,7 @@ import dayjs, { ConfigType } from "dayjs";
 import Vditor from "vditor";
 import "vditor/dist/index.css";
 import { ConfigParams } from "@/type/electron";
+import { EventEmitter } from "ahooks/lib/useEventEmitter";
 
 
 interface EditorContextProps {
@@ -25,7 +26,7 @@ const EditorContext: React.FC<EditorContextProps> = ({
     const lastSavedRef = useRef<{ title?: string; contentText: string }>({ title: '', contentText: '' }); // 上次已保存
     const currentUuidRef = useRef<string>('')
 
-    const { loadStickys$ } = useEvent();
+    const { loadStickys$, refreshContent$ } = useEvent();
     const notification = useNotifications();
 
     // 初始化编辑器
@@ -45,6 +46,8 @@ const EditorContext: React.FC<EditorContextProps> = ({
                 const title = titleMatch ? titleMatch[1].trim() : undefined;
                 // 触发保存
                 save(value, title);
+                // 触发刷新内容事件
+                refreshContent$.emit(value)
             },
             preview: {
                 theme: {
@@ -121,7 +124,6 @@ const EditorContext: React.FC<EditorContextProps> = ({
     const save = async (contentText: string, title?: string) => {
         // 内容为空则跳过
         if (!contentText) return;
-        console.log('save')
         // 若无变更则跳过
         if (contentText === lastSavedRef.current.contentText) return
         try {
@@ -179,11 +181,13 @@ const Editor2: React.FC<EditorProps> = ({
         >
             {showAITools ? 'Close' : 'AI Tools'}
         </Button>
-        <EditorContext getDeleteDay={(deletedAt) => {
-            // 换成与今天的差距
-            const diff = dayjs(deletedAt).diff(dayjs(), 'day');
-            setDeletedAt(diff);
-        }} />
+        <EditorContext
+            getDeleteDay={(deletedAt) => {
+                // 换成与今天的差距
+                const diff = dayjs(deletedAt).diff(dayjs(), 'day');
+                setDeletedAt(diff);
+            }}
+        />
         <Stack direction='row' justifyContent='space-between' alignItems="center">
             <Stack direction="row" spacing={0.5} alignItems="center" >
                 <Typography variant="bodySmall" color="textSecondary">

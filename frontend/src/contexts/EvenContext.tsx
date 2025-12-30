@@ -7,6 +7,7 @@ import { useEventEmitter } from 'ahooks';
 // 定义上下文接口
 interface EventContextType {
     loadStickys$: EventEmitter<StickyResult>
+    refreshContent$: EventEmitter<string>
 }
 // 创建上下文
 const EventContext = createContext<EventContextType | undefined>(undefined);
@@ -19,11 +20,14 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
     //事件
     const loadStickys$ = useEventEmitter<StickyResult>(); //加载便利贴
+    const refreshContent$ = useEventEmitter<string>(); //刷新便利贴内容
+
 
     return (
         <EventContext.Provider
             value={{
-                loadStickys$
+                loadStickys$,
+                refreshContent$
             }}
         >
             {children}

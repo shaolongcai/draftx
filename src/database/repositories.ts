@@ -1,4 +1,4 @@
-import { getDatabase } from './sqlite.js'
+import { getConfig, getDatabase } from './sqlite.js'
 import { logger } from '../core/logger.js';
 import dayjs from 'dayjs';
 
@@ -197,6 +197,25 @@ export const getGuideMemo = () => {
     }
 }
 
+/**
+ * 通过id获取便利贴
+ */
+export const getStickyById = (id: number) => {
+    try {
+        const stmt = db.prepare(`
+            SELECT id, uuid, title, content, created_at, modified_at, deleted_at
+            FROM stickys
+            WHERE id = ?
+            LIMIT 1
+        `);
+        return stmt.get(id);
+    } catch (error) {
+        logger.error(error);
+        return null;
+    }
+}
+
+
 
 /**
  * 添加AI工具
@@ -251,5 +270,28 @@ export const getAITools = (id?: number): AITool | AITool[] | null => {
     } catch (error) {
         logger.error(error);
         return null;
+    }
+}
+
+
+/**
+ * 获取 Ollama 配置
+ */
+export const getOllamaConfig = (): { host: string; model: string } => {
+    try {
+        const aiProvider = getConfig('ai_provider')
+        const host = JSON.parse(aiProvider).host
+        const model = JSON.parse(aiProvider).model
+
+        return {
+            host: host,
+            model: model
+        };
+    } catch (error) {
+        logger.error(error);
+        return {
+            host: 'http://127.0.0.1:11434',
+            model: 'qwen2.5vl:3b'
+        };
     }
 }

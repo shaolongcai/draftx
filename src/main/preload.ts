@@ -22,7 +22,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getAITools: (id?: number) => ipcRenderer.invoke('get-ai-tools', id), // 获取AI工具
 
   // AI流式对话
-  chatStream: (message: string, toolId?: number) => ipcRenderer.send('chat-stream', message, toolId), // 发起流式对话
+  chatStream: (message?: string, toolId?: number) => ipcRenderer.send('chat-stream', message, toolId), // 发起流式对话
   onChatStream: (callback: (chunk: string) => void) => {
     const listener = (_event: any, chunk: string) => callback(chunk);
     ipcRenderer.on('chat-stream-data', listener);

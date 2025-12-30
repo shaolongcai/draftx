@@ -4,6 +4,7 @@ import { useState } from "react";
 import AIToolConfig from "./AIToolConfig";
 import { useRequest } from "ahooks";
 import Chat from "./Chat";
+import { useEvent } from "@/contexts/EvenContext";
 
 
 interface ToolProps {
@@ -26,21 +27,32 @@ const Tool: React.FC<ToolProps> = ({
 
 
 interface Props {
-    mode: 'add' | 'edit'
+    mode: 'add' | 'edit',
+    open: boolean
 }
 /**
  * 对memo纸使用的的AI工具
  */
 const AITools: React.FC<Props> = ({
-    mode
+    mode,
+    open
 }) => {
 
-    const [open, setOpen] = useState(false); //是否显示配置AI工作
+    const [openConfig, setOpenConfig] = useState(false); //是否显示配置AI工作
     const [openChat, setOpenChat] = useState(false)
+    const [currentContent, setCurrentContent] = useState('') // 当前的便利贴内容
+    const [currentToolId, setCurrentToolId] = useState<number>() //工具ID
+
+    const { refreshContent$ } = useEvent()
+
+    // 刷新便利贴内容
+    refreshContent$.useSubscription((content) => {
+        setCurrentContent(content)
+    })
 
     const handleAddTool = () => {
         // 检查有否配置AI供应商
-        setOpen(true);
+        setOpenConfig(true);
     }
 
     // 获取配置好的AI工具
@@ -48,17 +60,24 @@ const AITools: React.FC<Props> = ({
         () => window.electronAPI.getAITools(),
     )
 
+    if (!open) return null
+
     return (
         <div >
-            <Chat open={openChat} onClose={() => { setOpenChat(false) }} />
+            <Chat
+                toolId={currentToolId}
+                open={openChat}
+                onClose={() => { setOpenChat(false) }}
+                currentContent={currentContent}
+            />
             <AIToolConfig
-                open={open}
+                open={openConfig}
                 mode={mode}
-                onClose={() => { setOpen(false) }}
-                onFinish={() => { setOpen(false) }}
+                onClose={() => { setOpenConfig(false) }}
+                onFinish={() => { setOpenConfig(false) }}
             />
             {
-                !open &&
+                !openConfig &&
                 <Grid container spacing={2}
                     columns={3}
                     className='w-70 h-fit m-3'
@@ -77,7 +96,10 @@ const AITools: React.FC<Props> = ({
                                 <Tool
                                     name={item.name}
                                     emoji={item.emoji}
-                                    onClick={() => { setOpenChat(true) }}
+                                    onClick={() => {
+                                        setCurrentToolId(item.id)
+                                        setOpenChat(true)
+                                    }}
                                 />
                             </Grid>
                         })

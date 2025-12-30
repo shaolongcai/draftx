@@ -4,6 +4,7 @@ import { theme } from './theme'
 // import { I18nProvider } from './contexts/I18nContext';
 import { NotificationsProvider } from '@toolpad/core/useNotifications';
 // import { globalContext } from '@/contexts/globalContext';
+import { EventProvider } from './contexts/EvenContext'
 
 
 // Provider 初始化与订阅（示例）
@@ -40,7 +41,9 @@ function RootProviders({ children }) {
                     },
 
                 }}>
-                {children}
+                <EventProvider >
+                    {children}
+                </EventProvider>
             </NotificationsProvider>
             {/* </globalContext.Provider> */}
         </ThemeProvider>
