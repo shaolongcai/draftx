@@ -48,13 +48,7 @@ const AIToolConfig: React.FC<Props> = ({
         };
 
         console.log('保存AI工具配置:', toolData);
-
-        // TODO: 调用API保存
-        // window.electronAPI.setConfig({
-        //     key: 'ai_tools',
-        //     value: JSON.stringify(toolData),
-        //     type: 'string'
-        // });
+        window.electronAPI.saveAITool(toolData);
 
         onFinish();
 

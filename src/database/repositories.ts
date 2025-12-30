@@ -196,3 +196,31 @@ export const getGuideMemo = () => {
         return null;
     }
 }
+
+
+/**
+ * 添加AI工具
+ */
+export const saveAITool = (tool: AITool): void => {
+    try {
+        console.log('添加AI工具', tool)
+        if (tool.id) {
+            // 若有ID则为更新
+            const stmt = db.prepare(`
+                UPDATE ai_tools 
+                SET name = ?, prompt = ?, emoji = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            `);
+            stmt.run(tool.name, tool.prompt, tool.emoji || null, tool.id);
+        } else {
+            // 若没有ID则为新增
+            const stmt = db.prepare(`
+                INSERT INTO ai_tools (name, prompt, emoji, created_at, updated_at)
+                VALUES (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            `);
+            stmt.run(tool.name, tool.prompt, tool.emoji || null);
+        }
+    } catch (error) {
+        logger.error(error);
+    }
+}

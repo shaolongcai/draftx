@@ -17,3 +17,14 @@ interface GenerateRequest {
     isJson?: boolean;
     jsonFormat?: any;
 }
+
+
+/**
+ * AI工具
+ */
+interface AITool {
+    id?: number;
+    name: string;
+    prompt: string;
+    emoji?: string;
+}

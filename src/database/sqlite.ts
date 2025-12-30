@@ -3,7 +3,7 @@ import pathConfig from '../core/pathConfigs.js'
 import path from 'path'
 import { logger } from '../core/logger.js'
 // import { pinyin } from "pinyin-pro";
-import { createConfigDb, createStickysDb, createStickysFtsDb } from './schrma.js'
+import { createAIToolsDb, createConfigDb, createStickysDb, createStickysFtsDb } from './schrma.js'
 
 let db: Database.Database | null = null
 
@@ -42,6 +42,11 @@ export function initializeDatabase(): Database.Database {
             createConfigDb(db)
         } catch (error) {
             logger.error(`创建表失败3: ${JSON.stringify(error)}`)
+        }
+        try {
+            createAIToolsDb(db)
+        } catch (error) {
+            logger.error(`创建表失败4: ${JSON.stringify(error)}`)
         }
 
         // 添加新的字段
@@ -102,7 +107,7 @@ export function getConfig(key: ConfigName | string): any {
  * @param value 配置值
  * @param type 数据类型
  */
-export function setConfig(key: string, value: any, type: 'boolean' | 'string' | 'number' | 'json'  = 'string'): boolean {
+export function setConfig(key: string, value: any, type: 'boolean' | 'string' | 'number' | 'json' = 'string'): boolean {
     try {
         const db = getDatabase()
         let configValue: string
