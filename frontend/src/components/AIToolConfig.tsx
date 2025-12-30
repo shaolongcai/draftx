@@ -1,10 +1,6 @@
-import { Button, Stack, TextField, Typography } from "@mui/material"
+import { Button, FormControlLabel, FormGroup, Stack, TextField, Typography } from "@mui/material"
 import CardDialog from "./CardDialog"
 import { useState } from "react";
-
-
-
-
 
 
 
@@ -29,6 +25,41 @@ const AIToolConfig: React.FC<Props> = ({
     const [deleteText, setDeleteText] = useState('Delete');
     const [isReadyAi, setIsReadyAi] = useState(true); //是否已经配置好AI
 
+
+    // 处理表单提交
+    const saveAITool = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        // 获取表单数据
+        const formData = new FormData(e.currentTarget);
+        const toolName = formData.get('toolName') as string;
+        const prompt = formData.get('prompt') as string;
+
+        // 验证
+        if (!toolName?.trim() || !prompt?.trim()) {
+            console.error('请填写完整信息');
+            return;
+        }
+
+        // 构建数据
+        const toolData = {
+            name: toolName,
+            prompt: prompt
+        };
+
+        console.log('保存AI工具配置:', toolData);
+
+        // TODO: 调用API保存
+        // window.electronAPI.setConfig({
+        //     key: 'ai_tools',
+        //     value: JSON.stringify(toolData),
+        //     type: 'string'
+        // });
+
+        onFinish();
+
+    }
+
     // 删除工具
     const handleDeleteTool = () => {
 
@@ -39,6 +70,13 @@ const AIToolConfig: React.FC<Props> = ({
     return <CardDialog
         title="AI Tool"
         onClose={onClose}
+        primaryAction={() => {
+            // 触发表单提交
+            const form = document.querySelector('form') as HTMLFormElement;
+            if (form) {
+                form.requestSubmit();
+            }
+        }}
         primaryBtnLabel={isReadyAi ? 'Save' : ''}
         secondaryBtn={
             mode === 'edit' &&
@@ -51,10 +89,29 @@ const AIToolConfig: React.FC<Props> = ({
     >
         {
             isReadyAi ?
-                <Stack component="form" spacing={1}>
-                    <TextField label="Tool name" required size='small' />
-                    <TextField multiline minRows={3} maxRows={5} label="Prompt" required size='small' />
-                </Stack>
+                <form onSubmit={saveAITool} >
+                    <Stack spacing={2}>
+                        <TextField
+                            name="toolName"
+                            label="Tool name"
+                            required
+                            size='small'
+                            fullWidth
+                            defaultValue={tool?.name || ''}
+                        />
+                        <TextField
+                            name="prompt"
+                            label="Prompt"
+                            multiline
+                            minRows={3}
+                            maxRows={5}
+                            required
+                            size='small'
+                            fullWidth
+                            defaultValue={tool?.prompt || ''}
+                        />
+                    </Stack>
+                </form>
                 :
                 <Stack spacing={2}>
                     <Typography variant='bodyMedium'>

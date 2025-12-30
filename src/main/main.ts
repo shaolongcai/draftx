@@ -7,6 +7,7 @@ import { deleteExpiredStickys, getGuideMemo, saveStickyNote } from '../database/
 import { initializeSystemApi } from '../api/system.js';
 import { logger } from '../core/logger.js';
 import { GuidMarkdown } from '../data/data.js';
+import { initializeAIApi } from '../api/ai.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -145,6 +146,7 @@ app.whenReady().then(async () => {
   // 初始化 API
   initializeStickyApi();
   initializeSystemApi();
+  initializeAIApi()
   // 创建托盘
   createTray();
   // 初始化引导memo

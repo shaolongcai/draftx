@@ -15,16 +15,16 @@ const AIProvider: React.FC<Props> = ({
 
     const [apiHost, setApiHost] = useState('http://127.0.0.1:11434');
     const [apiHostError, setApiHostError] = useState('');
-    const [modelID, setModelID] = useState('');
+    const [modelID, setModelID] = useState<string | undefined>();
     const [modelIDError, setModelIDError] = useState('');
 
     useRequest(window.electronAPI.getConfig, {
         defaultParams: ['ai_provider'],
         onSuccess: (dataString: string) => {
             const data = JSON.parse(dataString);
-            setApiHost(data.host);
-            setModelID(data.model);
             console.log('data', data)
+            setApiHost(data?.host || 'http://127.0.0.1:11434');
+            setModelID(data?.model);
         }
     });
 
@@ -36,6 +36,14 @@ const AIProvider: React.FC<Props> = ({
         if (!apiHost || !modelID) {
             setApiHostError(!apiHost ? 'please input API Host' : '');
             setModelIDError(!modelID ? 'please input Model ID' : '');
+            return;
+        }
+
+        // 检查ollama服务是否正常
+        const checkRes = await window.electronAPI.checkOllamaServer();
+        console.log('checkRes', checkRes)
+        if (checkRes.code !== 0) {
+            setApiHostError(checkRes.errMsg || 'check ollama server failed');
             return;
         }
 

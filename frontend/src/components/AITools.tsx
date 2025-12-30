@@ -16,10 +16,15 @@ const Tool = () => {
 }
 
 
+interface Props {
+    mode: 'add' | 'edit'
+}
 /**
  * 对memo纸使用的的AI工具
  */
-const AITools = () => {
+const AITools: React.FC<Props> = ({
+    mode
+}) => {
 
     const [open, setOpen] = useState(false); //是否显示配置AI工作
 
@@ -29,10 +34,10 @@ const AITools = () => {
     }
 
     return (
-        <>
+        <div className="m-3">
             <AIToolConfig
                 open={open}
-                mode='add'
+                mode={mode}
                 onClose={() => { setOpen(false) }}
                 onFinish={() => { setOpen(false) }}
             />
@@ -60,7 +65,7 @@ const AITools = () => {
                     </Grid>
                 </Grid>
             }
-        </>
+        </div>
     )
 }
 

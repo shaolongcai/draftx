@@ -5,9 +5,10 @@ import {
     Close as CloseIcon
 } from '@mui/icons-material';
 // import { useGlobalContext } from "@/contexts/globalContext";
-import { SettingItem, AIProvider } from "@/components";
+import { SettingItem, AIProvider, AIToolConfig } from "@/components";
 // import { useTranslation } from '@/contexts/I18nContext';
 import { ConfigParams } from '@/type/electron';
+import AITools from "@/components/AITools";
 // import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 
@@ -18,15 +19,11 @@ import { ConfigParams } from '@/type/electron';
  */
 const Setting = () => {
 
-    const [openSetting, setOpenSetting] = useState(true);
-    const [openAITool, setOpenAITool] = useState(false) //打开AI工具配置
+
     const [openReportProtocol, setOpenReportProtocol] = useState(false) //用户体验改进计划弹窗
-    const [hasGPU, setHasGPU] = useState(false)
-    const [gpuSeverOpen, setGpuSeverOpen] = useState(false) //GPU服务弹窗
-    const [isInstallGpu, setIsInstallGpu] = useState(false) //是否已安装GPU服务
-    const [openAIProvider, setOpenAIProvider] = useState(false) //AI服务弹窗
     const [reportAgreement, setReportAgreement] = useState(false) //是否已同意用户体验改进计划
     const [aiProvider, setAiProvider] = useState<{ host: string, model: string }>() //是否已设置AI服务
+    const [openType, setOpenType] = useState<'AIProvider' | 'AITools' | 'AIconfig' | null>(null)  //打开的弹窗类型
     // 更新檢查相關狀態
     const [isUpdateAvailable, setIsUpdateAvailable] = useState(false)
     const [isCheckingUpdate, setIsCheckingUpdate] = useState(false)
@@ -128,6 +125,19 @@ const Setting = () => {
         await window.electronAPI.setAutoLaunch(checked, autoLaunchHidden)
     }
 
+    // 渲染右侧弹窗
+    const genRightDialog = () => {
+        switch (openType) {
+            case 'AIProvider':
+                return <AIProvider onFinish={() => { setOpenType(null) }} />;
+            case 'AITools':
+                return <AITools />;
+            case 'AIconfig':
+            // return <AIToolConfig mode='edit' />;
+            default:
+                return null
+        }
+    }
 
     return <Stack
         direction='row'
@@ -151,11 +161,11 @@ const Setting = () => {
         >
             <Stack direction='row' justifyContent='space-between' alignItems='center' >
                 <Typography variant='headlineSmall' >
-                Setting
-            </Typography>
-            <IconButton >
-                <CloseIcon />
-            </IconButton>
+                    Setting
+                </Typography>
+                <IconButton >
+                    <CloseIcon />
+                </IconButton>
             </Stack>
             <Stack spacing={2} sx={{ marginTop: '16px' }}>
                 <Stack spacing={1}>
@@ -167,15 +177,14 @@ const Setting = () => {
                         type='button'
                         value={aiProvider?.model || 'Set'}
                         onAction={() => {
-                            setOpenAIProvider(true)
-                            setOpenSetting(false)
+                            setOpenType('AIProvider')
                         }}
                     />
                     <SettingItem
                         title='AI Tool'
                         type='button'
-                        value='Edit'
-                        onAction={() => { setOpenAITool(true) }}
+                        value={openType === 'AITools' ? 'Close' : 'Edit'}
+                        onAction={() => { setOpenType(openType === 'AITools' ? null : 'AITools') }}
                     />
                 </Stack>
                 <Stack spacing={1}>
@@ -251,10 +260,7 @@ const Setting = () => {
                         </Stack> */}
             </Stack>
         </Card>
-        {
-            openAIProvider &&
-            <AIProvider onFinish={() => { setOpenAIProvider(false), setOpenSetting(true) }} />
-        }
+        {genRightDialog()}
     </Stack>
 }
 

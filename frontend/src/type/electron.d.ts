@@ -64,6 +64,12 @@ interface ElectronAPI {
      * 获取引导memo
      */
     getGuideMemo: () => Promise<StickyResult>
+
+    /**
+     * 检查Ollama服务是否可用
+     * @returns code: 0 表示成功，1 表示失败 ,errMsg: 错误信息
+     */
+    checkOllamaServer: () => Promise<{ code: number, errMsg?: string }>
 }
 
 
