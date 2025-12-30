@@ -40,7 +40,7 @@ interface ElectronAPI {
     /**
      * 变更窗口大小
      */
-    resizeWindow: (size: { width: number, height: number }) => Promise<void>;
+    resizeWindow: (windowName: 'mainWindow' | 'settingsWindow', size: { width: number, height: number }) => Promise<void>;
 
     /**
      * 获取最近的项目

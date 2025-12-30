@@ -40,21 +40,24 @@ const SettingItem: React.FC<Props> = ({
                 return (
                     <Button
                         sx={{
+                            border: '1px solid transparent',
+                            boxSizing: 'border-box',
                             '&:focus': {
                                 outline: 'none',
-                                border: 'none',
+                                border: '1px solid #fff',
                                 boxShadow: 'none'
                             },
                             '&:active': {
                                 outline: 'none',
-                                border: 'none',
+                                border: '1px solid #fff',
                                 boxShadow: 'none'
                             },
                             '&:hover': {
-                                border: 'none'
+                                border: '1px solid #fff'
                             }
                         }}
                         variant='text'
+                        className="text-white"
                         onClick={onAction}
                     >
                         {value}
@@ -63,6 +66,21 @@ const SettingItem: React.FC<Props> = ({
             case 'switch':
                 return (
                     <Switch
+                        sx={{
+                            '& .MuiSwitch-track': {
+                                backgroundColor: '#fff !important',
+                                opacity: 0.45
+                            },
+                            '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                backgroundColor: '#fff !important',
+                                opacity: 1
+                            },
+                            // 圆点为白色
+                            '& .MuiSwitch-thumb': {
+                                backgroundColor: '#fff !important',
+                                border: '1px solid #000'
+                            }
+                        }}
                         checked={value as boolean}
                         onChange={(_e, checked) => onAction(checked)}
                         disabled={disabled}
@@ -82,11 +100,9 @@ const SettingItem: React.FC<Props> = ({
     }
 
     return (
-        <Paper className="border border-border" variant='outlined' sx={{
-            padding: '16px',
-        }}>
+        <Paper className="bg-black px-4 py-3 rounded-2xl" variant='outlined' >
             <Stack direction='row' justifyContent='space-between' alignItems='center'>
-                <Typography variant='bodySmall' color="text.secondary" className="font-semibold" >
+                <Typography variant='bodyLarge' color="text.primary" className=" text-white" >
                     {title}
                 </Typography>
                 {generateAction(type)}

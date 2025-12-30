@@ -12,20 +12,12 @@ function Home() {
     const [showAITools, setShowAITools] = useState(false)
 
     const debouncedValue = useDebounce(searchValue, { wait: 200 })
-    const rootRef = useRef(null)
-    const size = useSize(rootRef)
 
     // 注册alt+s 展示出memoList
     useKeyPress('alt.s', () => {
         setShowMemoList(pre => !pre);
     })
 
-
-    // 触发变更窗口大小
-    useRequest(() => window.electronAPI.resizeWindow(size), {
-        ready: Boolean(size),
-        refreshDeps: [size],
-    })
 
     // 搜索
     const { data } = useRequest(

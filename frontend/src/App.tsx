@@ -14,7 +14,7 @@ function App() {
 
 
   // 触发变更窗口大小
-  useRequest(() => window.electronAPI.resizeWindow(size), {
+  useRequest(() => window.electronAPI.resizeWindow('mainWindow',size), {
     ready: Boolean(size),
     refreshDeps: [size],
   })

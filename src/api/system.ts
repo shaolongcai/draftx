@@ -3,9 +3,9 @@ import { getConfig, setConfig } from '../database/sqlite.js';
 
 export function initializeSystemApi() {
     // 变更视窗大小
-    ipcMain.on('resize-window', async (_event, size: { width: number, height: number }) => {
+    ipcMain.on('resize-window', async (_event, windowName: 'mainWindow' | 'settingsWindow', size: { width: number, height: number }) => {
         const { windowManager } = await import('../core/windowManager.js');
-        windowManager.resizeWindow(size);
+        windowManager.resizeWindow(windowName, size);
     })
 
     // 获取配置

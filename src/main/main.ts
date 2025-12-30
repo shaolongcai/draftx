@@ -36,6 +36,7 @@ const registerGlobalShortcut = () => {
   // 触发：显示/隐藏主窗口
   const shortcut = isDev ? 'Alt+Shift+Z' : 'Alt+Z';
   globalShortcut.register(shortcut, () => {
+    settingsWindow.hide()
     // 触发：显示/隐藏主窗口
     if (mainWindow?.isVisible()) {
       mainWindow.hide();
@@ -67,7 +68,7 @@ function createTray() {
     // 創建托盤菜單
     const contextMenu = Menu.buildFromTemplate([
       {
-        label: isDev ? '便利贴（Alt + Shift + Z）' : '便利贴（Alt + Z）',
+        label: isDev ? 'Altmo（Alt + Shift + Z）' : 'Altmo（Alt + Z）',
         click: () => {
           const isVisible = mainWindow?.isVisible();
           isVisible ? mainWindow.hide() : mainWindow.show();
@@ -77,17 +78,17 @@ function createTray() {
       {
         type: 'separator'
       },
-      // {
-      //   label: t.settings,
-      //   click: () => {
-      //     searchWindow.hide();
-      //     settingsWindow.focus();
-      //     const isVisible = settingsWindow?.isVisible();
-      //     isVisible ? settingsWindow.hide() : settingsWindow.show();
-      //   }
-      // },
       {
-        label: '重新启动',
+        label: 'settings',
+        click: () => {
+          mainWindow.hide();
+          settingsWindow.focus();
+          const isVisible = settingsWindow?.isVisible();
+          isVisible ? settingsWindow.hide() : settingsWindow.show();
+        }
+      },
+      {
+        label: 'restart',
         click: () => {
           // 重新啟動應用
           app.relaunch();
@@ -98,7 +99,7 @@ function createTray() {
         type: 'separator'
       },
       {
-        label: '退出',
+        label: 'quit',
         accelerator: 'CommandOrControl+Q',
         click: () => {
           app.quit();

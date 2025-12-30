@@ -2,6 +2,7 @@ import { ConfigParams } from "@/type/electron";
 import { Button, Card, MenuItem, Paper, Stack, TextField, Typography } from "@mui/material"
 import { useRequest } from "ahooks";
 import { useState } from "react";
+import CardDialog from "./CardDialog";
 
 
 interface Props {
@@ -53,11 +54,11 @@ const AIProvider: React.FC<Props> = ({
     }
 
     return (
-        <Card elevation={1} className="w-[480px] min-h-[400px]">
+        <CardDialog
+            title="AI Provider"
+            onClose={onFinish}
+        >
             <Stack spacing={3} alignItems='center'>
-                <Typography variant='headlineSmall' className="w-full text-left">
-                    AI Provider
-                </Typography>
                 <Stack spacing={2} className="w-full" alignItems="center">
                     <Typography variant='titleSmall' color='text.secondary' className="w-full" >
                         Ollama
@@ -93,7 +94,7 @@ const AIProvider: React.FC<Props> = ({
                         fullWidth={false}
                         onClick={handleApply}
                     >
-                        Apply
+                        Save
                     </Button>
                     <Button
                         variant='outlined'
@@ -105,7 +106,7 @@ const AIProvider: React.FC<Props> = ({
                     </Button>
                 </Stack>
             </Stack>
-        </Card>
+        </CardDialog>
     )
 }
 

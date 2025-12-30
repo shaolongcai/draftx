@@ -83,7 +83,7 @@ class WindowManager {
     // 初始化settings窗口
     private initSettingsWindow() {
         this.settingsWindow = new BrowserWindow({
-            width: 480,
+            width: 512,
             height: 700,
             x: 0,               // 后面会计算居中
             y: 0,
@@ -118,14 +118,14 @@ class WindowManager {
     private loadWindows() {
         if (isDev) {
             this.mainWindow.loadURL('http://localhost:5173');   // 加载搜索条HTML
-            // this.settingsWindow.loadURL('http://localhost:5173/setting.html');   // 加载设置条HTML
+            this.settingsWindow.loadURL('http://localhost:5173/setting.html');   // 加载设置条HTML
             this.mainWindow.webContents.openDevTools(); //打开开发者工具        
-            // this.settingsWindow.webContents.openDevTools(); //打开开发者工具
+            this.settingsWindow.webContents.openDevTools(); //打开开发者工具
         } else {
             // 获取应用根目录
             const appPath = app.getAppPath();
             const mainPath = path.join(appPath, 'frontend/dist/index.html');
-            // const settingPath = path.join(__dirname, '../frontend/dist/setting.html');
+            const settingPath = path.join(__dirname, '../frontend/dist/setting.html');
 
             // 檢查文件是否存在
             if (!existsSync(mainPath)) {
@@ -135,13 +135,13 @@ class WindowManager {
                     logger.error(`加載主窗口文件失敗: ${error}`);
                 });
             }
-            // if (!existsSync(settingPath)) {
-            //     logger.error(`設置窗口文件不存在: ${settingPath}`);
-            // } else {
-            //     this.settingsWindow.loadFile(settingPath).catch((error) => {
-            //         logger.error(`加載設置窗口文件失敗: ${error}`);
-            //     });
-            // }
+            if (!existsSync(settingPath)) {
+                logger.error(`設置窗口文件不存在: ${settingPath}`);
+            } else {
+                this.settingsWindow.loadFile(settingPath).catch((error) => {
+                    logger.error(`加載設置窗口文件失敗: ${error}`);
+                });
+            }
         }
 
         // 當搜索框失去焦點時自動隱藏（開發模式下禁用，避免與開發者工具衝突）
@@ -189,10 +189,15 @@ class WindowManager {
     }
 
     // 变更窗口大小
-    public resizeWindow(size: { width: number, height: number }) {
-        if (!size.height || !size.width) return;
-        // 暂时固定窗口伸展大小
-        this.mainWindow.setBounds({
+    public resizeWindow(windowName: 'mainWindow' | 'settingsWindow', size: { width: number, height: number }) {
+        console.log('窗口变化',size)
+        if (!size || !size.height || !size.width) return;
+        let window = this.mainWindow;
+        if (windowName === 'settingsWindow') {
+            window = this.settingsWindow;
+            console.log('设置窗口变化')
+        }
+        window.setBounds({
             width: size.width + 8,
             height: size.height + 8 || this.mainWindow.getBounds().height + 8
         });

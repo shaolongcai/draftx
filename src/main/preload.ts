@@ -14,7 +14,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // 系统相关
   setConfig: (params: ConfigParams) => ipcRenderer.invoke('set-config', params.key, params.value, params.type), // 设置用户配置
   getConfig: (key?: string) => ipcRenderer.invoke('get-config', key),  // 获取用户配置
-  resizeWindow: (size: { width: number, height: number }) => ipcRenderer.send('resize-window', size), // 变更窗口大小
+  resizeWindow: (windowName: 'mainWindow' | 'settingsWindow', size: { width: number, height: number }) => ipcRenderer.send('resize-window', windowName, size), // 变更窗口大小
 
 });
 

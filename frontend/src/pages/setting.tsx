@@ -1,4 +1,4 @@
-import { Button, Paper, Stack, Typography, styled, Card } from "@mui/material"
+import { Button, Paper, Stack, Typography, styled, Card, IconButton } from "@mui/material"
 import { useState, useEffect } from "react";
 import {
     Settings as SettingsIcon,
@@ -10,48 +10,6 @@ import { SettingItem, AIProvider } from "@/components";
 import { ConfigParams } from '@/type/electron';
 // import LanguageSwitcher from '@/components/LanguageSwitcher';
 
-
-// 封装按钮样式
-const StyledButton = styled(Button)(({ theme }) => ({
-    '&:focus': { outline: 'none', border: 'none', boxShadow: 'none' },
-    '&:active': { outline: 'none', border: 'none', boxShadow: 'none' },
-    '&:hover': { border: 'none' }
-}));
-
-
-interface SettingButtonProps {
-    openSetting: boolean;
-    setOpenSetting: (value: boolean) => void;
-}
-/**
- * 设置按钮
- */
-const SettingButton = ({ openSetting, setOpenSetting }: SettingButtonProps) => {
-    return <Card
-        variant="elevation"
-        onClick={() => {
-            setOpenSetting(!openSetting);
-        }}
-        className="rounded-full! flex items-center justify-center cursor-pointer h-10 w-10
-        border border-solid border-[rgba(0,0,0,0.12)]
-        "
-    >
-        {
-            openSetting ?
-                <CloseIcon
-                    fontSize='small'
-                    sx={{
-                        color: 'rgba(0, 0, 0, 0.85)',
-                    }} />
-                :
-                <SettingsIcon
-                    fontSize='small'
-                    sx={{
-                        color: 'rgba(0, 0, 0, 0.85)',
-                    }} />
-        }
-    </Card>
-}
 
 
 
@@ -172,7 +130,8 @@ const Setting = () => {
 
 
     return <Stack
-        alignItems='flex-end'
+        direction='row'
+        alignItems='flex-start'
         spacing={3}
     >
         {/* {
@@ -186,15 +145,18 @@ const Setting = () => {
                 />
             } */}
         <Card
-            className="w-[480px] max-h-[680px]! box-border! overflow-y-auto 
+            className="w-[480px] max-h-[680px]!  overflow-y-auto 
                     scrollbar-thin
-                    p-6
-                    border border-solid border-[rgba(0,0,0,0.12)]
                     "
         >
-            <Typography variant='headlineSmall' >
+            <Stack direction='row' justifyContent='space-between' alignItems='center' >
+                <Typography variant='headlineSmall' >
                 Setting
             </Typography>
+            <IconButton >
+                <CloseIcon />
+            </IconButton>
+            </Stack>
             <Stack spacing={2} sx={{ marginTop: '16px' }}>
                 <Stack spacing={1}>
                     <Typography variant='titleSmall' className='color-rgba(0, 0, 0, 0.85)' >
@@ -223,7 +185,7 @@ const Setting = () => {
                     {/* 打开日志 */}
                     <SettingItem
                         title='Log Folder'
-                        action='Open'
+                        value='Open'
                         onAction={() => window.electronAPI.openDir('runLog')}
                         type='button'
                     />
