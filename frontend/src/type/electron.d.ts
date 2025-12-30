@@ -80,6 +80,29 @@ interface ElectronAPI {
      * 获取AI工具
      */
     getAITools: (id?: number) => Promise<AIToolItem[] | AIToolItem | null>;
+
+    /**
+     * 发起流式对话
+     */
+    chatStream: (message: string, toolId?: number) => void;
+
+    /**
+     * 监听流式数据
+     * @returns 取消监听的函数
+     */
+    onChatStream: (callback: (chunk: string) => void) => () => void;
+
+    /**
+     * 监听流式结束
+     * @returns 取消监听的函数
+     */
+    onChatStreamEnd: (callback: () => void) => () => void;
+
+    /**
+     * 监听流式错误
+     * @returns 取消监听的函数
+     */
+    onChatStreamError: (callback: (error: string) => void) => () => void;
 }
 
 

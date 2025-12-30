@@ -12,6 +12,7 @@ interface Props {
     secondaryBtnLabel?: string;
     secondaryAction?: () => void;
     secondaryBtn?: React.ReactNode; //额外的次级按钮,使用这个，不需要使用secondaryBtnLabel和secondaryAction
+    open?: boolean
 }
 /**
  * 自定义的卡片窗口
@@ -25,11 +26,14 @@ const CardDialog: React.FC<Props> = ({
     primaryAction,
     secondaryBtnLabel,
     secondaryAction,
-    secondaryBtn
+    secondaryBtn,
+    open = true
 }) => {
 
 
-    return <Card className="w-100">
+    if (!open) return null;
+
+    return <Card className="w-100 block-inline">
         <Stack spacing={2} >
             <Stack direction='row' alignItems='center' justifyContent='space-between'>
                 <Typography variant='headlineMedium'>

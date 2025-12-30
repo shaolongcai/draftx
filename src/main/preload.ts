@@ -21,8 +21,25 @@ contextBridge.exposeInMainWorld('electronAPI', {
   saveAITool: (toolData: AITool) => ipcRenderer.send('save-ai-tool', toolData), // 保存AI工具 
   getAITools: (id?: number) => ipcRenderer.invoke('get-ai-tools', id), // 获取AI工具
 
-});
+  // AI流式对话
+  chatStream: (message: string, toolId?: number) => ipcRenderer.send('chat-stream', message, toolId), // 发起流式对话
+  onChatStream: (callback: (chunk: string) => void) => {
+    const listener = (_event: any, chunk: string) => callback(chunk);
+    ipcRenderer.on('chat-stream-data', listener);
+    return () => ipcRenderer.removeListener('chat-stream-data', listener);
+  }, // 监听流式数据
+  onChatStreamEnd: (callback: () => void) => {
+    const listener = () => callback();
+    ipcRenderer.on('chat-stream-end', listener);
+    return () => ipcRenderer.removeListener('chat-stream-end', listener);
+  }, // 监听流式结束
+  onChatStreamError: (callback: (error: string) => void) => {
+    const listener = (_event: any, error: string) => callback(error);
+    ipcRenderer.on('chat-stream-error', listener);
+    return () => ipcRenderer.removeListener('chat-stream-error', listener);
+  }, // 监听流式错误
 
+});
 
 // 暴露一些实用工具
 contextBridge.exposeInMainWorld('electronUtils', {

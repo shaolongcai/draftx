@@ -3,6 +3,7 @@ import { Add as AddIcon } from "@mui/icons-material";
 import { useState } from "react";
 import AIToolConfig from "./AIToolConfig";
 import { useRequest } from "ahooks";
+import Chat from "./Chat";
 
 
 interface ToolProps {
@@ -35,6 +36,7 @@ const AITools: React.FC<Props> = ({
 }) => {
 
     const [open, setOpen] = useState(false); //是否显示配置AI工作
+    const [openChat, setOpenChat] = useState(false)
 
     const handleAddTool = () => {
         // 检查有否配置AI供应商
@@ -47,7 +49,8 @@ const AITools: React.FC<Props> = ({
     )
 
     return (
-        <div className="m-3">
+        <div >
+            <Chat open={openChat} onClose={() => { setOpenChat(false) }} />
             <AIToolConfig
                 open={open}
                 mode={mode}
@@ -58,7 +61,7 @@ const AITools: React.FC<Props> = ({
                 !open &&
                 <Grid container spacing={2}
                     columns={3}
-                    className='w-70 h-fit'
+                    className='w-70 h-fit m-3'
                 >
 
                     <Grid>
@@ -74,7 +77,7 @@ const AITools: React.FC<Props> = ({
                                 <Tool
                                     name={item.name}
                                     emoji={item.emoji}
-                                    onClick={() => { }}
+                                    onClick={() => { setOpenChat(true) }}
                                 />
                             </Grid>
                         })
