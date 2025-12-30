@@ -224,3 +224,32 @@ export const saveAITool = (tool: AITool): void => {
         logger.error(error);
     }
 }
+
+
+/**
+ * 获取AI工具
+ */
+export const getAITools = (id?: number): AITool | AITool[] | null => {
+    try {
+        if (id) {
+            // 根据ID获取单个AI工具
+            const stmt = db.prepare(`
+                SELECT id, name, prompt, emoji, created_at, updated_at
+                FROM ai_tools
+                WHERE id = ?
+            `);
+            return stmt.get(id) as AITool;
+        } else {
+            // 获取所有AI工具
+            const stmt = db.prepare(`
+                SELECT id, name, prompt, emoji, created_at, updated_at
+                FROM ai_tools
+                ORDER BY created_at DESC
+            `);
+            return stmt.all() as AITool[];
+        }
+    } catch (error) {
+        logger.error(error);
+        return null;
+    }
+}

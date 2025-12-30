@@ -16,12 +16,6 @@ export type ConfigParams = {
     type?: 'boolean' | 'string' | 'number' | 'json';
 }
 
-export interface AITool {
-    id?: number;
-    name: string;
-    prompt: string;
-    emoji?: string;
-}
 
 
 interface ElectronAPI {
@@ -81,6 +75,11 @@ interface ElectronAPI {
      * 保存AI工具
      */
     saveAITool: (toolData: AITool) => Promise<void>;
+
+    /**
+     * 获取AI工具
+     */
+    getAITools: (id?: number) => Promise<AIToolItem[] | AIToolItem | null>;
 }
 
 

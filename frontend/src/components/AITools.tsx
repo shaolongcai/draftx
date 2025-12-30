@@ -2,14 +2,22 @@ import { Card, Grid, Stack, Typography } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
 import { useState } from "react";
 import AIToolConfig from "./AIToolConfig";
+import { useRequest } from "ahooks";
 
 
-
-const Tool = () => {
-    return <Card className="w-20 h-20 m-0 shadow-[4px_4px_0px_01px_rgba(0,0,0,1)] p-2 cursor-pointer" >
+interface ToolProps {
+    name: string,
+    emoji?: string,
+    onClick: () => void
+}
+const Tool: React.FC<ToolProps> = ({
+    name, emoji,
+    onClick
+}) => {
+    return <Card className="w-20 h-20 m-0 shadow-[4px_4px_0px_01px_rgba(0,0,0,1)] p-2 cursor-pointer" onClick={onClick}>
         <Stack alignItems='center' justifyContent='center' className="h-full">
             <Typography variant='bodyMedium' fontWeight={600}>
-                AI 整理
+                {name}
             </Typography>
         </Stack>
     </Card>
@@ -33,6 +41,11 @@ const AITools: React.FC<Props> = ({
         setOpen(true);
     }
 
+    // 获取配置好的AI工具
+    const { data } = useRequest(
+        () => window.electronAPI.getAITools(),
+    )
+
     return (
         <div className="m-3">
             <AIToolConfig
@@ -47,6 +60,7 @@ const AITools: React.FC<Props> = ({
                     columns={3}
                     className='w-70 h-fit'
                 >
+
                     <Grid>
                         <Card className="m-0 shadow-[4px_4px_0px_01px_rgba(0,0,0,1)] cursor-pointer"
                             onClick={handleAddTool}
@@ -54,15 +68,17 @@ const AITools: React.FC<Props> = ({
                             <AddIcon />
                         </Card>
                     </Grid>
-                    <Grid  >
-                        <Tool />
-                    </Grid>
-                    <Grid  >
-                        <Tool />
-                    </Grid>
-                    <Grid  >
-                        <Tool />
-                    </Grid>
+                    {
+                        (data as AIToolItem[] || []).map(item => {
+                            return <Grid>
+                                <Tool
+                                    name={item.name}
+                                    emoji={item.emoji}
+                                    onClick={() => { }}
+                                />
+                            </Grid>
+                        })
+                    }
                 </Grid>
             }
         </div>

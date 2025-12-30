@@ -1,5 +1,5 @@
 import { ipcMain } from "electron";
-import { addDeleteDay, getGuideMemo, getRecentStickys, saveAITool, saveStickyNote, searchStickyNote } from "../database/repositories.js";
+import { addDeleteDay, getAITools, getGuideMemo, getRecentStickys, saveAITool, saveStickyNote, searchStickyNote } from "../database/repositories.js";
 import { ollamaService } from "../server/ollamaSever.js";
 import { logger } from "../core/logger.js";
 
@@ -28,16 +28,17 @@ export function initializeAIApi() {
     ipcMain.on('save-ai-tool', async (event, toolData: AITool) => {
         try {
             saveAITool(toolData)
-            return {
-                code: 0,
-                data: toolData
-            }
         } catch (error) {
             logger.error(error)
-            return {
-                code: 1,
-                errMsg: error.message
-            }
         }
+    })
+
+    // 获取AI工具
+    ipcMain.handle('get-ai-tools', (event, id?: number) => {
+        //有id则只获取对应id的
+        if (id) {
+            return getAITools(id)
+        }
+        return getAITools()
     })
 }
