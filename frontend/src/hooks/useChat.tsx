@@ -10,6 +10,8 @@ interface UseChatOptions {
 }
 
 export const useChat = (options?: UseChatOptions) => {
+
+    const [aiAnswer, setAiAnswer] = useState<string>('');  // AI的回答
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -18,8 +20,9 @@ export const useChat = (options?: UseChatOptions) => {
     useEffect(() => {
         // 监听流式数据
         const unsubscribeData = window.electronAPI.onChatStream((chunk: string) => {
-            console.log('流式数据', chunk)
             currentMessageRef.current += chunk;
+            setAiAnswer(prev => prev + chunk)
+            setIsLoading(false); //有结果时即不需要loading
             setMessages(prev => {
                 const newMessages = [...prev];
                 const lastMessage = newMessages[newMessages.length - 1];
@@ -39,7 +42,6 @@ export const useChat = (options?: UseChatOptions) => {
 
         // 监听流式结束
         const unsubscribeEnd = window.electronAPI.onChatStreamEnd(() => {
-            setIsLoading(false);
             currentMessageRef.current = '';
         });
 
@@ -55,10 +57,11 @@ export const useChat = (options?: UseChatOptions) => {
             unsubscribeData();
             unsubscribeEnd();
             unsubscribeError();
+            setAiAnswer('');
         };
     }, []);
 
-    const sendMessage = useCallback(( message?: string) => {
+    const sendMessage = useCallback((message?: string) => {
         if (isLoading) return;
 
         setError(null);
@@ -77,6 +80,7 @@ export const useChat = (options?: UseChatOptions) => {
 
     const clearMessages = useCallback(() => {
         setMessages([]);
+        setAiAnswer('');
         setError(null);
     }, []);
 
@@ -85,7 +89,8 @@ export const useChat = (options?: UseChatOptions) => {
         isLoading,
         error,
         sendMessage,
-        clearMessages
+        clearMessages,
+        aiAnswer
     };
 };
 

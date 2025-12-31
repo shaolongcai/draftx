@@ -1,6 +1,6 @@
 import { Card, Grid, Stack, Typography } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AIToolConfig from "./AIToolConfig";
 import { useRequest } from "ahooks";
 import Chat from "./Chat";
@@ -42,8 +42,15 @@ const AITools: React.FC<Props> = ({
     const [openChat, setOpenChat] = useState(false)
     const [currentContent, setCurrentContent] = useState('') // 当前的便利贴内容
     const [currentToolId, setCurrentToolId] = useState<number>() //工具ID
+    const [currentToolName, setCurrentToolName] = useState<string>() //工具名称
 
     const { refreshContent$ } = useEvent()
+
+    // 关闭时重置状态
+    useEffect(() => {
+        setOpenChat(false)
+        setOpenConfig(false)
+    }, [open])
 
     // 刷新便利贴内容
     refreshContent$.useSubscription((content) => {
@@ -66,6 +73,7 @@ const AITools: React.FC<Props> = ({
         <div >
             <Chat
                 toolId={currentToolId}
+                toolName={currentToolName}
                 open={openChat}
                 onClose={() => { setOpenChat(false) }}
                 currentContent={currentContent}
@@ -77,7 +85,7 @@ const AITools: React.FC<Props> = ({
                 onFinish={() => { setOpenConfig(false) }}
             />
             {
-                !openConfig &&
+                !openConfig && !openChat &&
                 <Grid container spacing={2}
                     columns={3}
                     className='w-70 h-fit m-3'
@@ -98,6 +106,7 @@ const AITools: React.FC<Props> = ({
                                     emoji={item.emoji}
                                     onClick={() => {
                                         setCurrentToolId(item.id)
+                                        setCurrentToolName(item.name)
                                         setOpenChat(true)
                                     }}
                                 />
