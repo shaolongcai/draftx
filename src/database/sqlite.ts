@@ -33,11 +33,11 @@ export function initializeDatabase(): Database.Database {
         } catch (error) {
             logger.error(`创建表失败: ${JSON.stringify(error)}`)
         }
-        try {
-            createStickysFtsDb(db)
-        } catch (error) {
-            logger.error(`FTS表创建失败: ${JSON.stringify(error)}`)
-        }
+        // try {
+        //     createStickysFtsDb(db)
+        // } catch (error) {
+        //     logger.error(`FTS表创建失败: ${JSON.stringify(error)}`)
+        // }
         try {
             createConfigDb(db)
         } catch (error) {

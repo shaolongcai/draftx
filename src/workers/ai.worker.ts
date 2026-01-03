@@ -79,9 +79,12 @@ async function aiInWorker(data: GenerateRequest & { requestId: string }): Promis
         //     })
         const messages: Message[] = [
             {
+                role: 'system',
+                content: data.prompt
+            },
+            {
                 role: 'user',
-                content: `${data.prompt} + ${data.content}`,
-                // content: '你好吗？',
+                content: `${data.content}`,
             }
         ]
         // 是否为图片

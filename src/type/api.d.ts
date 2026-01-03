@@ -12,6 +12,7 @@ type StickyParmas = {
     uuid: string;
     title?: string;
     content: string;
+    content_json: string;
 }
 
 

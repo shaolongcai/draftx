@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Grid, Stack, Typography } from '@mui/material'
 import { useDebounce, useKeyPress, useRequest, useSize } from 'ahooks'
-import { Search, MemoItem, Editor2, MemoList } from '@/components'
+import { Search, MemoItem, Editor, MemoList } from '@/components'
 import AITools from '@/components/AITools'
 
 function Home() {
@@ -55,10 +55,7 @@ function Home() {
                         </Grid>
                     }
                     <div className={searchValue ? 'hidden' : ''}>
-                        <Editor2
-                            handleAITools={() => setShowAITools(pre => !pre)}
-                            showAITools={showAITools}
-                        />
+                        <Editor />
                     </div>
                     <Stack
                         // onClick={() => setShowMemoList(pre => !pre)}

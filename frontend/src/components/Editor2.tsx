@@ -1,4 +1,4 @@
-import { Button, Card, Stack, Tooltip, Typography } from "@mui/material"
+import { Box, Button, Card, Stack, Tooltip, Typography } from "@mui/material"
 import { useEffect, useRef, useState } from "react";
 import { useDebounceFn, useKeyPress } from "ahooks";
 import { v4 as uuidv4 } from 'uuid';
@@ -10,7 +10,7 @@ import Vditor from "vditor";
 import "vditor/dist/index.css";
 import { ConfigParams } from "@/type/electron";
 import { EventEmitter } from "ahooks/lib/useEventEmitter";
-
+import { ModuleParser, ModuleBlock } from "@/utils/moduleParser";
 
 interface EditorContextProps {
     getDeleteDay: (date: string) => void;
@@ -36,16 +36,39 @@ const EditorContext: React.FC<EditorContextProps> = ({
             toolbarConfig: {
                 hide: true,
             },
-            minHeight: 320,
+            mode: 'ir',
+            // minHeight: 320,
             // typewriterMode: true,
             placeholder: 'Markdown input supported...',
             input: (value: string) => {
+                // 使用模块解析器检测模块
+                const parseResult = ModuleParser.parse(value);
 
-                // 提取标题：从第一个 # 到下一个换行
-                const titleMatch = value.match(/^#\s*(.*?)\s*$/m);
-                const title = titleMatch ? titleMatch[1].trim() : undefined;
+                // 检查是否正在编写模块
+                const writingStatus = ModuleParser.isWritingModule(value);
+                console.log('writingStatus', writingStatus)
+                if (parseResult.hasModules) {
+                    // 结束时，才会检查到模块
+                    console.log('检测到的模块:', parseResult.modules);
+                    // 处理每个模块
+                    parseResult.modules.forEach(module => {
+                        const validation = ModuleParser.validateModule(module);
+                        if (validation.valid) {
+                            console.log(`✓ ${module.type} 模块有效:`, module.content);
+                        } else {
+                            console.warn(`✗ ${module.type} 模块无效:`, validation.error);
+                        }
+                    });
+                }
+
+                if (writingStatus.isWriting) {
+                    console.log(`正在编写 ${writingStatus.moduleType} 模块...`);
+                }
+
+                // const htmlS = vditor.html2md(`<span style="color: red;">${value}</span>`)
+                // vditor.insertValue(htmlS)
                 // 触发保存
-                save(value, title);
+                save(value, '');
                 // 触发刷新内容事件
                 refreshContent$.emit(value)
             },
@@ -56,12 +79,15 @@ const EditorContext: React.FC<EditorContextProps> = ({
                 },
                 markdown: {
                     mark: true,
-                }
+                    sanitize: false,
+                    autoSpace: false,
+                },
             },
             after: () => {
                 // vditor.setValue("`Vditor` 最小代码示例");
                 setVd(vditor);
                 getGuideMemo(vditor)
+
             },
         });
         // Clear the effect
@@ -96,7 +122,8 @@ const EditorContext: React.FC<EditorContextProps> = ({
         }
         else {
             // 清空编辑器，初始化uuid
-            vd?.setValue('');
+            // vd?.setValue('');
+            vd?.insertValue(`<span style="color: red; font-size: 20px;">红色大字</span>`);
             currentUuidRef.current = uuidv4()
         }
     }
@@ -172,7 +199,7 @@ const Editor2: React.FC<EditorProps> = ({
 
     const [deletedAt, setDeletedAt] = useState<number>();
 
-    return <Card className="relative" >
+    return <Card className="relative min-h-96 flex flex-col" >
         {/* AI工具入口 */}
         <Button variant='contained'
             size='medium'
@@ -188,6 +215,11 @@ const Editor2: React.FC<EditorProps> = ({
                 setDeletedAt(diff);
             }}
         />
+        {/* 模块提示 */}
+        <Typography variant="bodyMedium" color="textSecondary" sx={{ color: 'rgba(0, 0, 0, 0.25)' }}>
+            The math keyword also enablesconversions.
+        </Typography>
+        <Box flex={1}></Box>
         <Stack direction='row' justifyContent='space-between' alignItems="center">
             <Stack direction="row" spacing={0.5} alignItems="center" >
                 <Typography variant="bodySmall" color="textSecondary">

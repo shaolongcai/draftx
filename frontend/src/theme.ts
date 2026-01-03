@@ -14,8 +14,8 @@ export const theme = createTheme({
                     borderRadius: '16px',
                     padding: '24px',
                     backgroundColor: '#F9F3E5',
-                    border: '4px solid #33322E',
-                    boxShadow: '12px 12px 0px #33322E',
+                    border: '1px solid rgba(0, 0, 0, 0.25)',
+                    boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.05)',
                     margin: '12px !important',
                 }
             }

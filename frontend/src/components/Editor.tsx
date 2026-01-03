@@ -22,6 +22,7 @@ import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin
 import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
+import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
 import { $createParagraphNode, $getRoot, $getSelection, $isRangeSelection, COMMAND_PRIORITY_CRITICAL, type EditorThemeClasses, PASTE_COMMAND } from 'lexical';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { useEffect, useRef, useState } from "react";
@@ -33,81 +34,11 @@ import { useEvent } from "@/contexts/EvenContext";
 import { HelpOutline } from "@mui/icons-material";
 import dayjs from "dayjs";
 import { $convertFromMarkdownString, TRANSFORMERS } from "@lexical/markdown";
+import TabFocusPlugin from '@/plugin/TabFocusPlugin';
+import { theme } from "@/theme/editorTheme";
+import PickerPlugin from "@/plugin/PickerPlugin";
+// import { useSettings } from '@/contexts/SettingContext';
 
-const theme: EditorThemeClasses = {
-    paragraph: 'editor-paragraph',
-    heading: {
-        h1: 'editor-h1',
-        h2: 'editor-h2',
-        h3: 'editor-h3',
-    },
-    quote: 'editor-quote',
-    code: 'editor-code',
-    text: {
-        code: 'editor-text-code',
-        bold: 'editor-text-bold',
-    },
-    codeHighlight: {
-        atrule: 'editor-tokenAttr',
-        attr: 'editor-tokenAttr',
-        boolean: 'editor-tokenProperty',
-        builtin: 'editor-tokenSelector',
-        cdata: 'editor-tokenComment',
-        char: 'editor-tokenSelector',
-        class: 'editor-tokenFunction',
-        'class-name': 'editor-tokenFunction',
-        comment: 'editor-tokenComment',
-        constant: 'editor-tokenProperty',
-        deleted: 'editor-tokenProperty',
-        doctype: 'editor-tokenComment',
-        entity: 'editor-tokenOperator',
-        function: 'editor-tokenFunction',
-        important: 'editor-tokenVariable',
-        inserted: 'editor-tokenSelector',
-        keyword: 'editor-tokenAttr',
-        namespace: 'editor-tokenVariable',
-        number: 'editor-tokenProperty',
-        operator: 'editor-tokenOperator',
-        prolog: 'editor-tokenComment',
-        property: 'editor-tokenProperty',
-        punctuation: 'editor-tokenPunctuation',
-        regex: 'editor-tokenVariable',
-        selector: 'editor-tokenSelector',
-        string: 'editor-tokenSelector',
-        symbol: 'editor-tokenProperty',
-        tag: 'editor-tokenProperty',
-        url: 'editor-tokenOperator',
-        variable: 'editor-tokenVariable',
-    },
-    list: {
-        nested: {
-            listitem: 'editor-nested-listitem',
-        },
-        ol: 'editor-list-ol',
-        listitemChecked: 'editor-listItemChecked',
-        listitemUnchecked: 'editor-listItemUnchecked',
-        olDepth: [
-            'editor-list-oll1',
-            'editor-list-ol2',
-            'editor-list-ol3',
-            'editor-list-ol4',
-            'editor-list-ol5',
-        ],
-        ulDepth: [
-            'editor-list-ul1',
-            'editor-list-ul2',
-            'editor-list-ul3',
-            'editor-list-ul4',
-            'editor-list-ul5',
-        ],
-    },
-    table: 'editor-table',
-    tableCell: 'editor-tableCell',
-    tableCellHeader: 'editor-tableCellHeader',
-    tableCellSelected: 'editor-tableCellSelected',
-    tableSelection: 'editor-tableSelection',
-
-}
 
 function Placeholder() {
     return <Box sx={{
@@ -140,6 +71,15 @@ const EditorContext: React.FC<EditorContextProps> = ({
     const { loadStickys$ } = useEvent();
     const notification = useNotifications();
 
+
+    // const {
+    //         setOption,
+    //         settings: {
+    //             listStrictIndent,
+    //         },
+    //     } = useSetting();
+
+    //     const isEditable = useLexicalEditable();
 
 
     // 监听粘贴事件
@@ -209,7 +149,7 @@ const EditorContext: React.FC<EditorContextProps> = ({
     })
 
     // 防抖保存
-    const AUTOSAVE_WAIT_MS = 1000;
+    const AUTOSAVE_WAIT_MS = 200;
     const { run: scheduleSave } = useDebounceFn(
         async (payload: { title?: string; contentJson: string; contentText: string }) => {
 
@@ -269,8 +209,9 @@ const EditorContext: React.FC<EditorContextProps> = ({
         />
         <HistoryPlugin />
         <AutoFocusPlugin />
-        <ListPlugin />
+
         <TabIndentationPlugin />
+        <ListPlugin hasStrictIndent={false} />
         <TablePlugin />
         <TableKeyboardPlugin />
         <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
@@ -278,19 +219,15 @@ const EditorContext: React.FC<EditorContextProps> = ({
         <CodeHighlightPlugin />
         <CodeActionPlugin />
         <MermaidPlugin />
+        <PickerPlugin />
+        <TabFocusPlugin />
+        <CheckListPlugin />
         <OnChangePlugin onChange={(editorState) => {
-            // 获取第一个 # 的标题
-            const firstHeading = editorState.read(() => $getRoot().getFirstChild()?.getTextContent());
-            // 判断类型是否为 HeadingNode
-            // let title: string | undefined = undefined;
-            // if (firstHeading?.getType() !== 'heading') {
-            //     title = firstHeading?.getTextContent();
-            // };
-            // console.log('firstHeading', firstHeading);
             // 获取纯文本内容
             const plain = editorState.read(() => $getRoot().getTextContent());
+            console.log('plain', plain);
             const json = editorState.toJSON();
-            scheduleSave({ title: firstHeading, contentJson: json, contentText: plain });
+            scheduleSave({ contentJson: json, contentText: plain });
         }} />
     </div>
 }

@@ -16,14 +16,15 @@ export const saveStickyNote = (stickyNote: StickyParmas) => {
         const deletedAt = dayjs().add(7, 'day').toISOString(); //测试用，只增加一天
         // 存在即更新，不存在则插入
         const upsertStmt = db.prepare(`
-                INSERT INTO stickys ( uuid, content, title, created_at, modified_at,deleted_at)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO stickys ( uuid, content, content_json, title, created_at, modified_at, deleted_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT( uuid ) DO UPDATE SET
                     content = excluded.content,
+                    content_json = excluded.content_json,
                     title = excluded.title,
                     modified_at = excluded.modified_at
             `);
-        upsertStmt.run(stickyNote.uuid, stickyNote.content, stickyNote.title, now, now, deletedAt);
+        upsertStmt.run(stickyNote.uuid, stickyNote.content, stickyNote.content_json, stickyNote.title, now, now, deletedAt);
     } catch (error) {
         logger.error(error)
     }
@@ -37,65 +38,27 @@ export const saveStickyNote = (stickyNote: StickyParmas) => {
  */
 export const searchStickyNote = (query: string, limit: number = 50) => {
     try {
-        // 拆分为单字的方法（用于 FTS5 前缀查询，FTS5会把每个字作为一个 token，作为倒排）
-        const buildFtsQuery = (input: string) => {
-            const tokens = input
-                .toLowerCase()
-                .trim()
-                .split(/\s+/)
-                .filter(t => t.length > 0 && t.length <= 32)
-                .slice(0, 8); // 控制词数，避免过长导致性能问题
-            if (tokens.length === 0) return input.toLowerCase();
-            // 用 OR + 前缀匹配扩大召回（fts5 支持 token* 前缀查询）
-            return tokens.map(t => `${t}*`).join(' OR ');
-        };
-        const ftsQuery = buildFtsQuery(query);
-
         const stmt = db.prepare(`
-            WITH q(query) AS (SELECT lower(?)),
-            ftsHits AS (
-                SELECT 
-                    rowid,
-                    snippet(stickys_fts, 0, '<mark>', '</mark>', '...', 32) AS snippet,
-                    bm25(stickys_fts) AS fts_score
-                FROM stickys_fts
-                WHERE stickys_fts MATCH ?
-                ORDER BY bm25(stickys_fts)
-                LIMIT ?
-            )
+            WITH q(query) AS (SELECT lower(?))
             SELECT 
-                s.id, s.uuid, s.title, s.content, s.created_at, s.modified_at,s.deleted_at,
+                s.id, s.uuid, s.title, s.content, s.created_at, s.modified_at, s.deleted_at,
                 (
-                    0.35 * CASE WHEN lower(s.title) LIKE q.query || '%' THEN CAST(length(q.query) AS REAL) / NULLIF(length(s.title), 0) ELSE 0 END
-                    + 0.25 * CASE WHEN instr(lower(s.title), q.query) > 0 THEN 1 - (instr(lower(s.title), q.query) - 1) / CAST(length(s.title) AS REAL) ELSE 0 END
-                    + 0.18 * COALESCE(1.0 / (ftsHits.fts_score + 1.0), 0.0)
+                    0.40 * CASE WHEN lower(s.title) LIKE q.query || '%' THEN CAST(length(q.query) AS REAL) / NULLIF(length(s.title), 0) ELSE 0 END
+                    + 0.30 * CASE WHEN instr(lower(s.title), q.query) > 0 THEN 1 - (instr(lower(s.title), q.query) - 1) / CAST(length(s.title) AS REAL) ELSE 0 END
+                    + 0.15 * CASE WHEN instr(lower(s.content), q.query) > 0 THEN 1.0 ELSE 0 END
                     + 0.10 * (1.0 - 1.0 / (COALESCE(s.click_count, 0) + 1))
-                    + 0.06 * (
-                        CASE 
-                            WHEN s.last_access_time IS NULL THEN 0
-                            ELSE 
-                                CASE 
-                                    WHEN (julianday('now') - julianday(s.last_access_time)) <= 0.5 THEN 1.0
-                                    WHEN (julianday('now') - julianday(s.last_access_time)) >= 90.0 THEN 0.0
-                                    ELSE 1.0 - ((julianday('now') - julianday(s.last_access_time)) - 0.5) / (90.0 - 0.5)
-                                END
-                        END
-                    )
-                    + 0.04 * (1.0 - MIN(length(s.title), 255) / 255.0)
-                ) AS score,
-                ftsHits.snippet AS snippet
+                    + 0.05 * (1.0 - MIN(length(s.title), 255) / 255.0)
+                ) AS score
             FROM stickys s
-            LEFT JOIN ftsHits ON ftsHits.rowid = s.id
             CROSS JOIN q
             WHERE (
                 lower(s.title) LIKE '%' || q.query || '%'
                 OR lower(s.content) LIKE '%' || q.query || '%'
-                OR ftsHits.rowid IS NOT NULL
             )
             ORDER BY score DESC, s.title
             LIMIT ?
         `);
-        const rows = stmt.all(query, ftsQuery, limit, limit);
+        const rows = stmt.all(query, limit);
         return rows;
     } catch (error) {
         logger.error(error)
@@ -185,7 +148,7 @@ export const getRecentStickys = (limit: number = 12) => {
 export const getGuideMemo = () => {
     try {
         const stmt = db.prepare(`
-            SELECT id, uuid, title, content, created_at, modified_at, deleted_at
+            SELECT id, uuid, title, content, content_json, created_at, modified_at, deleted_at
             FROM stickys
             WHERE uuid = ?
             LIMIT 1
@@ -203,7 +166,7 @@ export const getGuideMemo = () => {
 export const getStickyById = (id: number) => {
     try {
         const stmt = db.prepare(`
-            SELECT id, uuid, title, content, created_at, modified_at, deleted_at
+            SELECT id, uuid, title, content, content_json, created_at, modified_at, deleted_at
             FROM stickys
             WHERE id = ?
             LIMIT 1

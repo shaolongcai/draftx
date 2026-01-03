@@ -1,0 +1,136 @@
+/* 标题 */
+.editor-h1 {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.editor-h2 {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.editor-h3 {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+
+/* 有序列表 */
+.editor-list-ol1 {
+    margin: 0;
+    list-style-type: decimal;
+    list-style-position: inside;
+    padding-left: 16px;
+}
+
+.editor-list-ol2 {
+    margin: 0;
+    list-style-type: upper-alpha;
+    list-style-position: inside;
+    padding-left: 16px;
+}
+
+.editor-list-ol3 {
+    margin: 0;
+    list-style-type: lower-alpha;
+    list-style-position: inside;
+    padding-left: 16px;
+}
+
+
+/* 列表 */
+.editor-nested-listitem {
+    list-style-type: none; /* key：令到缩进在本行缩进，而不需要换行再缩进 */
+}
+/* 无序列表 */
+.editor-list-ul1 {
+    padding: 0;
+    margin: 0;
+    list-style-type: inherit;
+    list-style-position: inside;
+}
+
+.editor-list-ul2 {
+    /* padding-left: 16px; */
+    margin: 0;
+    list-style-type: circle;
+    list-style-position: inside;
+}
+
+.editor-list-ul3 {
+    /* padding-left: 16px; */
+    margin: 0;
+    list-style-type: square;
+    list-style-position: inside;
+}
+
+
+/* checklist */
+.editor-listItemChecked,
+.editor-listItemUnchecked {
+    position: relative;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+    list-style-type: none;
+    outline: none;
+    display: block;
+    min-height: 1.5em;
+}
+
+.editor-listItemChecked>*,
+.editor-listItemUnchecked>* {
+    margin-left: 0.01em;
+}
+
+.editor-listItemUnchecked:before,
+.editor-listItemChecked:before {
+    content: '\200B';
+    width: 0.9em;
+    height: 0.9em;
+    top: 50%;
+    left: 0;
+    cursor: pointer;
+    display: block;
+    background-size: cover;
+    position: absolute;
+    transform: translateY(-50%);
+}
+
+.editor-listItemChecked {
+    text-decoration: line-through;
+}
+
+.editor-listItemUnchecked:focus:before,
+.editor-listItemChecked:focus:before {
+    box-shadow: 0 0 0 2px #a6cdfe;
+    border-radius: 2px;
+}
+
+.editor-listItemUnchecked:before {
+    border: 1px solid #999;
+    border-radius: 2px;
+}
+
+.editor-listItemChecked:before {
+    border: 1px solid rgb(61, 135, 245);
+    border-radius: 2px;
+    background-color: #3d87f5;
+    background-repeat: no-repeat;
+}
+
+.editor-listItemChecked:after {
+    content: '';
+    cursor: pointer;
+    border-color: #fff;
+    border-style: solid;
+    position: absolute;
+    display: block;
+    top: 45%;
+    width: 0.2em;
+    left: 0.35em;
+    height: 0.4em;
+    transform: translateY(-50%) rotate(45deg);
+    border-width: 0 0.1em 0.1em 0;
+}
