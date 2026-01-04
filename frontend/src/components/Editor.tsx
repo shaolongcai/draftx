@@ -23,7 +23,7 @@ import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
-import { $createParagraphNode, $getRoot, $getSelection, $isRangeSelection, COMMAND_PRIORITY_CRITICAL, type EditorThemeClasses, PASTE_COMMAND } from 'lexical';
+import { $createParagraphNode, $getRoot, $getSelection, $isRangeSelection, COMMAND_PRIORITY_CRITICAL, type EditorThemeClasses, LexicalNode, PASTE_COMMAND } from 'lexical';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { useEffect, useRef, useState } from "react";
 import { useDebounceFn, useKeyPress, useUpdateEffect } from "ahooks";
@@ -37,6 +37,9 @@ import { $convertFromMarkdownString, TRANSFORMERS } from "@lexical/markdown";
 import TabFocusPlugin from '@/plugin/TabFocusPlugin';
 import { theme } from "@/theme/editorTheme";
 import PickerPlugin from "@/plugin/PickerPlugin";
+import { MathNode } from "@/nodes/MathNode";
+import { MathPlugin } from "@/plugin/MathPlugin";
+import { MathItemNode } from "@/nodes/MathItemNode";
 // import { useSettings } from '@/contexts/SettingContext';
 
 
@@ -175,19 +178,20 @@ const EditorContext: React.FC<EditorContextProps> = ({
     );
 
     // 注册Shitf+A 新建便利贴
-    useKeyPress('shift.enter', () => {
-        scheduleSave(lastSavedRef.current);
-        setCurrentUuid(uuidv4());
-        // 清空编辑器内容
-        editor.update(() => {
-            const root = $getRoot();
-            root.clear();
-        });
+    // useKeyPress('shift.enter', () => {
+    //     scheduleSave(lastSavedRef.current);
+    //     setCurrentUuid(uuidv4());
+    //     // 清空编辑器内容
+    //     editor.update(() => {
+    //         const root = $getRoot();
+    //         root.clear();
+    //     });
 
-        notification.show('The sticky has been saved', {
-            severity: 'success',
-        });
-    })
+    //     notification.show('The sticky has been saved', {
+    //         severity: 'success',
+    //     });
+    // })
+
 
     return <div className="scrollbar-thin!">
         <RichTextPlugin
@@ -222,11 +226,24 @@ const EditorContext: React.FC<EditorContextProps> = ({
         <PickerPlugin />
         <TabFocusPlugin />
         <CheckListPlugin />
+        <MathPlugin />
         <OnChangePlugin onChange={(editorState) => {
             // 获取纯文本内容
             const plain = editorState.read(() => $getRoot().getTextContent());
-            console.log('plain', plain);
+            // console.log('plain', plain);
             const json = editorState.toJSON();
+
+            // 获取math节点
+            editorState.read(() => {
+                const lastChild = $getRoot().getLastChild()
+                // console.log('lastChild', lastChild)
+                // const nodeType = lastChild.getType()
+                // if (nodeType === 'math') {
+                //     console.log('找到数学节点')
+                //     const text = lastChild.getTextContent()
+                //     console.log('数学上的节点', text)
+                // }
+            });
             scheduleSave({ contentJson: json, contentText: plain });
         }} />
     </div>
@@ -258,6 +275,8 @@ const Editor = () => {
             HorizontalRuleNode,
             TableRowNode,
             mermaidNode,
+            MathNode,
+            MathItemNode
         ]
     };
 

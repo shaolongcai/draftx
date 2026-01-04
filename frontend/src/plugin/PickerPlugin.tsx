@@ -29,6 +29,8 @@ import { Backdrop, ClickAwayListener, Menu, MenuItem } from '@mui/material';
 import { useUpdateLayoutEffect } from 'ahooks';
 import { $createHeadingNode } from '@lexical/rich-text';
 import { INSERT_CHECK_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDERED_LIST_COMMAND } from '@lexical/list';
+import { $createMathNode } from '@/nodes/MathNode';
+import { $createMathItemNode } from '@/nodes/MathItemNode';
 
 
 
@@ -111,6 +113,38 @@ const createHeading = (editor: LexicalEditor, type: 'h1' | 'h2' | 'h3') => {
 function getBaseOptions(editor: LexicalEditor) {
 
     return [
+        new ComponentPickerOption('Math', {
+            icon: <i className="icon paragraph" />,
+            keywords: ['h1'],
+            onSelect: () => {
+                editor.update(() => {
+                     // 插入标准块结构：容器 + 段落
+                const selection = $getSelection();
+                const mathNode = $createMathNode();
+
+                // 插入容器到当前位置
+                selection.insertNodes([mathNode]);
+
+                // 标题段（只读标识）
+                const titleParagraph = $createParagraphNode();
+                const titleNode = $createTextNode('数学模块');
+                titleNode.setMode('token'); // 作为标识/不可编辑
+                titleParagraph.append(titleNode);
+                mathNode.append(titleParagraph);
+
+                // 输入段（可编辑）
+                const inputParagraph = $createParagraphNode();
+                // 可选择使用普通文本节点或自定义 MathItemNode
+                const inputText = $createTextNode(''); // 或 $createMathItemNode('')
+                inputParagraph.append(inputText);
+                mathNode.append(inputParagraph);
+
+                // 将光标定位到输入段，便于直接输入
+                inputParagraph.select();
+
+                });
+            }
+        }),
         new ComponentPickerOption('Heading 1', {
             icon: <i className="icon paragraph" />,
             keywords: ['h1'],
