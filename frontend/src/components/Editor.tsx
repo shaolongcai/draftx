@@ -40,6 +40,8 @@ import PickerPlugin from "@/plugin/PickerPlugin";
 import { MathNode } from "@/nodes/MathNode";
 import { MathPlugin } from "@/plugin/MathPlugin";
 import { MathItemNode } from "@/nodes/MathItemNode";
+import { BlockTitleNode } from "@/nodes/BlockTitleNode";
+import { BlockTipNode } from "@/nodes/BlockTipNode";
 // import { useSettings } from '@/contexts/SettingContext';
 
 
@@ -274,9 +276,11 @@ const Editor = () => {
             TableCellNode,
             HorizontalRuleNode,
             TableRowNode,
+            BlockTitleNode,
+            BlockTipNode,
             mermaidNode,
             MathNode,
-            MathItemNode
+            MathItemNode,
         ]
     };
 

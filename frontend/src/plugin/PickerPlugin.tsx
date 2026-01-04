@@ -31,6 +31,8 @@ import { $createHeadingNode } from '@lexical/rich-text';
 import { INSERT_CHECK_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDERED_LIST_COMMAND } from '@lexical/list';
 import { $createMathNode } from '@/nodes/MathNode';
 import { $createMathItemNode } from '@/nodes/MathItemNode';
+import { $createBlockTitleNode } from '@/nodes/BlockTitleNode';
+import { $createBlockTipNode } from '@/nodes/BlockTipNode';
 
 
 
@@ -115,32 +117,30 @@ function getBaseOptions(editor: LexicalEditor) {
     return [
         new ComponentPickerOption('Math', {
             icon: <i className="icon paragraph" />,
-            keywords: ['h1'],
+            keywords: ['Math'],
             onSelect: () => {
                 editor.update(() => {
-                     // 插入标准块结构：容器 + 段落
-                const selection = $getSelection();
-                const mathNode = $createMathNode();
+                    // 插入标准块结构：容器 + 段落
+                    const selection = $getSelection();
+                    const mathNode = $createMathNode();
+                    // 插入容器到当前位置
+                    selection.insertNodes([mathNode]);
+                    // 标题段（只读标识）
+                    const titleNode = $createBlockTitleNode();
+                    mathNode.append(titleNode);
 
-                // 插入容器到当前位置
-                selection.insertNodes([mathNode]);
-
-                // 标题段（只读标识）
-                const titleParagraph = $createParagraphNode();
-                const titleNode = $createTextNode('数学模块');
-                titleNode.setMode('token'); // 作为标识/不可编辑
-                titleParagraph.append(titleNode);
-                mathNode.append(titleParagraph);
-
-                // 输入段（可编辑）
-                const inputParagraph = $createParagraphNode();
-                // 可选择使用普通文本节点或自定义 MathItemNode
-                const inputText = $createTextNode(''); // 或 $createMathItemNode('')
-                inputParagraph.append(inputText);
-                mathNode.append(inputParagraph);
-
-                // 将光标定位到输入段，便于直接输入
-                inputParagraph.select();
+                    // 输入段（可编辑）
+                    const inputParagraph = $createParagraphNode();
+                    // 作用：将占位符放到段落里（行内、不可编辑）
+                    const tipNode = $createBlockTipNode();
+                    inputParagraph.append(tipNode);
+                    mathNode.append(inputParagraph);
+                    // 可选择使用普通文本节点或自定义 MathItemNode
+                    const inputText = $createTextNode(''); // 或 $createMathItemNode('')
+                    inputText.selectStart();
+                    tipNode.insertBefore(inputText);
+                    // 将光标定位到输入段，便于直接输入
+                    // inputParagraph.select();
 
                 });
             }
@@ -301,7 +301,6 @@ export default function PickerPlugin(): JSX.Element {
                             </MenuItem>
                         ))}
                     </Menu>
-
                 }}
             />
         </>

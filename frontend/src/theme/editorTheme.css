@@ -1,16 +1,16 @@
 /* 标题 */
 .editor-h1 {
-    font-size: 28px;
-    font-weight: 700;
-}
-
-.editor-h2 {
     font-size: 24px;
     font-weight: 700;
 }
 
-.editor-h3 {
+.editor-h2 {
     font-size: 20px;
+    font-weight: 700;
+}
+
+.editor-h3 {
+    font-size: 16px;
     font-weight: 700;
 }
 
