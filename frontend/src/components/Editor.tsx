@@ -42,6 +42,9 @@ import { MathPlugin } from "@/plugin/MathPlugin";
 import { MathItemNode } from "@/nodes/MathItemNode";
 import { BlockTitleNode } from "@/nodes/BlockTitleNode";
 import { BlockTipNode } from "@/nodes/BlockTipNode";
+import { AutoPastePlugin } from "@/plugin/AutoPastePlugin";
+import { BlockTipPlugin } from "@/plugin/BlockTipPlugin";
+import { PasteNode } from "@/nodes/PasteNode";
 // import { useSettings } from '@/contexts/SettingContext';
 
 
@@ -229,23 +232,12 @@ const EditorContext: React.FC<EditorContextProps> = ({
         <TabFocusPlugin />
         <CheckListPlugin />
         <MathPlugin />
+        <AutoPastePlugin />
+        <BlockTipPlugin />
         <OnChangePlugin onChange={(editorState) => {
             // 获取纯文本内容
             const plain = editorState.read(() => $getRoot().getTextContent());
-            // console.log('plain', plain);
             const json = editorState.toJSON();
-
-            // 获取math节点
-            editorState.read(() => {
-                const lastChild = $getRoot().getLastChild()
-                // console.log('lastChild', lastChild)
-                // const nodeType = lastChild.getType()
-                // if (nodeType === 'math') {
-                //     console.log('找到数学节点')
-                //     const text = lastChild.getTextContent()
-                //     console.log('数学上的节点', text)
-                // }
-            });
             scheduleSave({ contentJson: json, contentText: plain });
         }} />
     </div>
@@ -281,6 +273,7 @@ const Editor = () => {
             mermaidNode,
             MathNode,
             MathItemNode,
+            PasteNode,
         ]
     };
 

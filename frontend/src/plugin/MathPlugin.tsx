@@ -228,32 +228,6 @@ export function MathPlugin(): null {
                     currentEditPNodeRef.current = inputParagraph;
                     if (!inputParagraph) return;
 
-                    // 找到输入段落（anchor 可能是 TextNode，需向上找段落）
-                    let p: LexicalNode | null = selection.anchor.getNode();
-                    while (p && !$isParagraphNode(p)) p = p.getParent();
-                    if (!p || !$isParagraphNode(p)) return;
-                    // 作用：段落有文本时，移除占位符
-                    const hasText = node.getTextContent().trim().length > 0;
-                    console.log('hasText', hasText)
-                    if (hasText) {
-                        const tipChild = (p as ElementNode).getChildren().find((c) => $isBlockTipNode(c));
-                        if (tipChild) {
-                            editor.update(() => {
-                                tipChild.remove();
-                            });
-                        }
-                    }
-                    else {
-                        console.log('段落无文本时，添加占位符')
-                        const tipChild = (p as ElementNode).getChildren().find((c) => $isBlockTipNode(c));
-                        if (!tipChild) {
-                            editor.update(() => {
-                                const tipNode = $createBlockTipNode();
-                                p.append(tipNode);
-                            });
-                        }
-                    }
-
                     // 获取输入段落的文字内容
                     const expr = inputParagraph.getTextContent().trim();
                     // 过滤expr，若有 = 则分割，取前面

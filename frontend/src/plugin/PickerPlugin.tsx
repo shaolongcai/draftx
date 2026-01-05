@@ -33,6 +33,7 @@ import { $createMathNode } from '@/nodes/MathNode';
 import { $createMathItemNode } from '@/nodes/MathItemNode';
 import { $createBlockTitleNode } from '@/nodes/BlockTitleNode';
 import { $createBlockTipNode } from '@/nodes/BlockTipNode';
+import { OPEN_PASTE_COMMAND } from './AutoPastePlugin';
 
 
 
@@ -143,6 +144,14 @@ function getBaseOptions(editor: LexicalEditor) {
                     // inputParagraph.select();
 
                 });
+            }
+        }),
+        new ComponentPickerOption('Paste', {
+            icon: <i className="icon paragraph" />,
+            keywords: ['continueWriting'],
+            onSelect: () => {
+                // 触发命令
+                editor.dispatchCommand(OPEN_PASTE_COMMAND, undefined);
             }
         }),
         new ComponentPickerOption('Heading 1', {
