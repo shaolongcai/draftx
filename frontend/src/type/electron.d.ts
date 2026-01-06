@@ -106,6 +106,11 @@ interface ElectronAPI {
      * @returns 取消监听的函数
      */
     onChatStreamError: (callback: (error: string) => void) => () => void;
+
+    /**
+     * 读取系统剪贴板文本
+     */
+    readClipboardText: () => Promise<string>;
 }
 
 

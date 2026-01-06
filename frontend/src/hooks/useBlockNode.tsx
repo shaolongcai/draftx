@@ -1,7 +1,10 @@
+import { useEvent } from "@/contexts/EvenContext";
 import { $createBlockTipNode } from "@/nodes/BlockTipNode";
 import { $createBlockTitleNode, $isBlockTitleNode } from "@/nodes/BlockTitleNode";
 import { $createMathNode, $isMathNode, MathNode } from "@/nodes/MathNode";
 import { $createPasteNode, $isPasteNode, PasteNode } from "@/nodes/PasteNode";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { useKeyPress } from "ahooks";
 import { $createParagraphNode, $createTextNode, $getSelection, $isParagraphNode, $isRangeSelection, $isTextNode, COMMAND_PRIORITY_CRITICAL, COMMAND_PRIORITY_HIGH, ElementNode, KEY_BACKSPACE_COMMAND, KEY_ENTER_COMMAND, LexicalEditor } from "lexical";
 import { LexicalNode } from "lexical";
 
@@ -14,22 +17,81 @@ import { LexicalNode } from "lexical";
  */
 const useBlockNode = (editor: LexicalEditor, blockType: 'math' | 'paste') => {
 
+    const { closePaste$ } = useEvent();
+
+
+    // 监听关闭blcok的快捷键
+    useKeyPress(['alt.enter'], () => {
+        console.log('Alt.Enter');
+        //访问 $getSelection() 、 $getNodeByKey() 、节点遍历：必须在 .read(...) 或 .update(...) 中执行
+        editor.read(() => {
+            // 向上找到所属的 MathNode
+            const selection = $getSelection();
+            if (!$isRangeSelection(selection)) return false;
+
+            // 向上寻找block节点
+            const anchorNode = selection.anchor.getNode();
+            let current: LexicalNode | null = anchorNode;
+            while (current && !isBlockNode(current)) {
+                current = current.getParent();
+            }
+                console.log('zhaodao ',current);
+            if (!isBlockNode(current)) return false;
+
+        
+
+            editor.update(() => {
+                const blockNode = current as ElementNode;
+
+                // 删除标题节点（如果存在）
+                const children = blockNode.getChildren();
+                const firstChild = children[0];
+                if (firstChild && $isBlockTitleNode(firstChild)) {
+                    firstChild.remove();
+                }
+                console.log('build p')
+                // 创建普通段落，并迁移输入段落的文本
+                // 2) 构造一个普通段落，累积文本（避免段落嵌套）
+                const paragraph = $createParagraphNode();
+                const texts = blockNode
+                    .getChildren()
+                    .filter((n) => $isParagraphNode(n))
+                    .map((n) => n.getTextContent().trim())
+                    .filter(Boolean);
+                if (texts.length) {
+                    paragraph.append($createTextNode(texts.join('\n')));
+                }
+                // 3) 用普通段落替换整个 block 节点，并选中
+                blockNode.replace(paragraph);
+                paragraph.select();
+            });
+            // 粘贴模块，则关闭粘贴
+            if (blockType === 'paste') {
+                closePaste$.emit();
+            }
+        })
+
+    })
+
     // 判断是否为block节点
     const isBlockNode = (node: LexicalNode): boolean => {
         return $isMathNode(node) || $isPasteNode(node);
     }
 
     // 创建块级节点
-    const createBlockNode = (content: string) => {
+    const createBlockNode = (content: string): string => {
         // 插入标准块结构：容器:[标题,段落：[占位符]]
         const selection = $getSelection();
         let containerNode: MathNode | PasteNode
+        let containerNodeKey: string
         switch (blockType) {
             case 'math':
                 containerNode = $createMathNode();
+                containerNodeKey = containerNode.getKey();
                 break;
             case 'paste':
                 containerNode = $createPasteNode();
+                containerNodeKey = containerNode.getKey();
                 break;
             default:
                 break;
@@ -49,6 +111,7 @@ const useBlockNode = (editor: LexicalEditor, blockType: 'math' | 'paste') => {
         const inputText = $createTextNode('');
         inputText.selectStart();
         tipNode.insertBefore(inputText);
+        return containerNodeKey;
     };
 
     // Backspace：在输入段落开头且无内容时，删除整个数学块
@@ -170,6 +233,10 @@ const useBlockNode = (editor: LexicalEditor, blockType: 'math' | 'paste') => {
                     blockNode.replace(paragraph);
                     paragraph.select();
                 });
+                // 粘贴模块，则关闭粘贴
+                if (blockType === 'paste') {
+                    closePaste$.emit();
+                }
                 return false;
             } catch (error) {
                 const msg = error instanceof Error ? error.message : '升级失败';

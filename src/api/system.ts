@@ -1,4 +1,4 @@
-import { ipcMain, app, shell } from 'electron';
+import { ipcMain, app, shell, clipboard } from 'electron';
 import { getConfig, setConfig } from '../database/sqlite.js';
 
 export function initializeSystemApi() {
@@ -19,5 +19,10 @@ export function initializeSystemApi() {
         const config = setConfig(key, value, type);
         return config;
     })
+
+    // 新增：读取系统剪贴板文本
+    ipcMain.handle('read-clipboard-text', async () => {
+        return clipboard.readText();
+    });
 }
 

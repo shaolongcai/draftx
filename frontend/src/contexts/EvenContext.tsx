@@ -8,6 +8,7 @@ import { useEventEmitter } from 'ahooks';
 interface EventContextType {
     loadStickys$: EventEmitter<StickyResult>
     refreshContent$: EventEmitter<string>
+    closePaste$: EventEmitter<void>
 }
 // 创建上下文
 const EventContext = createContext<EventContextType | undefined>(undefined);
@@ -21,13 +22,15 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     //事件
     const loadStickys$ = useEventEmitter<StickyResult>(); //加载便利贴
     const refreshContent$ = useEventEmitter<string>(); //刷新便利贴内容
+    const closePaste$ = useEventEmitter<void>(); //关闭粘贴
 
 
     return (
         <EventContext.Provider
             value={{
                 loadStickys$,
-                refreshContent$
+                refreshContent$,
+                closePaste$
             }}
         >
             {children}

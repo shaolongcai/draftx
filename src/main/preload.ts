@@ -39,6 +39,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return () => ipcRenderer.removeListener('chat-stream-error', listener);
   }, // 监听流式错误
 
+  // 复制相关
+  readClipboardText: () => ipcRenderer.invoke('read-clipboard-text'), // 读取系统剪贴板文本
+  // stopListenCopy: () => ipcRenderer.send('stop-listen-copy'), // 关闭监听复制
+  // onCopy: (callback: (text: string) => void) => {
+  //   const listener = (_event: any, text: string) => callback(text);
+  //   ipcRenderer.on('copy', listener);
+  //   return () => ipcRenderer.removeListener('copy', listener);
+  // }, // 监听复制事件
+
 });
 
 // 暴露一些实用工具

@@ -8,6 +8,7 @@ import { $createBlockTitleNode, $isBlockTitleNode } from "@/nodes/BlockTitleNode
 import { $createBlockTipNode, $isBlockTipNode } from "@/nodes/BlockTipNode";
 import { $createPasteNode } from "@/nodes/PasteNode";
 import useBlockNode from "@/hooks/useBlockNode";
+import { useEvent } from "@/contexts/EvenContext";
 
 
 // 定义开始与关闭自动粘贴的命令
@@ -21,9 +22,13 @@ export const CLOSE_PASTE_COMMAND: LexicalCommand<{}> = createCommand('CLOSE_PAST
 export function AutoPastePlugin(): null {
 
 
+
+    const watchTimerRef = useRef<number | null>(null); // 轮询定时器
+    const lastClipboardRef = useRef<string | null>(null); // 上次剪贴板文本
+
     const [editor] = useLexicalComposerContext();
-    const currentEditPNodeRef = useRef<ElementNode | TextNode | null>(null); // 当前编辑的段落节点
     const { removeBackspace, createBlockNode, removeEnter } = useBlockNode(editor, 'paste')
+    const { closePaste$ } = useEvent();
 
 
     useEffect(() => {
@@ -34,15 +39,48 @@ export function AutoPastePlugin(): null {
         };
     }, [editor]);
 
+    // 关闭粘贴
+    closePaste$.useSubscription(() => {
+        // 关闭监听复制
+        if (watchTimerRef.current) {
+            clearInterval(watchTimerRef.current);
+            watchTimerRef.current = null;
+        }
+    })
+
     // 注册命令
     editor.registerCommand(
         OPEN_PASTE_COMMAND,
         (payload) => {
-            console.log('触发命令')
             // 插入标题与tip节点
-            createBlockNode('paste');
-            // 开启监听复制
-            return true;
+            const containerNodeKey = createBlockNode('paste');
+            // 防止第一个复制的文案被粘贴
+            window.electronAPI.readClipboardText()
+                .then(text => { lastClipboardRef.current = text || ''; })
+            // 开启轮询（500ms）
+            if (watchTimerRef.current) {
+                clearInterval(watchTimerRef.current);
+            }
+            watchTimerRef.current = window.setInterval(async () => {
+                const text = await window.electronAPI.readClipboardText();
+                console.log('剪贴板文本:', text);
+                // 添加节点
+                if (text && text !== lastClipboardRef.current) {
+                    lastClipboardRef.current = text;
+                    console.log('添加节点:', text);
+                    editor.update(() => {
+                        const pNode = $createParagraphNode();
+                        pNode.append($createTextNode(text));
+                        console.log('节点:', $getNodeByKey(containerNodeKey));
+                        const containerNode = $getNodeByKey(containerNodeKey);
+                        const titleNode = (containerNode as ElementNode).getFirstChild();
+                        titleNode.insertAfter(pNode);
+                        // $getNodeByKey(containerNodeKey).append(pNode);
+                    });
+                }
+            }, 500);
+
+            return true; //阻止向下传播
         },
         COMMAND_PRIORITY_CRITICAL
     );

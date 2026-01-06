@@ -25,7 +25,7 @@ export function BlockTipPlugin(): null {
                     const selection = $getSelection();
                     if (!$isRangeSelection(selection)) return;
 
-                    // 若回车后光标前面是空段落，删除占位符
+                    // 情况1：若回车后增加了新段落节点，删除占位符（即单纯回车也需要删除节点）
                     const selectionNode = selection.anchor.getNode()
                     if ($isParagraphNode(selectionNode.getPreviousSibling())) {
                         // 寻找tip节点
@@ -37,7 +37,7 @@ export function BlockTipPlugin(): null {
                         }
                     }
 
-                    // 步骤：向上查找最近的自定义 block（Math/Paste）
+                    // 向上查找最近的自定义 block（Math/Paste）
                     let cur: ElementNode | TextNode | null = selection.anchor.getNode();
                     let inBlock = $isMathNode(cur) || $isPasteNode(cur);
                     while (cur && !inBlock) {
@@ -47,11 +47,10 @@ export function BlockTipPlugin(): null {
                     if (!cur || !inBlock) return;
                     const block = cur as ElementNode;
 
-                    // 寻找块节点的第二个节点（段落）中的节点数量是否大于2，或者段落中是否包含文本节点（第二个节点统一为段落）
+                    // 情况2：在片段中，若段落中包含文本节点，删除占位符
                     const paragraph = block.getChildren()[1] as ElementNode;
                     const hasText = block.getTextContent().length > 0
 
-                    // console.log('hasText',block.getTextContent())
                     const tipChild = paragraph.getChildren().find((c) => $isBlockTipNode(c));
                     if ((hasText) && tipChild) {
                         removeTipKey = tipChild.getKey();
