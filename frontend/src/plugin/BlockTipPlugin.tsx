@@ -1,10 +1,9 @@
-import { $getSelection, $isRangeSelection, $isParagraphNode, $isTextNode, $getNodeByKey, LexicalNode, ElementNode, TextNode } from "lexical";
+import { $getSelection, $isRangeSelection, $isParagraphNode, $isTextNode, $getNodeByKey, LexicalNode, ElementNode, TextNode, COMMAND_PRIORITY_CRITICAL, KEY_ENTER_COMMAND, $isElementNode, COMMAND_PRIORITY_HIGH } from "lexical";
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useEffect } from "react";
 import { $isMathNode } from "@/nodes/MathNode";
-import { $createBlockTipNode, $isBlockTipNode } from "@/nodes/BlockTipNode";
+import { $createBlockTipNode, $isBlockTipNode, BlockTipNode } from "@/nodes/BlockTipNode";
 import { $isPasteNode } from "@/nodes/PasteNode";
-
 
 
 /**
@@ -13,6 +12,7 @@ import { $isPasteNode } from "@/nodes/PasteNode";
 export function BlockTipPlugin(): null {
 
     const [editor] = useLexicalComposerContext();
+
 
     useEffect(() => {
         const unregister = editor.registerUpdateListener(({ editorState }) => {
@@ -24,6 +24,18 @@ export function BlockTipPlugin(): null {
                 editorState.read(() => {
                     const selection = $getSelection();
                     if (!$isRangeSelection(selection)) return;
+
+                    // 若回车后光标前面是空段落，删除占位符
+                    const selectionNode = selection.anchor.getNode()
+                    if ($isParagraphNode(selectionNode.getPreviousSibling())) {
+                        // 寻找tip节点
+                        const tipChild = (selectionNode as ElementNode).getChildren().find((c) => $isBlockTipNode(c));
+                        if (tipChild) {
+                            editor.update(() => {
+                                tipChild.remove();
+                            })
+                        }
+                    }
 
                     // 步骤：向上查找最近的自定义 block（Math/Paste）
                     let cur: ElementNode | TextNode | null = selection.anchor.getNode();
@@ -37,14 +49,11 @@ export function BlockTipPlugin(): null {
 
                     // 寻找块节点的第二个节点（段落）中的节点数量是否大于2，或者段落中是否包含文本节点（第二个节点统一为段落）
                     const paragraph = block.getChildren()[1] as ElementNode;
-                    // 步骤：仅统计 TextNode 文本，忽略占位符（避免抖动）
                     const hasText = block.getTextContent().length > 0
-                    // .getChildren()
-                    // .some((c) => $isTextNode(c) && c.getTextContent().length > 0);
 
+                    // console.log('hasText',block.getTextContent())
                     const tipChild = paragraph.getChildren().find((c) => $isBlockTipNode(c));
-
-                    if (hasText && tipChild) {
+                    if ((hasText) && tipChild) {
                         removeTipKey = tipChild.getKey();
                     } else if (!hasText && !tipChild) {
                         addTipParagraphKey = paragraph.getKey();
@@ -67,11 +76,14 @@ export function BlockTipPlugin(): null {
                     });
                 }
             } catch (error) {
-                const msg = error instanceof Error ? error.message : '升级失败';
+                const msg = error instanceof Error ? error.message : '处理提示节点时出错';
+                console.error(msg);
             }
         });
 
-        return () => unregister();
+        return () => {
+            unregister();
+        };
     }, [editor]);
 
     return null

@@ -2,7 +2,7 @@ import { $createBlockTipNode } from "@/nodes/BlockTipNode";
 import { $createBlockTitleNode, $isBlockTitleNode } from "@/nodes/BlockTitleNode";
 import { $createMathNode, $isMathNode, MathNode } from "@/nodes/MathNode";
 import { $createPasteNode, $isPasteNode, PasteNode } from "@/nodes/PasteNode";
-import { $createParagraphNode, $createTextNode, $getSelection, $isParagraphNode, $isRangeSelection, $isTextNode, COMMAND_PRIORITY_CRITICAL, ElementNode, KEY_BACKSPACE_COMMAND, KEY_ENTER_COMMAND, LexicalEditor } from "lexical";
+import { $createParagraphNode, $createTextNode, $getSelection, $isParagraphNode, $isRangeSelection, $isTextNode, COMMAND_PRIORITY_CRITICAL, COMMAND_PRIORITY_HIGH, ElementNode, KEY_BACKSPACE_COMMAND, KEY_ENTER_COMMAND, LexicalEditor } from "lexical";
 import { LexicalNode } from "lexical";
 
 
@@ -170,7 +170,7 @@ const useBlockNode = (editor: LexicalEditor, blockType: 'math' | 'paste') => {
                     blockNode.replace(paragraph);
                     paragraph.select();
                 });
-                return true;
+                return false;
             } catch (error) {
                 const msg = error instanceof Error ? error.message : '升级失败';
                 console.error(msg);
