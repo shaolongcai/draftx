@@ -248,7 +248,7 @@ const EditorContext: React.FC<EditorContextProps> = ({
 const Editor = () => {
 
     const [deletedAt, setDeletedAt] = useState<number>();
-    const [cardSize, setCardSize] = useState({ width: 512, height: 360 });
+    const [cardSize, setCardSize] = useState({ width: 400, height: 400 });
 
     const initialConfig = {
         namespace: 'MyEditor',
@@ -295,10 +295,10 @@ const Editor = () => {
                     let nextHeight = prev.height;
 
                     if (edge === 'e' || edge === 'se') {
-                        nextWidth = Math.max(360, startWidth + dx);
+                        nextWidth = Math.min(Math.max(360, startWidth + dx), 800); //最大800，最小360
                     }
                     if (edge === 's' || edge === 'se') {
-                        nextHeight = Math.max(360, startHeight + dy);
+                        nextHeight = Math.min(Math.max(360, startHeight + dy), 800); //最大800，最小360
                     }
                     return { width: nextWidth, height: nextHeight };
                 });
@@ -320,6 +320,10 @@ const Editor = () => {
     return <Card className="relative rounded-2xl ring-1 ring-gray-300/60  overflow-hidden"
         style={{ width: cardSize.width, height: cardSize.height }}
     >
+        {/* 顶部拖动句柄 */}
+        <div
+            className="drag absolute top-0 left-0 right-0 h-8 z-10 "
+        />
         {/* 右侧缩放句柄：横向缩放 */}
         <div
             onMouseDown={startResize('e')}
@@ -344,12 +348,12 @@ const Editor = () => {
             }} />
         </LexicalComposer>
         <Stack direction='row' justifyContent='space-between' alignItems="center"
-        className="absolute bottom-6 left-0 right-0 px-4"
+            className="absolute bottom-6 left-0 right-0 px-4"
         >
             <Stack direction="row" spacing={0.5} alignItems="center" >
                 <Typography variant="bodySmall" color="textSecondary">
                     {/* 删除的天数，+3天是因为点击后会加3天删除时间，修改增加的删除时间时，需要同步更改这里 */}
-                   After {deletedAt ? deletedAt + 3 : 7} days will be deleted
+                    After {deletedAt ? deletedAt + 3 : 7} days will be deleted
                 </Typography>
                 <Tooltip title="Each view adds 3 days to deletion">
                     <HelpOutline fontSize="small" className="cursor-pointer" color='action' />
