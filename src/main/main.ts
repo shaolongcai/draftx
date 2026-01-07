@@ -6,7 +6,7 @@ import { initializeDraftApi } from '../api/draft.js';
 import { deleteExpiredStickys, getGuideMemo, saveStickyNote } from '../database/repositories.js';
 import { initializeSystemApi } from '../api/system.js';
 import { logger } from '../core/logger.js';
-import { GuidMarkdown } from '../data/data.js';
+import { GuidJson, GuidMarkdown } from '../data/data.js';
 import { initializeAIApi } from '../api/ai.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -129,6 +129,7 @@ const initializeGuideMemo = () => {
     saveStickyNote({
       uuid: 'guide',
       content: GuidMarkdown,
+      contentJson: JSON.stringify(GuidJson),
     });
   }
 }

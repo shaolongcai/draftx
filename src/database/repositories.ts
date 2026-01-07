@@ -42,7 +42,7 @@ export const getDraft = (query?: string, limit: number = 50) => {
         // 空查询：直接返回全部，按修改时间排序
         if (!query || query.trim() === '') {
             const stmt = db.prepare(`
-                SELECT id, uuid, title, content, created_at, modified_at, deleted_at
+                SELECT id, uuid, title, content, content_json, created_at, modified_at, deleted_at
                 FROM stickys
                 ORDER BY modified_at DESC
                 LIMIT ?
@@ -54,7 +54,7 @@ export const getDraft = (query?: string, limit: number = 50) => {
         const stmt = db.prepare(`
             WITH q(query) AS (SELECT lower(?))
             SELECT 
-                s.id, s.uuid, s.title, s.content, s.created_at, s.modified_at, s.deleted_at,
+                s.id, s.uuid, s.title, s.content, s.content_json, s.created_at, s.modified_at, s.deleted_at,
                 (
                     0.40 * CASE WHEN lower(s.title) LIKE q.query || '%' THEN CAST(length(q.query) AS REAL) / NULLIF(length(s.title), 0) ELSE 0 END
                     + 0.30 * CASE WHEN instr(lower(s.title), q.query) > 0 THEN 1 - (instr(lower(s.title), q.query) - 1) / CAST(length(s.title) AS REAL) ELSE 0 END

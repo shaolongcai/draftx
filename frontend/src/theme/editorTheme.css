@@ -14,6 +14,11 @@
     font-weight: 700;
 }
 
+/* 段落 */
+.editor-paragraph{
+    line-height: 1.8;
+    margin-bottom: 8px; /* 段落之间留出更大间距 */
+}
 
 /* 有序列表 */
 .editor-list-ol1 {

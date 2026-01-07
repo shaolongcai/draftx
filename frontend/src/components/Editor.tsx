@@ -104,6 +104,7 @@ const EditorContext: React.FC<EditorContextProps> = ({
 
     // 监听加载新的便利贴
     loadStickys$.useSubscription((sticky) => {
+        console.log('加载新的便利贴', sticky);
         // 新增天数
         window.electronAPI.addDeleteDay(sticky.id);
         getDeleteDay(sticky.deleted_at)
@@ -116,8 +117,7 @@ const EditorContext: React.FC<EditorContextProps> = ({
                 // 创建root
                 const root = $getRoot();
                 root.append($createParagraphNode());
-                // console.log('插入新内容', sticky);
-                const initialEditorState = editor.parseEditorState(sticky.content_string);
+                const initialEditorState = editor.parseEditorState(sticky.content_json);
                 editor.setEditorState(initialEditorState);
                 setCurrentUuid(sticky.uuid);
             } catch (error) {
@@ -150,16 +150,17 @@ const EditorContext: React.FC<EditorContextProps> = ({
             // 内容为空则跳过
             if (!payload.contentText) return;
             // 若无变更则跳过
-            if (payload.contentJson === lastSavedRef.current.contentJson) return
+            // if (payload.contentJson === lastSavedRef.current.contentJson) return
+            // 仅在文本变更时保存
+            if (payload.contentText === lastSavedRef.current.contentText) return
             try {
                 window.electronAPI.saveSticky({
                     uuid: currentUuid,
                     title: payload.title,
                     content: payload.contentText,
-                    contentJson: JSON.stringify(payload.contentJson), // 需要字符串化
+                    contentJson: payload.contentJson, // 这里已经是字符串化
                 });
                 lastSavedRef.current = payload;
-                // console.log('已自动保存', payload);
                 // 如需提示可开启：message.success('已自动保存');
             } catch (error) {
                 const msg = error instanceof Error ? error.message : '保存失败';
@@ -179,7 +180,7 @@ const EditorContext: React.FC<EditorContextProps> = ({
         <RichTextPlugin
             contentEditable={
                 <ContentEditable style={{
-                    maxHeight: '600px',
+                    maxHeight: 'calc(100vh - 64px)',
                     minHeight: '240px',
                     overflow: 'auto',
                     outline: 'none',
@@ -215,7 +216,7 @@ const EditorContext: React.FC<EditorContextProps> = ({
             // 获取纯文本内容
             const plain = editorState.read(() => $getRoot().getTextContent());
             const json = editorState.toJSON();
-            scheduleSave({ contentJson: json, contentText: plain });
+            scheduleSave({ contentJson: JSON.stringify(json), contentText: plain });
         }} />
     </div>
 }
@@ -333,7 +334,7 @@ const Editor: React.FC = () => {
             }} />
         </LexicalComposer>
         <Stack direction='row' justifyContent='center' alignItems="center"
-            className="absolute bottom-4 left-0 right-0 px-4 h-8"
+            className="absolute bottom-4 left-0 right-0 px-4 h-4"
         >
             {/* <Stack direction="row" spacing={0.5} alignItems="center"
                 className={`transition-opacity duration-700 ${showTips ? 'opacity-100' : 'opacity-0'}`}

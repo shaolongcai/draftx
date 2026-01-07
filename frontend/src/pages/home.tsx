@@ -28,11 +28,9 @@ function Home() {
 
     // 使用工具切换
     handleOnclickTool$.useSubscription((tool) => {
-        console.log(tool)
         if (tool === 'allList') {
             setShowDraftList(true)
         } else if (tool === 'draft') {
-            console.log('切换到草稿页')
             setShowDraftList(false)
         } else if (tool === 'addDraft') {
             setShowDraftList(false)
@@ -60,6 +58,7 @@ function Home() {
                                             content={item.content}
                                             snippet={item.snippet}
                                             lineClamp={5}
+                                            onClick={() => setShowDraftList(false)}
                                             {...item}
                                         />
                                     </Grid>
