@@ -7,6 +7,7 @@ export function initializeStickyApi() {
 
     // 保存 stickyNote 到数据库
     ipcMain.on('save-sticky', (event, stickyNote: StickyParmas) => {
+        console.log('保存便利贴', stickyNote);
         saveStickyNote(stickyNote);
     });
 

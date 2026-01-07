@@ -5,6 +5,7 @@ import {
     Search as SearchIcon,
     GridView as AllIcon
 } from "@mui/icons-material";
+import { useEvent } from "@/contexts/EvenContext";
 
 
 
@@ -12,41 +13,46 @@ interface ToolButtonProps {
     icon: ReactNode;
     className?: string;
     tip?: string;
+    onClick?: () => void;
 }
 // Icon按钮
 const ToolButton: React.FC<ToolButtonProps> = ({
     icon,
     className,
-    tip
+    tip,
+    onClick
 }) => {
     return (
         <Tooltip title={tip}>
-            <IconButton size="small" className={`text-white ${className}`}>
+            <IconButton size="small" className={`text-white ${className}`}
+                onClick={onClick}
+            >
                 {icon}
             </IconButton>
         </Tooltip>
     )
 }
 
-const ToolBar = () => {
+
+//主控件
+const ToolBar: React.FC = () => {
 
     const [active, setActive] = useState(false);
+
+    const { handleOnclickTool$ } = useEvent();
 
     const toolButtons = useMemo(() => [
         {
             icon: <AddIcon />,
             className: 'hover:bg-[#9F7207]/70',
-            tip: 'Add a new Draft'
-        },
-        {
-            icon: <SearchIcon />,
-            className: 'hover:bg-[#9F7207]/70',
-            tip: 'Search for a Draft'
+            tip: 'Add a new Draft',
+            onClick: () => handleOnclickTool$.emit('addDraft'),
         },
         {
             icon: <AllIcon />,
             className: 'hover:bg-[#9F7207]/70',
-            tip: 'Show all Drafts'
+            tip: 'Show all Drafts',
+            onClick: () => handleOnclickTool$.emit('allList'),
         }
     ], []);
 

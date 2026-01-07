@@ -24,7 +24,7 @@ export const saveStickyNote = (stickyNote: StickyParmas) => {
                     title = excluded.title,
                     modified_at = excluded.modified_at
             `);
-        upsertStmt.run(stickyNote.uuid, stickyNote.content, stickyNote.content_json, stickyNote.title, now, now, deletedAt);
+        upsertStmt.run(stickyNote.uuid, stickyNote.content, stickyNote.contentJson, stickyNote.title, now, now, deletedAt);
     } catch (error) {
         logger.error(error)
     }

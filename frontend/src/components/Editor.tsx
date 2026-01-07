@@ -23,7 +23,7 @@ import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
-import { $createParagraphNode, $getRoot, $getSelection, $isRangeSelection, COMMAND_PRIORITY_CRITICAL, type EditorThemeClasses, LexicalNode, PASTE_COMMAND } from 'lexical';
+import { $createParagraphNode, $getRoot } from 'lexical';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { useEffect, useRef, useState } from "react";
 import { useDebounceFn, useKeyPress, useUpdateEffect } from "ahooks";
@@ -77,7 +77,7 @@ const EditorContext: React.FC<EditorContextProps> = ({
     const lastSavedRef = useRef<{ title?: string; contentJson: string; contentText: string }>({ contentJson: '', contentText: '' }); // 上次已保存
 
     const [editor] = useLexicalComposerContext()
-    const { loadStickys$ } = useEvent();
+    const { loadStickys$, handleOnclickTool$ } = useEvent();
     const notification = useNotifications();
 
 
@@ -90,47 +90,17 @@ const EditorContext: React.FC<EditorContextProps> = ({
 
     //     const isEditable = useLexicalEditable();
 
-
-    // 监听粘贴事件
-    // useEffect(() => {
-    //     return editor.registerCommand(
-    //         PASTE_COMMAND,
-    //         (event: ClipboardEvent) => {
-    //             event.preventDefault(); // 阻止默认行为
-    //             event.stopPropagation();
-    //             const pastedText = event.clipboardData?.getData('text');
-    //             console.log('粘贴文本', pastedText);
-
-    //             // 手动插入到编辑器
-    //             if (pastedText) {
-    //                 editor.update(() => {
-    //                     // 获取当前选择范围
-    //                     const selection = $getSelection();
-    //                     if ($isRangeSelection(selection)) {
-    //                         const { anchor, focus } = selection;
-    //                         // 获取光标位置
-    //                         const cursorNode = anchor.getNode();
-    //                         // 在selection后面创建新段落
-    //                         const temp = $createParagraphNode();
-    //                         // 光标位置插入temp
-    //                         cursorNode.insertAfter(temp);
-    //                         temp.selectEnd();
-    //                         $convertFromMarkdownString(pastedText, TRANSFORMERS, temp);
-    //                     }
-    //                 });
-    //             }
-    //             return true; // 📌 关键：命令已消费，让后面的插件不再触发
-    //         },
-    //         COMMAND_PRIORITY_CRITICAL // 最高优先级
-    //     )
-    // }, [editor]);
-
-
-
     // 初始化uuid
     useEffect(() => {
         setCurrentUuid(uuidv4());
     }, []);
+
+    // 监听点击新建草稿
+    handleOnclickTool$.useSubscription((tool) => {
+        if (tool === 'addDraft') {
+            addNewDraft();
+        }
+    })
 
     // 监听加载新的便利贴
     loadStickys$.useSubscription((sticky) => {
@@ -157,11 +127,26 @@ const EditorContext: React.FC<EditorContextProps> = ({
         });
     })
 
+    // 新建草稿
+    const addNewDraft = () => {
+        // 保存现在的内容
+        scheduleSave(lastSavedRef.current);
+        setCurrentUuid(uuidv4());
+        // 清空编辑器内容
+        editor.update(() => {
+            const root = $getRoot();
+            root.clear();
+        });
+
+        notification.show('The sticky has been saved', {
+            severity: 'success',
+        });
+    }
+
     // 防抖保存
     const AUTOSAVE_WAIT_MS = 200;
     const { run: scheduleSave } = useDebounceFn(
         async (payload: { title?: string; contentJson: string; contentText: string }) => {
-
             // 内容为空则跳过
             if (!payload.contentText) return;
             // 若无变更则跳过
@@ -171,6 +156,7 @@ const EditorContext: React.FC<EditorContextProps> = ({
                     uuid: currentUuid,
                     title: payload.title,
                     content: payload.contentText,
+                    contentJson: JSON.stringify(payload.contentJson), // 需要字符串化
                 });
                 lastSavedRef.current = payload;
                 // console.log('已自动保存', payload);
@@ -184,19 +170,9 @@ const EditorContext: React.FC<EditorContextProps> = ({
     );
 
     // 注册Shitf+A 新建便利贴
-    // useKeyPress('shift.enter', () => {
-    //     scheduleSave(lastSavedRef.current);
-    //     setCurrentUuid(uuidv4());
-    //     // 清空编辑器内容
-    //     editor.update(() => {
-    //         const root = $getRoot();
-    //         root.clear();
-    //     });
-
-    //     notification.show('The sticky has been saved', {
-    //         severity: 'success',
-    //     });
-    // })
+    useKeyPress('alt.n', () => {
+        addNewDraft();
+    })
 
 
     return <div className="scrollbar-thin!">
@@ -246,7 +222,8 @@ const EditorContext: React.FC<EditorContextProps> = ({
 
 
 
-const Editor = () => {
+
+const Editor: React.FC = () => {
 
     const [deletedAt, setDeletedAt] = useState<number>();
     const [cardSize, setCardSize] = useState({ width: 400, height: 400 });
@@ -285,6 +262,7 @@ const Editor = () => {
         return () => clearTimeout(t)
     }, [])
 
+    // 调整卡片大小
     const startResize = (edge: 'e' | 's' | 'se') => (e: React.MouseEvent) => {
         e.preventDefault();
         try {

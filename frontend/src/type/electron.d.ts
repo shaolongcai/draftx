@@ -4,7 +4,8 @@
 type StickyParmas = {
     uuid: string;
     title?: string;
-    content?: string;
+    content: string;
+    contentJson: string;
 }
 
 // 配置类型
