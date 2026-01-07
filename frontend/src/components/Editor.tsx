@@ -45,6 +45,7 @@ import { BlockTipNode } from "@/nodes/BlockTipNode";
 import { AutoPastePlugin } from "@/plugin/AutoPastePlugin";
 import { BlockTipPlugin } from "@/plugin/BlockTipPlugin";
 import { PasteNode } from "@/nodes/PasteNode";
+import ToolBar from "./ToolBar";
 // import { useSettings } from '@/contexts/SettingContext';
 
 
@@ -249,6 +250,7 @@ const Editor = () => {
 
     const [deletedAt, setDeletedAt] = useState<number>();
     const [cardSize, setCardSize] = useState({ width: 400, height: 400 });
+    const [showTips, setShowTips] = useState(true);
 
     const initialConfig = {
         namespace: 'MyEditor',
@@ -277,6 +279,11 @@ const Editor = () => {
             PasteNode,
         ]
     };
+
+    useEffect(() => {
+        const t = setTimeout(() => setShowTips(false), 5000)
+        return () => clearTimeout(t)
+    }, [])
 
     const startResize = (edge: 'e' | 's' | 'se') => (e: React.MouseEvent) => {
         e.preventDefault();
@@ -348,18 +355,23 @@ const Editor = () => {
             }} />
         </LexicalComposer>
         <Stack direction='row' justifyContent='space-between' alignItems="center"
-            className="absolute bottom-6 left-0 right-0 px-4"
+            className="absolute bottom-4 left-0 right-0 px-4 h-8"
         >
-            <Stack direction="row" spacing={0.5} alignItems="center" >
+            <Stack direction="row" spacing={0.5} alignItems="center"
+                className={`transition-opacity duration-700 ${showTips ? 'opacity-100' : 'opacity-0'}`}
+            >
                 <Typography variant="bodySmall" color="textSecondary">
                     {/* 删除的天数，+3天是因为点击后会加3天删除时间，修改增加的删除时间时，需要同步更改这里 */}
                     After {deletedAt ? deletedAt + 3 : 7} days will be deleted
                 </Typography>
-                <Tooltip title="Each view adds 3 days to deletion">
+                {/* <Tooltip title="Each view adds 3 days to deletion">
                     <HelpOutline fontSize="small" className="cursor-pointer" color='action' />
-                </Tooltip>
+                </Tooltip> */}
             </Stack>
-            <Stack direction="row" spacing={0.5} alignItems="center" >
+            <ToolBar />
+            <Stack direction="row" spacing={0.5} alignItems="center"
+                className={`transition-opacity duration-700 ${showTips ? 'opacity-100' : 'opacity-0'}`}
+            >
                 <span className="border border-text-secondary border-gray-300 text-gray-600 rounded px-2 py-1 text-xs leading-none">
                     Alt
                 </span>
