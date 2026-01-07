@@ -16,7 +16,6 @@ export const theme = createTheme({
                     backgroundColor: '#F9F3E5',
                     border: '1px solid rgba(0, 0, 0, 0.25)',
                     boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.05)',
-                    margin: '12px !important',
                 }
             }
         },

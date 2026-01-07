@@ -40,18 +40,19 @@ class WindowManager {
             height: 700,
             x: 0,               // 后面会计算居中
             y: 0,
-            frame: false,       // 无边框
-            resizable: false,
+            frame: false,       // 有无边框
+            resizable: true, // 是否可调整大小
             movable: true,
             alwaysOnTop: true,  // 总在最前
             skipTaskbar: true,  // 不占用任务栏
             show: false,        // 先不显示
             transparent: true,
-            backgroundColor: '#00000000',
+            // backgroundColor: '#00000000',
+            hasShadow: false,
             // backgroundColor: '#E92828',
-
             // vibrancy: 'under-window', // macOS 模糊效果，增强边框层次
             // titleBarStyle: 'hidden', // 隐藏原生标题栏，保留边框
+            // titleBarStyle: 'hiddenInset',
             webPreferences: {
                 preload: path.join(__dirname, '../main/preload.js'),
                 nodeIntegration: false,
@@ -195,7 +196,7 @@ class WindowManager {
         let window = this.mainWindow;
         if (windowName === 'settingsWindow') {
             window = this.settingsWindow;
-            console.log('设置窗口变化')
+            // console.log('设置窗口变化')
         }
         window.setBounds({
             width: size.width + 8,

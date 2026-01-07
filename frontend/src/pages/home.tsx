@@ -13,11 +13,6 @@ function Home() {
 
     const debouncedValue = useDebounce(searchValue, { wait: 200 })
 
-    // 注册alt+s 展示出memoList
-    useKeyPress('alt.s', () => {
-        setShowMemoList(pre => !pre);
-    })
-
 
     // 搜索
     const { data } = useRequest(
@@ -33,8 +28,8 @@ function Home() {
         <Stack direction='row' spacing={2}>
             <div>
                 {/* 展示最近的memo,要通过样式的hidden来隐藏，否则监听不了事件 */}
-                <Stack spacing={2} className={`w-lg ${showMemoList ? 'hidden' : ''}`}>
-                    <Search onSearch={setSearchValue} />
+                <Stack spacing={2} >
+                    {/* <Search onSearch={setSearchValue} /> */}
                     {
                         (data?.length > 0 && searchValue) &&
                         <Grid container columns={2} className='max-h-150 overflow-auto'>
@@ -54,31 +49,13 @@ function Home() {
                             }
                         </Grid>
                     }
-                    <div className={searchValue ? 'hidden' : ''}>
-                        <Editor />
-                    </div>
-                    <Stack
-                        // onClick={() => setShowMemoList(pre => !pre)}
-                        className='bg-[#F9F3E5] opacity-85 p-2 rounded-md mx-auto w-fit'
-                        direction="row" spacing={0.5} alignItems="center" justifyContent='center'
-                    >
-                        <span className="border border-text-secondary border-gray-300  rounded px-2 py-1 text-xs leading-none">
-                            Alt
-                        </span>
-                        <Typography variant="bodySmall" color="textSecondary">+</Typography>
-                        <span className="border border-text-secondary border-gray-300  rounded px-2 py-1 text-xs leading-none">
-                            S
-                        </span>
-                        <Typography variant="bodySmall" color="textSecondary" className="pl-1">
-                            to display the most recent memos
-                        </Typography>
-                    </Stack>
+                    <Editor />
                 </Stack>
                 {/* 展示memo列表 */}
-                <MemoList handleChooseMemo={() => setShowMemoList(false)} isOpen={showMemoList} />
+                {/* <MemoList handleChooseMemo={() => setShowMemoList(false)} isOpen={showMemoList} /> */}
             </div>
             {/* AI工具 */}
-            <AITools open={showAITools} mode='add' />
+            {/* <AITools open={showAITools} mode='add' /> */}
         </Stack>
     )
 }

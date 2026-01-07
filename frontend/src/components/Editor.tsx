@@ -248,6 +248,7 @@ const EditorContext: React.FC<EditorContextProps> = ({
 const Editor = () => {
 
     const [deletedAt, setDeletedAt] = useState<number>();
+    const [cardSize, setCardSize] = useState({ width: 512, height: 360 });
 
     const initialConfig = {
         namespace: 'MyEditor',
@@ -277,7 +278,63 @@ const Editor = () => {
         ]
     };
 
-    return <Card className="relative" >
+    const startResize = (edge: 'e' | 's' | 'se') => (e: React.MouseEvent) => {
+        e.preventDefault();
+        try {
+            const startWidth = cardSize.width;
+            const startHeight = cardSize.height;
+            const startX = e.clientX;
+            const startY = e.clientY;
+
+            const onMove = (ev: MouseEvent) => {
+                const dx = ev.clientX - startX;
+                const dy = ev.clientY - startY;
+
+                setCardSize(prev => {
+                    let nextWidth = prev.width;
+                    let nextHeight = prev.height;
+
+                    if (edge === 'e' || edge === 'se') {
+                        nextWidth = Math.max(360, startWidth + dx);
+                    }
+                    if (edge === 's' || edge === 'se') {
+                        nextHeight = Math.max(360, startHeight + dy);
+                    }
+                    return { width: nextWidth, height: nextHeight };
+                });
+            };
+
+            const onUp = () => {
+                window.removeEventListener('mousemove', onMove);
+                window.removeEventListener('mouseup', onUp);
+            };
+
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onUp);
+        } catch (error) {
+            const msg = error instanceof Error ? error.message : '升级失败';
+            console.error(msg);
+        }
+    };
+
+    return <Card className="relative rounded-2xl ring-1 ring-gray-300/60  overflow-hidden"
+        style={{ width: cardSize.width, height: cardSize.height }}
+    >
+        {/* 右侧缩放句柄：横向缩放 */}
+        <div
+            onMouseDown={startResize('e')}
+            className="absolute right-0 top-0 h-full w-2 cursor-ew-resize opacity-0 hover:opacity-100 transition-opacity duration-150"
+        />
+        {/* 底部缩放句柄：纵向缩放 */}
+        <div
+            onMouseDown={startResize('s')}
+            className="absolute left-0 bottom-0 w-full h-2 cursor-ns-resize opacity-0 hover:opacity-100 transition-opacity duration-150"
+        />
+        {/* 右下角缩放句柄：同时缩放 */}
+        <div
+            onMouseDown={startResize('se')}
+            className="absolute right-0 bottom-0 w-3 h-3 cursor-nwse-resize opacity-0 hover:opacity-100 transition-opacity duration-150"
+        />
         <LexicalComposer initialConfig={initialConfig}>
             <EditorContext getDeleteDay={(deletedAt) => {
                 // 换成与今天的差距
@@ -286,26 +343,28 @@ const Editor = () => {
                 setDeletedAt(diff);
             }} />
         </LexicalComposer>
-        <Stack direction='row' justifyContent='space-between' alignItems="center">
+        <Stack direction='row' justifyContent='space-between' alignItems="center"
+        className="absolute bottom-6 left-0 right-0 px-4"
+        >
             <Stack direction="row" spacing={0.5} alignItems="center" >
                 <Typography variant="bodySmall" color="textSecondary">
                     {/* 删除的天数，+3天是因为点击后会加3天删除时间，修改增加的删除时间时，需要同步更改这里 */}
-                    {deletedAt ? deletedAt + 3 : 7} 天后删除
+                   After {deletedAt ? deletedAt + 3 : 7} days will be deleted
                 </Typography>
                 <Tooltip title="Each view adds 3 days to deletion">
                     <HelpOutline fontSize="small" className="cursor-pointer" color='action' />
                 </Tooltip>
             </Stack>
             <Stack direction="row" spacing={0.5} alignItems="center" >
-                <span className="border border-text-secondary border-gray-300  rounded px-2 py-1 text-xs leading-none">
-                    ⇧
+                <span className="border border-text-secondary border-gray-300 text-gray-600 rounded px-2 py-1 text-xs leading-none">
+                    Alt
                 </span>
-                <Typography variant="bodySmall" color="textSecondary">+</Typography>
-                <span className="border border-gray-300 rounded px-2 py-1 text-xs leading-none">
-                    ↵
+                <Typography variant="bodySmall" color='textTertiary'>+</Typography>
+                <span className="border border-gray-300 rounded px-2 py-1 text-xs text-gray-600 leading-none">
+                    N
                 </span>
-                <Typography variant="bodySmall" color="textSecondary" className="pl-1">
-                    新的便利贴
+                <Typography variant="bodySmall" color="textTertiary" className="pl-1">
+                    New draft
                 </Typography>
             </Stack>
         </Stack>

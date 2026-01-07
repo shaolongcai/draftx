@@ -12,6 +12,7 @@ function App() {
   const rootRef = useRef(null)
   const size = useSize(rootRef)
 
+  console.log(size)
 
   // 触发变更窗口大小
   useRequest(() => window.electronAPI.resizeWindow('mainWindow', size), {

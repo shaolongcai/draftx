@@ -42,6 +42,8 @@
   font-display: swap;
 }
 
+/* .no-drag { -webkit-app-region: no-drag; }  */
+
 
 :root {
   font-family: 'Roboto', 'Noto Sans SC', system-ui, Avenir, Helvetica, Arial, sans-serif;
