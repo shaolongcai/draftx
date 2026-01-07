@@ -8,8 +8,9 @@ export class MathItemNode extends TextNode {
         return 'math-item-node';
     }
 
+    // 克隆节点时，需要指定key，否则会报错
     static clone(node: MathItemNode): MathItemNode {
-        return new MathItemNode(node.__key);
+        return new MathItemNode(node.__text, node.__key);
     }
 
     constructor(text: string, key?: NodeKey) {
@@ -53,6 +54,7 @@ export class MathItemNode extends TextNode {
             ...super.exportJSON(),
             type: 'math-item-node',
             version: 1,
+            text: this.__text,
         };
     }
 }

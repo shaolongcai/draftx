@@ -5,17 +5,19 @@ import { ReactElement, JSXElementConstructor } from 'react';
 
 // ElementNode是普通节点，才拥有append方法
 export class BlockTipNode extends DecoratorNode<React.ReactElement> {
+    private __placeholder: string
 
     static getType(): string {
         return 'block-tip-node';
     }
 
     static clone(node: BlockTipNode): BlockTipNode {
-        return new BlockTipNode(node.__key);
+        return new BlockTipNode(node.__placeholder, node.__key);
     }
 
-    constructor(key?: NodeKey) {
+    constructor(placeholder: string, key?: NodeKey) {
         super(key);
+        this.__placeholder = placeholder;
     }
 
     createDOM(config: EditorConfig): HTMLElement {
@@ -37,8 +39,8 @@ export class BlockTipNode extends DecoratorNode<React.ReactElement> {
     decorate(editor: LexicalEditor, config: EditorConfig): ReactElement<unknown, string | JSXElementConstructor<any>> {
         return (
             <span className="block-tip-node italic text-xs text-gray-400">
-                    这是一个计算模块，你可以直接计算表达式，例如：2+2，敲击 = 的时候，会自动得出4
-                </span>
+                {this.__placeholder}
+            </span>
         );
     }
 
@@ -48,7 +50,7 @@ export class BlockTipNode extends DecoratorNode<React.ReactElement> {
     }
 
     static importJSON(serializedNode: any): BlockTipNode {
-        return $createBlockTipNode();
+        return $createBlockTipNode(serializedNode.placeholder ?? '');
     }
 
     exportJSON(): any {
@@ -56,12 +58,13 @@ export class BlockTipNode extends DecoratorNode<React.ReactElement> {
             ...super.exportJSON(),
             type: 'block-tip-node',
             version: 1,
+            placeholder: this.__placeholder,
         };
     }
 }
 
-export function $createBlockTipNode(): BlockTipNode {
-    return new BlockTipNode();
+export function $createBlockTipNode(placeholder: string, key?: NodeKey): BlockTipNode {
+    return new BlockTipNode(placeholder, key);
 }
 
 export function $isBlockTipNode(node: LexicalNode | null | undefined): node is BlockTipNode {

@@ -84,14 +84,23 @@ const useBlockNode = (editor: LexicalEditor, blockType: 'math' | 'paste') => {
         const selection = $getSelection();
         let containerNode: MathNode | PasteNode
         let containerNodeKey: string
+        let containerTitle:string  // 容器的标题
+        let containerTip : string // 容器的提示
+        let conPlaceholder: string // 占位符
         switch (blockType) {
             case 'math':
                 containerNode = $createMathNode();
                 containerNodeKey = containerNode.getKey();
+                containerTitle = 'Calculation';
+                containerTip = 'Press Alt + Enter to exit the block';
+                conPlaceholder = 'This is a calculation block. You can evaluate expressions directly, e.g., 2+2; pressing = will automatically give you 4.';
                 break;
             case 'paste':
                 containerNode = $createPasteNode();
                 containerNodeKey = containerNode.getKey();
+                containerTitle = 'Paste';
+                containerTip = 'Press Alt + Enter to exit the block and stop auto-pasting.';
+                conPlaceholder = 'Auto-paste: everything you copy will be pasted here automatically and wrapped with new lines.';
                 break;
             default:
                 break;
@@ -99,13 +108,13 @@ const useBlockNode = (editor: LexicalEditor, blockType: 'math' | 'paste') => {
         // 插入容器到当前位置
         selection.insertNodes([containerNode]);
         // 容器内插入标题节点
-        const titleNode = $createBlockTitleNode();
+        const titleNode = $createBlockTitleNode(containerTitle,containerTip);
         containerNode.append(titleNode);
         // 容器内插入段落节点
         const inputParagraph = $createParagraphNode();
         containerNode.append(inputParagraph);
         // 段落内插入占位符节点
-        const tipNode = $createBlockTipNode();
+        const tipNode = $createBlockTipNode(conPlaceholder);
         inputParagraph.append(tipNode);
         // 占位符节点前插入一个文本节点
         const inputText = $createTextNode('');

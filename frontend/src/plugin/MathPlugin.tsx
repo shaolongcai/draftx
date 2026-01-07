@@ -6,6 +6,7 @@ import { Parser, Expression } from 'expr-eval';
 import { useKeyPress } from "ahooks";
 import { $isBlockTitleNode } from "@/nodes/BlockTitleNode";
 import { $createBlockTipNode, $isBlockTipNode } from "@/nodes/BlockTipNode";
+import useBlockNode from "@/hooks/useBlockNode";
 
 /**
  * 计算插件，包含数学计算以及单位换算
@@ -13,9 +14,9 @@ import { $createBlockTipNode, $isBlockTipNode } from "@/nodes/BlockTipNode";
 
 
 // 定义一个命令
-export const INSER_MATH_COMMAND: LexicalCommand<{
+export const OPEN_CALCULATOR_COMMAND: LexicalCommand<{
 
-}> = createCommand('INSER_MATH_BLOCK')
+}> = createCommand('OPEN_CALCULATOR_COMMAND')
 
 
 // 计算表达式
@@ -45,6 +46,7 @@ export function MathPlugin(): null {
 
     const [editor] = useLexicalComposerContext();
     const currentEditPNodeRef = useRef<ElementNode | TextNode | null>(null); // 当前编辑的段落节点
+    const { removeBackspace, createBlockNode, removeEnter } = useBlockNode(editor, 'math')
 
     // 更新提示的计算结果
     useKeyPress((e) => e.key === '=', () => {
@@ -248,6 +250,19 @@ export function MathPlugin(): null {
             removeBackspace();
         };
     }, [editor]);
+
+
+    // 注册命令
+    editor.registerCommand(
+        OPEN_CALCULATOR_COMMAND,
+        (payload) => {
+            // 插入标题与tip节点
+            const containerNodeKey = createBlockNode('math');
+
+            return true; //阻止向下传播
+        },
+        COMMAND_PRIORITY_CRITICAL
+    );
 
     return null
 }

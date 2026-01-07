@@ -14,26 +14,18 @@ import {
     useBasicTypeaheadTriggerMatch,
 } from '@lexical/react/LexicalTypeaheadMenuPlugin';
 import {
-    $getRoot,
     LexicalEditor,
     TextNode,
-    $createParagraphNode,
     $createTextNode,
-    $isParagraphNode,
-    $isTextNode,
     $getSelection,
 } from 'lexical';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import * as ReactDOM from 'react-dom';
-import { Backdrop, ClickAwayListener, Menu, MenuItem } from '@mui/material';
-import { useUpdateLayoutEffect } from 'ahooks';
+import { Menu, MenuItem } from '@mui/material';
 import { $createHeadingNode } from '@lexical/rich-text';
 import { INSERT_CHECK_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDERED_LIST_COMMAND } from '@lexical/list';
-import { $createMathNode } from '@/nodes/MathNode';
-import { $createMathItemNode } from '@/nodes/MathItemNode';
-import { $createBlockTitleNode } from '@/nodes/BlockTitleNode';
-import { $createBlockTipNode } from '@/nodes/BlockTipNode';
 import { OPEN_PASTE_COMMAND } from './AutoPastePlugin';
+import { OPEN_CALCULATOR_COMMAND } from './MathPlugin';
 
 
 
@@ -68,29 +60,6 @@ class ComponentPickerOption extends MenuOption {
 }
 
 
-// 统一的AI生成 ， 可以考虑放到  onSelectOption 中
-// const createAIRespone = (editor: LexicalEditor, singleChat: (params: BaseChatRequest) => void, type: 'continueWriting' | 'oppositeView' | 'transition' | 'outline') => {
-//     let systemPrompt: string = ''
-//     switch (type) {
-//         case 'continueWriting':
-//             systemPrompt = continueWritingPrompt
-//             break;
-//         case 'oppositeView':
-//             systemPrompt = oppositeViewPrompt
-//             break;
-//         default:
-//             break;
-//     }
-//     // 获取到现在的纯文本
-//     const root = editor.getEditorState().read(() => $getRoot());
-//     const text = root.getTextContent();
-//     singleChat({
-//         userPrompt: text,
-//         systemPrompt: systemPrompt,
-//     })
-// }
-
-
 // 统一创建h模块
 const createHeading = (editor: LexicalEditor, type: 'h1' | 'h2' | 'h3') => {
     editor.update(() => {
@@ -116,39 +85,18 @@ const createHeading = (editor: LexicalEditor, type: 'h1' | 'h2' | 'h3') => {
 function getBaseOptions(editor: LexicalEditor) {
 
     return [
-        new ComponentPickerOption('Math', {
+        new ComponentPickerOption('Calculator', {
             icon: <i className="icon paragraph" />,
-            keywords: ['Math'],
+            keywords: ['Calculator', 'Math', '计算', '计数'],
             onSelect: () => {
                 editor.update(() => {
-                    // 插入标准块结构：容器 + 段落
-                    const selection = $getSelection();
-                    const mathNode = $createMathNode();
-                    // 插入容器到当前位置
-                    selection.insertNodes([mathNode]);
-                    // 标题段（只读标识）
-                    const titleNode = $createBlockTitleNode();
-                    mathNode.append(titleNode);
-
-                    // 输入段（可编辑）
-                    const inputParagraph = $createParagraphNode();
-                    // 作用：将占位符放到段落里（行内、不可编辑）
-                    const tipNode = $createBlockTipNode();
-                    inputParagraph.append(tipNode);
-                    mathNode.append(inputParagraph);
-                    // 可选择使用普通文本节点或自定义 MathItemNode
-                    const inputText = $createTextNode(''); // 或 $createMathItemNode('')
-                    inputText.selectStart();
-                    tipNode.insertBefore(inputText);
-                    // 将光标定位到输入段，便于直接输入
-                    // inputParagraph.select();
-
+                    editor.dispatchCommand(OPEN_CALCULATOR_COMMAND, undefined);
                 });
             }
         }),
         new ComponentPickerOption('Paste', {
             icon: <i className="icon paragraph" />,
-            keywords: ['continueWriting'],
+            keywords: ['复制'],
             onSelect: () => {
                 // 触发命令
                 editor.dispatchCommand(OPEN_PASTE_COMMAND, undefined);
@@ -199,7 +147,6 @@ export default function PickerPlugin(): JSX.Element {
     const [queryString, setQueryString] = useState<string | null>(null);
 
     const [editor] = useLexicalComposerContext();
-
 
 
     // 监听输入 / 符号，触发菜单

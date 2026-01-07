@@ -253,7 +253,7 @@ const Editor = () => {
         namespace: 'MyEditor',
         theme: theme,
         onError: (error: Error) => {
-            console.error(error);
+            console.error(error.message);
         },
         nodes: [
             HeadingNode,
