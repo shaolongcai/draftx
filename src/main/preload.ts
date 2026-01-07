@@ -6,9 +6,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // 便利贴相关
   saveSticky: (stickyNote: StickyParmas) => ipcRenderer.send('save-sticky', stickyNote), // 保存 stickyNote API
-  searchSticky: (query: string) => ipcRenderer.invoke('search-sticky', query),   // 搜索 stickyNote API
+  getDraft: (query: string, limit: number) => ipcRenderer.invoke('get-draft', query, limit),   // 搜索 stickyNote API
   addDeleteDay: (id: number) => ipcRenderer.send('add-delete-day', id), // 点击增加天数
-  getRecentStickys: (limit: number) => ipcRenderer.invoke('get-recent-stickys', limit), // 获取最近的便利贴
   getGuideMemo: () => ipcRenderer.invoke('get-guide-memo'), // 获取引导memo
 
   // 系统相关
@@ -41,12 +40,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // 复制相关
   readClipboardText: () => ipcRenderer.invoke('read-clipboard-text'), // 读取系统剪贴板文本
-  // stopListenCopy: () => ipcRenderer.send('stop-listen-copy'), // 关闭监听复制
-  // onCopy: (callback: (text: string) => void) => {
-  //   const listener = (_event: any, text: string) => callback(text);
-  //   ipcRenderer.on('copy', listener);
-  //   return () => ipcRenderer.removeListener('copy', listener);
-  // }, // 监听复制事件
 
 });
 

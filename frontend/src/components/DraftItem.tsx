@@ -23,7 +23,7 @@ interface Props {
 /**
  * 搜索结果
  */
-const MemoItem: React.FC<Props> = ({
+const DraftItem: React.FC<Props> = ({
     id,
     title,
     content,
@@ -40,11 +40,11 @@ const MemoItem: React.FC<Props> = ({
 
     // 点击卡片
     const handleClick = () => {
-        loadStickys$.emit({ ...rest, content, id } as StickyResult)
+        loadStickys$.emit({ ...rest, content, id } as DraftResult)
         onClick?.(id)
     }
 
-    return <Card className="cursor-pointer  "
+    return <Card className="cursor-pointer  border border-[#9F7207]/25 "
         onClick={handleClick}
         sx={{
             height
@@ -73,4 +73,4 @@ const MemoItem: React.FC<Props> = ({
 }
 
 
-export default MemoItem
+export default DraftItem

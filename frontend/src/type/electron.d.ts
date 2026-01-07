@@ -22,11 +22,11 @@ export type ConfigParams = {
 interface ElectronAPI {
 
     /**
-     * 搜索便利贴
+     * 获取所有草稿
      * @param query 搜索词
-     * @returns 便利贴列表
+     * @returns 直接返回草稿列表
      */
-    searchSticky: (query: string) => Promise<StickyResult[]>;
+    getDraft: (query: string) => Promise<DraftResult[]>;
 
     /**
      * 保存便利贴
@@ -42,12 +42,6 @@ interface ElectronAPI {
      * 变更窗口大小
      */
     resizeWindow: (windowName: 'mainWindow' | 'settingsWindow', size: { width: number, height: number }) => Promise<void>;
-
-    /**
-     * 获取最近的项目
-     * @param limit 获取最近的项目数
-     */
-    getRecentStickys: (limit: number) => Promise<StickyResult[]>
 
     /**
      * 获取配置

@@ -32,12 +32,25 @@ export const saveStickyNote = (stickyNote: StickyParmas) => {
 
 
 /**
- * 搜索 stickyNote 从数据库
- * @param query 
- * @returns 
+ * 从数据库获取操作
+ * @param query 搜索关键词 如果没有则返回所有
+ * @param limit 限制返回数量
+ * @returns 直接返回草稿列表
  */
-export const searchStickyNote = (query: string, limit: number = 50) => {
+export const getDraft = (query?: string, limit: number = 50) => {
     try {
+        // 空查询：直接返回全部，按修改时间排序
+        if (!query || query.trim() === '') {
+            const stmt = db.prepare(`
+                SELECT id, uuid, title, content, created_at, modified_at, deleted_at
+                FROM stickys
+                ORDER BY modified_at DESC
+                LIMIT ?
+            `);
+            const rows = stmt.all(limit);
+            return rows;
+        }
+
         const stmt = db.prepare(`
             WITH q(query) AS (SELECT lower(?))
             SELECT 
@@ -122,24 +135,6 @@ export const deleteExpiredStickys = () => {
     }
 }
 
-
-/**
- * 获取最近的便利贴
- */
-export const getRecentStickys = (limit: number = 12) => {
-    try {
-        const stmt = db.prepare(`
-            SELECT id, uuid, title, content, created_at, modified_at, deleted_at
-            FROM stickys
-            ORDER BY modified_at DESC
-            LIMIT ?
-        `);
-        return stmt.all(limit);
-    } catch (error) {
-        logger.error(error);
-        return [];
-    }
-};
 
 
 /**

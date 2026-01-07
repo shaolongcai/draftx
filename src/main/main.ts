@@ -2,7 +2,7 @@ import { app, BrowserWindow, nativeImage, Tray, globalShortcut, Menu } from 'ele
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { getConfig, initializeDatabase, setConfig } from '../database/sqlite.js';
-import { initializeStickyApi } from '../api/stickys.js';
+import { initializeDraftApi } from '../api/draft.js';
 import { deleteExpiredStickys, getGuideMemo, saveStickyNote } from '../database/repositories.js';
 import { initializeSystemApi } from '../api/system.js';
 import { logger } from '../core/logger.js';
@@ -144,7 +144,7 @@ app.whenReady().then(async () => {
   // 注册全局快捷键
   registerGlobalShortcut();
   // 初始化 API
-  initializeStickyApi();
+  initializeDraftApi();
   initializeSystemApi();
   initializeAIApi()
   // 创建托盘

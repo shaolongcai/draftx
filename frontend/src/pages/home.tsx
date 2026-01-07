@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
-import { Grid, Stack, Typography } from '@mui/material'
+import { Card, Grid, Stack, Typography } from '@mui/material'
 import { useDebounce, useKeyPress, useRequest, useSize } from 'ahooks'
-import { Search, MemoItem, Editor, MemoList } from '@/components'
+import { Search, DraftItem, Editor, ToolBar } from '@/components'
 import AITools from '@/components/AITools'
 import { useEvent } from '@/contexts/EvenContext'
 
@@ -15,12 +15,14 @@ function Home() {
     const { handleOnclickTool$ } = useEvent()
 
 
-    // 搜索
+    // 获取所有草稿
     const { data } = useRequest(
-        () => window.electronAPI.searchSticky(debouncedValue),
+        () => window.electronAPI.getDraft(debouncedValue || ''),
         {
-            ready: Boolean(debouncedValue),
-            refreshDeps: [debouncedValue],
+            refreshDeps: [debouncedValue, showDraftList],
+            onError: (err) => {
+                console.error('获取草稿失败:', err);
+            }
         }
     );
 
@@ -29,6 +31,11 @@ function Home() {
         console.log(tool)
         if (tool === 'allList') {
             setShowDraftList(true)
+        } else if (tool === 'draft') {
+            console.log('切换到草稿页')
+            setShowDraftList(false)
+        } else if (tool === 'addDraft') {
+            setShowDraftList(false)
         }
     })
 
@@ -37,34 +44,37 @@ function Home() {
         <Stack direction='row' spacing={2}>
             <div>
                 {/* 所有草稿列表 */}
-                {
-                    showDraftList ?
-                        <Stack>
-                            <Search onSearch={setSearchValue} />
+                <Card className={`w-100 ${showDraftList ? 'block' : 'hidden'}`}>
+                    <Search onSearch={setSearchValue} />
+                    {
+                        (data?.length > 0) &&
+                        <Grid container columns={2} spacing={2}
+                            className='max-h-140 overflow-auto  mt-4 overflow-y-auto'
+                        >
                             {
-                                (data?.length > 0 && searchValue) &&
-                                <Grid container columns={2} className='max-h-150 overflow-auto'>
-                                    {
-                                        data.map(item =>
-                                            <Grid key={item.id} size={1} >
-                                                <MemoItem
-                                                    id={item.id}
-                                                    title={item.title}
-                                                    content={item.content}
-                                                    snippet={item.snippet}
-                                                    lineClamp={5}
-                                                    {...item}
-                                                />
-                                            </Grid>
-                                        )
-                                    }
-                                </Grid>
+                                data.map(item =>
+                                    <Grid key={item.id} size={1} >
+                                        <DraftItem
+                                            id={item.id}
+                                            title={item.title}
+                                            content={item.content}
+                                            snippet={item.snippet}
+                                            lineClamp={5}
+                                            {...item}
+                                        />
+                                    </Grid>
+                                )
                             }
-                        </Stack>
-                        :
-                        <Editor />
-                }
+                        </Grid>
+                    }
+                    <div className='mx-auto mt-4 w-fit'>
+                        <ToolBar currentPage='list' />
+                    </div>
+                </Card>
                 {/* 要通过样式的hidden来隐藏，否则监听不了事件 */}
+                <div className={showDraftList ? 'hidden' : ''}>
+                    <Editor />
+                </div>
             </div>
         </Stack>
     )

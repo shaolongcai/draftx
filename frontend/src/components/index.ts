@@ -1,6 +1,6 @@
 export { default as Search } from './Search'
 export { default as Editor } from './Editor'
-export { default as MemoItem } from './MemoItem'
+export { default as DraftItem } from './DraftItem'
 export { default as Editor2 } from './Editor2'
 export { default as MemoList } from './MemoList'
 export { default as CardDialog } from './CardDialog'

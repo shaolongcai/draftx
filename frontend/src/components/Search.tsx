@@ -29,8 +29,8 @@ const Search: React.FC<Props> = ({
 
     return <Card
         id='search-panel'
-        elevation={1}
-        className="px-4 py-1 mx-3"
+        elevation={0}
+        className="px-0 py-0  border border-[#9F7207]/25"
     >
         <Stack direction="row" spacing={2} alignItems="center">
             <TextField
@@ -49,6 +49,7 @@ const Search: React.FC<Props> = ({
                 sx={{
                     flex: 1,
                     '& .MuiOutlinedInput-root': {
+                        fontSize: '14px',
                         height: '56px',
                         '& fieldset': {
                             borderWidth: '0px',

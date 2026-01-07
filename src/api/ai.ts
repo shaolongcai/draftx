@@ -1,5 +1,5 @@
 import { ipcMain, BrowserWindow } from "electron";
-import { addDeleteDay, getAITools, getGuideMemo, getRecentStickys, getStickyById, saveAITool, saveStickyNote, searchStickyNote } from "../database/repositories.js";
+import { addDeleteDay, getAITools, saveAITool, } from "../database/repositories.js";
 import { ollamaService } from "../server/ollamaSever.js";
 import { logger } from "../core/logger.js";
 

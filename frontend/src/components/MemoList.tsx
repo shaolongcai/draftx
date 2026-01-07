@@ -1,5 +1,5 @@
 import { Grid, Stack, Typography } from "@mui/material"
-import MemoItem from "./MemoItem"
+import MemoItem from "./DraftItem"
 import { useRequest } from "ahooks";
 
 

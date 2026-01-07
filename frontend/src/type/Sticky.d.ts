@@ -1,7 +1,7 @@
 
 
 // 搜索结果
-type StickyResult = {
+type DraftResult = {
     id: number;
     uuid: string;
     title: string;
