@@ -113,6 +113,7 @@ async function aiInWorker(data: GenerateRequest & { requestId: string }): Promis
             clearTimeout(timeoutId); // 每次收到数据重置超时
 
             const content = chunk.message.content;
+            console.log('content', content);
 
             // 发送流式数据块到主线程
             parentPort?.postMessage({

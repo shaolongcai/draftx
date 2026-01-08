@@ -17,6 +17,10 @@ export type ConfigParams = {
     type?: 'boolean' | 'string' | 'number' | 'json';
 }
 
+type ChatData = {
+    content: string;
+    type :'stream' | 'done'
+}
 
 
 interface ElectronAPI {
@@ -88,7 +92,7 @@ interface ElectronAPI {
      * 监听流式数据
      * @returns 取消监听的函数
      */
-    onChatStream: (callback: (chunk: string) => void) => () => void;
+    onChatStream: (callback: (chunk: ChatData) => void) => () => void;
 
     /**
      * 监听流式结束

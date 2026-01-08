@@ -69,7 +69,7 @@ export function initializeAIApi() {
                     content: message,
                 },
                 // 流式回调函数
-                (chunk: string) => {
+                (chunk: { content: string; type: "stream" | "done"; }) => {
                     sender.send('chat-stream-data', chunk);
                 }
             );

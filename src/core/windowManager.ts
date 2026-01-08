@@ -191,7 +191,6 @@ class WindowManager {
 
     // 变更窗口大小
     public resizeWindow(windowName: 'mainWindow' | 'settingsWindow', size: { width: number, height: number }) {
-        console.log('窗口变化',size)
         if (!size || !size.height || !size.width) return;
         let window = this.mainWindow;
         if (windowName === 'settingsWindow') {

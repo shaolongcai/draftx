@@ -12,7 +12,7 @@ class OllamaService {
     private process: ChildProcess | null = null;
     private isRunning = false;
     private aiWorker: Worker | null = null;
-    private pendingAiRequests: Map<string, { resolve: Function; reject: Function, params: GenerateRequest, onStream?: (chunk: string) => void }>
+    private pendingAiRequests: Map<string, { resolve: Function; reject: Function, params: GenerateRequest, onStream?: (chunk: { content: string, type: 'stream' | 'done' }) => void }>
     private isProcessingQueue = false; // 用于标记是否正在处理队列中的请求
 
 
@@ -47,9 +47,13 @@ class OllamaService {
 
                 // 处理流式数据块
                 if (type === 'stream' && chunk) {
-                    console.log('chunk', chunk)
+                    logger.info(`chunk:${chunk}`)
+                    const chunkData = {
+                        content: chunk,
+                        type: 'stream' as 'stream',
+                    }
                     if (pending.onStream) {
-                        pending.onStream(chunk);
+                        pending.onStream(chunkData);
                     }
                     return;
                 }
@@ -59,6 +63,14 @@ class OllamaService {
                     this.pendingAiRequests.delete(requestId);
                     this.isProcessingQueue = false;
                     if (success) {
+                        // 返回结束标识符
+                        const doneData = {
+                            content: '',
+                            type: 'done' as 'done',
+                        }
+                        if (pending.onStream) {
+                            pending.onStream(doneData);
+                        }
                         pending.resolve(result);
                     } else {
                         pending.reject(new Error(error));
@@ -97,7 +109,7 @@ class OllamaService {
                 return;
             }
 
-            logger.info(`处理队列中的请求: ${firstRequestId}`);
+            logger.info(`处理队列中的请求: ${JSON.stringify(params)}`);
             this.isProcessingQueue = true; // 标记为正在处理队列中的请求
 
             // 发送任务到Worker
@@ -112,6 +124,7 @@ class OllamaService {
             });
 
         } catch (error) {
+            logger.error(`处理队列中的请求失败: ${firstRequestId},error:${error}`);
             this.isProcessingQueue = false;
             reject(error);
 
@@ -124,7 +137,7 @@ class OllamaService {
     }
 
     // 使用线程生成文本
-    public async generate(params: GenerateRequest, onStream?: (chunk: string) => void): Promise<string> {
+    public async generate(params: GenerateRequest, onStream?: (chunk: { content: string, type: 'stream' | 'done' }) => void): Promise<string> {
         return new Promise((resolve, reject) => {
             if (!this.aiWorker) {
                 reject(new Error('文档处理Worker未初始化'));

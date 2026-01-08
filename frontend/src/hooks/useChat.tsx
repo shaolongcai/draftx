@@ -3,11 +3,14 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 export interface Message {
     role: 'user' | 'assistant';
     content: string;
+    type: 'stream' | 'done';
 }
 
 interface UseChatOptions {
     toolId?: number;
 }
+
+
 
 export const useChat = (options?: UseChatOptions) => {
 
@@ -19,20 +22,25 @@ export const useChat = (options?: UseChatOptions) => {
 
     useEffect(() => {
         // 监听流式数据
-        const unsubscribeData = window.electronAPI.onChatStream((chunk: string) => {
-            currentMessageRef.current += chunk;
-            setAiAnswer(prev => prev + chunk)
-            setIsLoading(false); //有结果时即不需要loading
+        const unsubscribeData = window.electronAPI.onChatStream((chunk) => {
+            currentMessageRef.current += chunk.content;
+            console.log('接收到的chunk', chunk);
+            setAiAnswer(prev => prev + chunk.content)
+            if( chunk.type === 'done'){
+                setIsLoading(false);
+            }
             setMessages(prev => {
                 const newMessages = [...prev];
                 const lastMessage = newMessages[newMessages.length - 1];
 
                 if (lastMessage && lastMessage.role === 'assistant') {
                     lastMessage.content = currentMessageRef.current;
+                    lastMessage.type = chunk.type;
                 } else {
                     newMessages.push({
                         role: 'assistant',
-                        content: currentMessageRef.current
+                        content: currentMessageRef.current,
+                        type: chunk.type,
                     });
                 }
 
@@ -71,7 +79,8 @@ export const useChat = (options?: UseChatOptions) => {
         // 添加用户消息
         setMessages(prev => [...prev, {
             role: 'user',
-            content: message
+            content: message || '',
+            type: 'stream',
         }]);
 
         // 发起流式请求

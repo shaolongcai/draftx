@@ -46,6 +46,8 @@ import { AutoPastePlugin } from "@/plugin/AutoPastePlugin";
 import { BlockTipPlugin } from "@/plugin/BlockTipPlugin";
 import { PasteNode } from "@/nodes/PasteNode";
 import ToolBar from "./ToolBar";
+import AiPickerPlugin from "@/plugin/AIPickerPlugin";
+import { LoadingNode } from "@/nodes/LoadingNode";
 // import { useSettings } from '@/contexts/SettingContext';
 
 
@@ -207,6 +209,7 @@ const EditorContext: React.FC<EditorContextProps> = ({
         <CodeActionPlugin />
         <MermaidPlugin />
         <PickerPlugin />
+        <AiPickerPlugin />
         <TabFocusPlugin />
         <CheckListPlugin />
         <MathPlugin />
@@ -255,6 +258,7 @@ const Editor: React.FC = () => {
             MathNode,
             MathItemNode,
             PasteNode,
+            LoadingNode
         ]
     };
 
