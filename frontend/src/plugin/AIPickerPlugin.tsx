@@ -26,13 +26,11 @@ import {
     LexicalNode,
     $isElementNode,
     ParagraphNode,
+    $getNodeByKey,
 } from 'lexical';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import * as ReactDOM from 'react-dom';
-import { Backdrop, ClickAwayListener, Menu, MenuItem } from '@mui/material';
-
-
-import { useUpdateLayoutEffect } from 'ahooks';
+import { Menu, MenuItem } from '@mui/material';
+import { useRequest, useUpdateLayoutEffect } from 'ahooks';
 import useChat from '@/hooks/useChat';
 import { $createLoadingNode, $isLoadingNode } from '@/nodes/LoadingNode';
 
@@ -75,30 +73,35 @@ export default function AiPickerPlugin(): JSX.Element {
 
 
     const [queryString, setQueryString] = useState<string | null>(null);
+    const [baseOptions, setBaseOptions] = useState<ComponentPickerOption[]>([]);
+    const [textNodeKey, setTextNodeKey] = useState<string | null>(null); //AI内容的节点
 
     const [editor] = useLexicalComposerContext();
     const { aiAnswer, isLoading, error, messages, sendMessage, clearMessages } = useChat({ toolId: 1 });
 
-    function getBaseOptions() {
-
-        return [
-            new ComponentPickerOption('摘要上述文案', {
-                icon: <i className="icon paragraph" />,
-                keywords: ['摘要'],
-                onSelect: createAIRespone
-            }),
-            new ComponentPickerOption('翻译上述文案', {
-                icon: <i className="icon table" />,
-                keywords: ['翻译'],
-                onSelect: createAIRespone
-            }),
-        ]
-    }
+    // 获取AI工具
+    useRequest(
+        () => window.electronAPI.getAITools(),
+        {
+            onSuccess: (data: AIToolItem[]) => {
+                console.log('data', data);
+                const options = data.map((item: AIToolItem) => new ComponentPickerOption(
+                    `${item.name}`,
+                    {
+                        icon: <div>{item.emoji}</div>,
+                        keywords: [],
+                        onSelect: createAIRespone
+                    }));
+                setBaseOptions(options);
+            }
+        }
+    )
 
 
     // 统一的AI生成 ， 可以考虑放到  onSelectOption 中
     const createAIRespone = () => {
         clearMessages();
+        editor.setEditable(false); //先禁用编辑器
         editor.read(() => {
             const root = $getRoot();
             // 获取光标往上的所有文案
@@ -147,6 +150,7 @@ export default function AiPickerPlugin(): JSX.Element {
                 pNode.append(loadingNode);
                 // 如果本来就是空段落，则只需要增加文本节点
                 const textNode = $createTextNode(' ');
+                setTextNodeKey(textNode.getKey()); // 保存文本节点的key
                 pNode.append(textNode);
                 textNode.select()
             })
@@ -176,9 +180,10 @@ export default function AiPickerPlugin(): JSX.Element {
                 editor.update(() => {
                     loadingNode?.remove();
                     // 默认选中新段落的textNode，直接追加内容
-                    if ($isTextNode(anchorNode)) {
-                        anchorNode.setTextContent(aiAnswer);
-                        anchorNode.getParent()?.selectEnd(); // 每更新一次都将光标移动到最后
+                    const textNode = $getNodeByKey(textNodeKey);
+                    if ($isTextNode(textNode)) {
+                        textNode.setTextContent(aiAnswer);
+                        textNode.getParent()?.selectEnd(); // 每更新一次都将光标移动到最后
                     }
                 })
             })
@@ -245,7 +250,7 @@ export default function AiPickerPlugin(): JSX.Element {
 
     // 过滤选项
     const options = useMemo(() => {
-        const baseOptions = getBaseOptions();
+        // const baseOptions = getBaseOptions();
 
         if (!queryString) {
             return baseOptions;
@@ -344,7 +349,6 @@ export default function AiPickerPlugin(): JSX.Element {
                             </MenuItem>
                         ))}
                     </Menu>
-
                 }}
             />
         </>

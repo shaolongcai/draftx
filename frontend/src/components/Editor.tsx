@@ -56,7 +56,7 @@ function Placeholder() {
         color: '#ccc',
         // overflow: 'hidden',
         position: 'absolute',
-        top: '24px',
+        top: '26px',
         fontSize: '16px',
         userSelect: 'none',
         display: 'inline-block',
@@ -307,28 +307,28 @@ const Editor: React.FC = () => {
         }
     };
 
-    return <Card className="relative rounded-2xl ring-1 ring-gray-300/60  overflow-hidden"
+    return <div className="overflow-hidden"
         style={{ width: cardSize.width, height: cardSize.height }}
     >
         {/* 顶部拖动句柄 */}
         <div
             className="drag absolute top-0 left-0 right-0 h-8 z-10 "
         />
-        {/* 右侧缩放句柄：横向缩放 */}
+        {/* 右侧缩放句柄：横向缩放
         <div
             onMouseDown={startResize('e')}
             className="absolute right-0 top-0 h-full w-2 cursor-ew-resize opacity-0 hover:opacity-100 transition-opacity duration-150"
         />
-        {/* 底部缩放句柄：纵向缩放 */}
+        底部缩放句柄：纵向缩放
         <div
             onMouseDown={startResize('s')}
             className="absolute left-0 bottom-0 w-full h-2 cursor-ns-resize opacity-0 hover:opacity-100 transition-opacity duration-150"
         />
-        {/* 右下角缩放句柄：同时缩放 */}
+        右下角缩放句柄：同时缩放
         <div
             onMouseDown={startResize('se')}
             className="absolute right-0 bottom-0 w-3 h-3 cursor-nwse-resize opacity-0 hover:opacity-100 transition-opacity duration-150"
-        />
+        /> */}
         <LexicalComposer initialConfig={initialConfig}>
             <EditorContext getDeleteDay={(deletedAt) => {
                 // 换成与今天的差距
@@ -341,7 +341,7 @@ const Editor: React.FC = () => {
             className="absolute bottom-4 left-0 right-0 px-4 h-4"
         >
             {/* <Stack direction="row" spacing={0.5} alignItems="center"
-                className={`transition-opacity duration-700 ${showTips ? 'opacity-100' : 'opacity-0'}`}
+                className={`transition-opacity duration-700 `}
             >
                 <Typography variant="bodySmall" color="textSecondary">
                     删除的天数，+3天是因为点击后会加3天删除时间，修改增加的删除时间时，需要同步更改这里
@@ -364,7 +364,12 @@ const Editor: React.FC = () => {
                 </Typography>
             </Stack> */}
         </Stack>
-    </Card>
+        {/* 删除提示标记点 (应该改为超过30日未查看的草稿将会被删除) */}
+        <Tooltip title={`After ${deletedAt ? deletedAt + 3 : 7} days will be deleted`}>
+            <div className={`absolute bottom-6 right-6 w-2 h-2  rounded-full 
+            ${deletedAt + 3 > 6 ? 'bg-[#34C759]/0' : 'bg-[#FF8D28]'}`} />
+        </Tooltip>
+    </div>
 }
 
 export default Editor

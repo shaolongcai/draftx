@@ -18,6 +18,9 @@
   padding-left: 1.25rem;
 } */
 
+body {
+  padding: 24px;
+}
 /* 字体定义 */
 @font-face {
   font-family: 'Roboto';

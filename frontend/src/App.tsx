@@ -13,10 +13,10 @@ function App() {
   const size = useSize(rootRef)
 
   // 触发变更窗口大小
-  useRequest(() => window.electronAPI.resizeWindow('mainWindow', size), {
-    ready: Boolean(size),
-    refreshDeps: [size],
-  })
+  // useRequest(() => window.electronAPI.resizeWindow('mainWindow', size), {
+  //   ready: Boolean(size),
+  //   refreshDeps: [size],
+  // })
 
 
   return (

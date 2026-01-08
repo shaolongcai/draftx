@@ -30,9 +30,8 @@ const Search: React.FC<Props> = ({
     return <Card
         id='search-panel'
         elevation={0}
-        className="px-0 py-0  border border-[#9F7207]/25"
+        className="px-0 py-0  border border-[#9F7207]/25 "
     >
-        <Stack direction="row" spacing={2} alignItems="center">
             <TextField
                 inputRef={inputRef}
                 slotProps={{
@@ -66,7 +65,7 @@ const Search: React.FC<Props> = ({
                     },
                 }}
             />
-        </Stack>
+      
     </Card>
 }
 
