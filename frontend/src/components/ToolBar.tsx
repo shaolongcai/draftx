@@ -37,9 +37,13 @@ const ToolButton: React.FC<ToolButtonProps> = ({
 
 interface Props {
     currentPage: 'draft' | 'list' //当前处在的页面
+    setCurrentPage: (page: 'draft' | 'list') => void;
 }
 //主控件
-const ToolBar: React.FC<Props> = ({ currentPage }) => {
+const ToolBar: React.FC<Props> = ({
+    currentPage,
+    setCurrentPage,
+}) => {
 
     const [active, setActive] = useState(false);
 
@@ -60,7 +64,7 @@ const ToolBar: React.FC<Props> = ({ currentPage }) => {
                 icon: <AllIcon />,
                 className: 'hover:bg-[#9F7207]/70',
                 tip: 'Show all drafts',
-                onClick: () => handleOnclickTool$.emit('allList'),
+                onClick: () => setCurrentPage('list'),
             });
         }
 
@@ -69,21 +73,25 @@ const ToolBar: React.FC<Props> = ({ currentPage }) => {
                 icon: <DraftIcon />,
                 className: 'hover:bg-[#9F7207]/70',
                 tip: 'Back the draft',
-                onClick: () => handleOnclickTool$.emit('draft'),
+                onClick: () => setCurrentPage('draft'),
             });
         }
 
         return buttons;
-    }, [currentPage]);
+    }, [currentPage, setCurrentPage]);
 
 
     return (
-        <div className="w-fit">
+        <div className="mx-auto w-fit">
             <div
-                className={` mx-auto rounded-2xl transition-all   
-                    duration-300 ease-out 
-                    ${active ? 'w-full px-2 py-1 bg-linear-to-r from-[#9F7207]/70 via-[#9F7207]/85 to-[#9F7207] opacity-100' :
-                        'h-1 w-20 bg-[#9F7207]/45 '}`}
+                className={`mx-auto rounded-xl overflow-hidden origin-center 
+                        transition-all duration-300 ease-out
+                        ${active
+                        // 展开：固定高度 + 中心缩放到 1
+                        ? 'w-full h-9 px-2 bg-linear-to-r from-[#9F7207]/70 via-[#9F7207]/85 to-[#9F7207] scale-y-100'
+                        // 收起：保持高度为展开值，使用 scaleY 压到近似 1px（对称收缩）
+                        : 'w-20 h-9 bg-[#9F7207]/25 scale-y-[0.12]'
+                    }`}
                 onMouseEnter={() => setActive(true)}
                 onMouseLeave={() => setActive(false)}
             >

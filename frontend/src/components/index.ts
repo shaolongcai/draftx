@@ -1,5 +1,5 @@
 export { default as Search } from './Search'
-export { default as Editor } from './Editor'
+export { default as EditorContext } from './Editor'
 export { default as DraftItem } from './DraftItem'
 export { default as Editor2 } from './Editor2'
 export { default as MemoList } from './MemoList'

@@ -36,8 +36,10 @@ class WindowManager {
     // 初始化main窗口
     private initMainWindow() {
         this.mainWindow = new BrowserWindow({
-            width: 408,
-            height: 408,
+            width: 460,
+            height: 460,
+            minWidth: 360,
+            minHeight: 360,
             x: 0,               // 后面会计算居中
             y: 0,
             frame: true,       // 有无边框

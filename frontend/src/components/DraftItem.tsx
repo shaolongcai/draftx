@@ -40,8 +40,8 @@ const DraftItem: React.FC<Props> = ({
 
     // 点击卡片
     const handleClick = () => {
-        loadStickys$.emit({ ...rest, content, id } as DraftResult)
         onClick?.(id)
+        loadStickys$.emit({ ...rest, content, id } as DraftResult)
     }
 
     return <Card className="cursor-pointer  border border-[#9F7207]/25 "
