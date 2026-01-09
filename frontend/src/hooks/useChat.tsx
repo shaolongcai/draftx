@@ -6,13 +6,9 @@ export interface Message {
     type: 'stream' | 'done';
 }
 
-interface UseChatOptions {
-    toolId?: number;
-}
 
 
-
-export const useChat = (options?: UseChatOptions) => {
+export const useChat = () => {
 
     const [aiAnswer, setAiAnswer] = useState<string>('');  // AI的回答
     const [messages, setMessages] = useState<Message[]>([]);
@@ -26,7 +22,7 @@ export const useChat = (options?: UseChatOptions) => {
             currentMessageRef.current += chunk.content;
             console.log('接收到的chunk', chunk);
             setAiAnswer(prev => prev + chunk.content)
-            if( chunk.type === 'done'){
+            if (chunk.type === 'done') {
                 setIsLoading(false);
             }
             setMessages(prev => {
@@ -69,7 +65,7 @@ export const useChat = (options?: UseChatOptions) => {
         };
     }, []);
 
-    const sendMessage = useCallback((message?: string) => {
+    const sendMessage = useCallback((message: string, toolId: number) => {
         if (isLoading) return;
 
         setError(null);
@@ -84,8 +80,8 @@ export const useChat = (options?: UseChatOptions) => {
         }]);
 
         // 发起流式请求
-        window.electronAPI.chatStream(message, options?.toolId);
-    }, [isLoading, options?.toolId]);
+        window.electronAPI.chatStream(message, toolId);
+    }, [isLoading]);
 
     const clearMessages = useCallback(() => {
         setMessages([]);

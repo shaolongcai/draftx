@@ -61,7 +61,7 @@ function Placeholder() {
         userSelect: 'none',
         display: 'inline-block',
         pointerEvents: 'none',
-    }}>支持markdown格式输入...</Box>;
+    }}>Press / bring up the menu <br /> Press ` bring up the AI tool....</Box>;
 }
 
 

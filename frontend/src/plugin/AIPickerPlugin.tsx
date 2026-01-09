@@ -77,7 +77,7 @@ export default function AiPickerPlugin(): JSX.Element {
     const [textNodeKey, setTextNodeKey] = useState<string | null>(null); //AI内容的节点
 
     const [editor] = useLexicalComposerContext();
-    const { aiAnswer, isLoading, error, messages, sendMessage, clearMessages } = useChat({ toolId: 1 });
+    const { aiAnswer, isLoading, error, messages, sendMessage, clearMessages } = useChat();
 
     // 获取AI工具
     useRequest(
@@ -90,7 +90,7 @@ export default function AiPickerPlugin(): JSX.Element {
                     {
                         icon: <div>{item.emoji}</div>,
                         keywords: [],
-                        onSelect: createAIRespone
+                        onSelect: () => createAIRespone(item.id),
                     }));
                 setBaseOptions(options);
             }
@@ -99,7 +99,7 @@ export default function AiPickerPlugin(): JSX.Element {
 
 
     // 统一的AI生成 ， 可以考虑放到  onSelectOption 中
-    const createAIRespone = () => {
+    const createAIRespone = (toolId: number) => {
         clearMessages();
         editor.setEditable(false); //先禁用编辑器
         editor.read(() => {
@@ -132,7 +132,7 @@ export default function AiPickerPlugin(): JSX.Element {
             }
 
             console.log('aboveText', aboveText);
-            sendMessage(aboveText);
+            sendMessage(aboveText, toolId);
 
             // 增加一个段落以承载AI内容
             editor.update(() => {
@@ -168,24 +168,28 @@ export default function AiPickerPlugin(): JSX.Element {
         if (aiAnswer) {
             // console.log('messagesType', messages[messages.length - 1].type);
             editor.read(() => {
-                // 在光标位置的下边增加段落节点
-                const selection = $getSelection();
-                if (!$isRangeSelection(selection)) {
-                    throw new Error('未找到有效光标');
+                const textNode = $getNodeByKey(textNodeKey!);
+                try {
+                    // 先删掉loading节点
+                    const pNode = textNode.getParent();
+                    const loadingNode = pNode?.getChildren().find(child => $isLoadingNode(child));
+                    editor.update(() => {
+                        loadingNode?.remove();
+
+                        if ($isTextNode(textNode)) {
+                            textNode.setTextContent(aiAnswer);
+                            textNode.getParent()?.selectEnd(); // 每更新一次都将光标移动到最后
+                        }
+                    })
+                } catch (error) {
+                    editor.update(() => {
+                        if ($isTextNode(textNode)) {
+                            textNode.setTextContent('AI generation failed');
+                            textNode.getParent()?.selectEnd(); // 每更新一次都将光标移动到最后
+                        }
+                    })
+                    console.log('更新AI内容失败', error);
                 }
-                const anchorNode = selection.anchor.getNode();
-                // 先删掉loading节点
-                const pNode = anchorNode.getParent();
-                const loadingNode = pNode?.getChildren().find(child => $isLoadingNode(child));
-                editor.update(() => {
-                    loadingNode?.remove();
-                    // 默认选中新段落的textNode，直接追加内容
-                    const textNode = $getNodeByKey(textNodeKey);
-                    if ($isTextNode(textNode)) {
-                        textNode.setTextContent(aiAnswer);
-                        textNode.getParent()?.selectEnd(); // 每更新一次都将光标移动到最后
-                    }
-                })
             })
         }
     }, [aiAnswer, messages])
