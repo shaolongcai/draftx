@@ -105,9 +105,9 @@ const Editor: React.FC = () => {
         // style={{ width: cardSize.width, height: cardSize.height }}
     >
         {/* 顶部拖动句柄 */}
-        <div
+        {/* <div
             className="drag absolute top-0 left-0 right-0 h-8 z-10 "
-        />
+        /> */}
         {/* 右侧缩放句柄：横向缩放
         <div
             onMouseDown={startResize('e')}

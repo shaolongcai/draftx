@@ -16,6 +16,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   resizeWindow: (windowName: 'mainWindow' | 'settingsWindow', size: { width: number, height: number }) => ipcRenderer.send('resize-window', windowName, size), // 变更窗口大小
   checkForUpdates: () => ipcRenderer.invoke('check-for-updates'), // 检查更新
   downloadUpdate: () => ipcRenderer.invoke('download-update'),  // 下载新版本
+  onDownloadProgress: (callback) => ipcRenderer.on('download-progress', (_event, data) => callback(data)),  //监听下载进度,
 
   // AI相关
   checkOllamaServer: () => ipcRenderer.invoke('check-ollama-server'), // 检查ollama服务是否可用

@@ -36,6 +36,9 @@ function App() {
         <EventProvider >
           <HashRouter>
             <div ref={rootRef} >
+              <div
+                className="drag absolute top-0 left-0 right-0 h-8 z-10 "
+              />
               <style>{`
                 /* root隐藏滚动条但保持可滚动 */
                 ::-webkit-scrollbar {

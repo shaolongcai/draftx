@@ -1,9 +1,7 @@
-import { Button, Stack, Typography } from "@mui/material";
-import { useCallback, useEffect } from "react";
+import { Button, LinearProgress, Stack, Typography } from "@mui/material";
+import { useCallback, useEffect, useState } from "react";
 import updateImage from '../assets/images/update.png'
 import { useNavigate } from 'react-router-dom';
-
-
 
 
 
@@ -13,11 +11,12 @@ import { useNavigate } from 'react-router-dom';
  */
 const Update = () => {
 
+    const [downloadProgress, setDownloadProgress] = useState(0);
+
     const navigate = useNavigate();
 
     // 检查更新
     useEffect(() => {
-
         const checkUpdate = async () => {
             const res = await window.electronAPI.checkForUpdates();
             if (res.isUpdateAvailable) {
@@ -28,9 +27,16 @@ const Update = () => {
                 navigate('/draft');
             }
         }
-
         checkUpdate();
     }, [navigate])
+
+    // 监听下载新版本
+    useEffect(() => {
+        window.electronAPI.onDownloadProgress((progress: number) => {
+            console.log('下载进度', progress);
+            setDownloadProgress(progress);
+        })
+    }, [])
 
 
     // 处理更新
@@ -46,22 +52,30 @@ const Update = () => {
         <Stack spacing={2} alignItems="center" className="m-10" >
             <img src={updateImage} alt="init" className="w-45 h-45" />
             <Typography variant='bodyLarge' color='textPrimary' >
-                A new version avaliba
+                {
+                    downloadProgress > 0 ?
+                        'Downloading update...' :
+                        'A new version is available'
+                }
             </Typography>
-            <Stack spacing={1} alignItems="center">
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleUpdate}
-                >
-                    Update
-                </Button>
-                <Button variant="outlined" className="w-fit" onClick={() => {
-                    navigate('/draft');
-                }}>
-                    later
-                </Button>
-            </Stack>
+            {
+                downloadProgress > 0 ?
+                    <LinearProgress variant="determinate" value={downloadProgress} /> :
+                    <Stack spacing={1} alignItems="center">
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleUpdate}
+                        >
+                            Update
+                        </Button>
+                        <Button variant="outlined" className="w-fit" onClick={() => {
+                            navigate('/draft');
+                        }}>
+                            later
+                        </Button>
+                    </Stack>
+            }
         </Stack>
     )
 }

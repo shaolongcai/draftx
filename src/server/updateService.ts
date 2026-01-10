@@ -123,15 +123,9 @@ class UpdateService {
         });
 
         autoUpdater.on('download-progress', (progressObj) => {
-            const message = `下载进度: ${Math.round(progressObj.percent)}%`;
-            logger.info(`update-${message}`);
-            // const notification: INotification = {
-            //     id: 'download-progress',
-            //     text: message,
-            //     type: 'loading',
-            //     tooltip: '下载完成后需要重启应用'
-            // }
-            // sendToRenderer('system-info', notification);
+            const progress = Math.round(progressObj.percent);
+            logger.info(`下载进度-${progress}`);
+            sendToRenderer('download-progress', progress);
         });
 
         autoUpdater.on('update-downloaded', () => {
@@ -150,22 +144,22 @@ class UpdateService {
     /**
      * 步骤3：检查更新
      */
-    async checkForUpdates(): Promise<void> {
-        if (this.isUpdating) {
-            logger.warn('更新检查已在进行中');
-            return;
-        }
-        console.log('执行 checkForUpdates');
-        try {
-            this.isUpdating = true;
-            await autoUpdater.checkForUpdatesAndNotify();
-        } catch (error) {
-            const msg = error instanceof Error ? error.message : '检查更新失败';
-            logger.error(`检查更新失败: ${msg}`);
-        } finally {
-            this.isUpdating = false;
-        }
-    }
+    // async checkForUpdates(): Promise<void> {
+    //     if (this.isUpdating) {
+    //         logger.warn('更新检查已在进行中');
+    //         return;
+    //     }
+    //     console.log('执行 checkForUpdates');
+    //     try {
+    //         this.isUpdating = true;
+    //         await autoUpdater.checkForUpdatesAndNotify();
+    //     } catch (error) {
+    //         const msg = error instanceof Error ? error.message : '检查更新失败';
+    //         logger.error(`检查更新失败: ${msg}`);
+    //     } finally {
+    //         this.isUpdating = false;
+    //     }
+    // }
 
     /**
      * 步骤4：开始下载更新

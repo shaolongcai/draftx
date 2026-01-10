@@ -1,7 +1,7 @@
 /**
  * 发送消息到前端的channel类型
  */
-type ChannelType = 'index-progress' | 'system-info';
+type ChannelType = 'download-progress';
 
 
 
