@@ -65,15 +65,10 @@ function Placeholder() {
 }
 
 
-interface EditorContextProps {
-    getDeleteDay: (date: string) => void;
-}
 /**
  * 内容编辑器
  */
-const EditorContext: React.FC<EditorContextProps> = ({
-    getDeleteDay,
-}) => {
+const EditorContext: React.FC = () => {
 
     const [currentUuid, setCurrentUuid] = useState<string>('');
     const lastSavedRef = useRef<{ title?: string; contentJson: string; contentText: string }>({ contentJson: '', contentText: '' }); // 上次已保存
@@ -107,9 +102,8 @@ const EditorContext: React.FC<EditorContextProps> = ({
     // 监听加载新的便利贴
     loadStickys$.useSubscription((sticky) => {
         console.log('加载新的便利贴', sticky);
-        // 新增天数
-        window.electronAPI.addDeleteDay(sticky.id);
-        getDeleteDay(sticky.deleted_at)
+        // 刷新删除天数
+        window.electronAPI.refreshDeleteDay(sticky.id);
         // 清空编辑器内容
         editor.update(() => {
             const root = $getRoot();
@@ -181,8 +175,8 @@ const EditorContext: React.FC<EditorContextProps> = ({
     return <div className="scrollbar-thin!">
         <RichTextPlugin
             contentEditable={
-                <ContentEditable   style={{
-                    height:'500px',
+                <ContentEditable style={{
+                    height: '500px',
                     width: '100%',
                     maxHeight: 'calc(100vh - 64px)',
                     minHeight: '240px',

@@ -12,14 +12,17 @@ import { useNavigate } from 'react-router-dom';
 const Update = () => {
 
     const [downloadProgress, setDownloadProgress] = useState(0);
+    const [checking, setChecking] = useState(true);
 
     const navigate = useNavigate();
 
     // 检查更新
     useEffect(() => {
         const checkUpdate = async () => {
+            setChecking(true);
             const res = await window.electronAPI.checkForUpdates();
             if (res.isUpdateAvailable) {
+                setChecking(false);
                 // 有更新，显示更新按钮
                 console.log('有更新', res.message);
             } else {
@@ -53,14 +56,14 @@ const Update = () => {
             <img src={updateImage} alt="init" className="w-45 h-45" />
             <Typography variant='bodyLarge' color='textPrimary' >
                 {
-                    downloadProgress > 0 ?
-                        'Downloading update...' :
-                        'A new version is available'
+                    checking ? 'Checking for updates...' :
+                        downloadProgress > 0 ?
+                            'Downloading update...' :
+                            'A new version is available'
                 }
             </Typography>
             {
-                downloadProgress > 0 ?
-                    <LinearProgress variant="determinate" value={downloadProgress} /> :
+                (downloadProgress === 0 && !checking) ?
                     <Stack spacing={1} alignItems="center">
                         <Button
                             variant="contained"
@@ -75,6 +78,8 @@ const Update = () => {
                             later
                         </Button>
                     </Stack>
+                    :
+                    <LinearProgress variant="determinate" value={downloadProgress} />
             }
         </Stack>
     )

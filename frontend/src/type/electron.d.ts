@@ -38,9 +38,9 @@ interface ElectronAPI {
     saveSticky: (params: StickyParmas) => void;
 
     /**
-     * 增加删除时间
+     * 刷新删除时间（默认30天）
      */
-    addDeleteDay: (id: number) => void;
+    refreshDeleteDay: (id: number) => void;
 
     /**
      * 变更窗口大小
@@ -120,6 +120,12 @@ interface ElectronAPI {
      * 下载更新
      */
     downloadUpdate: () => Promise<void>;
+
+    /**
+     * 监听下载进度
+     * @returns 取消监听的函数
+     */
+    onDownloadProgress: (callback: (progress: number) => void) => () => void;
 }
 
 

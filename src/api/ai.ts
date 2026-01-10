@@ -1,5 +1,5 @@
 import { ipcMain, BrowserWindow } from "electron";
-import { addDeleteDay, getAITools, saveAITool, } from "../database/repositories.js";
+import { getAITools, saveAITool, } from "../database/repositories.js";
 import { ollamaService } from "../server/ollamaSever.js";
 import { logger } from "../core/logger.js";
 
@@ -67,6 +67,7 @@ export function initializeAIApi() {
                 {
                     prompt: systemPrompt,
                     content: message,
+                    isImage: false,
                 },
                 // 流式回调函数
                 (chunk: { content: string; type: "stream" | "done"; }) => {

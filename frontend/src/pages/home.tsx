@@ -102,7 +102,7 @@ const Editor: React.FC = () => {
     };
 
     return <div className="overflow-hidden"
-        // style={{ width: cardSize.width, height: cardSize.height }}
+    // style={{ width: cardSize.width, height: cardSize.height }}
     >
         {/* 顶部拖动句柄 */}
         {/* <div
@@ -124,12 +124,7 @@ const Editor: React.FC = () => {
             className="absolute right-0 bottom-0 w-3 h-3 cursor-nwse-resize opacity-0 hover:opacity-100 transition-opacity duration-150"
         /> */}
         <LexicalComposer initialConfig={initialConfig}>
-            <EditorContext getDeleteDay={(deletedAt) => {
-                // 换成与今天的差距
-                const diff = dayjs(deletedAt).diff(dayjs(), 'day');
-                console.log('diff', diff);
-                setDeletedAt(diff);
-            }} />
+            <EditorContext />
         </LexicalComposer>
         <Stack direction='row' justifyContent='center' alignItems="center"
             className="absolute bottom-4 left-0 right-0 px-4 h-4"

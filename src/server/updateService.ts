@@ -93,7 +93,7 @@ class UpdateService {
             // 或者设置更新服务器地址
             // autoUpdater.setFeedURL({
             //     provider: 'generic',
-            //     url: 'http://t420e4d1q.hd-bkt.clouddn.com/V1.0-test/'
+            //     url: 'http://kodo.osai.click/V1.0-test/'
             // });
         }
 

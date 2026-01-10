@@ -1,5 +1,5 @@
 import { ipcMain } from "electron";
-import { addDeleteDay, getGuideMemo, saveStickyNote, getDraft } from "../database/repositories.js";
+import { getGuideMemo, saveStickyNote, getDraft, refreshDeleteDay } from "../database/repositories.js";
 
 
 
@@ -16,9 +16,9 @@ export function initializeDraftApi() {
         return getDraft(query, limit);
     });
 
-    // 点击增加天数
-    ipcMain.on('add-delete-day', (event, id: number) => {
-        addDeleteDay(id);
+    // 点击刷新删除时间
+    ipcMain.on('refresh-delete-day', (event, id: number) => {
+        refreshDeleteDay(id);
     });
 
     // 获取引导memo

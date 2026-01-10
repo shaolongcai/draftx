@@ -13,7 +13,7 @@ export const saveStickyNote = (stickyNote: StickyParmas) => {
     try {
         const now = new Date().toISOString();
         // const deletedAt = dayjs().add(30, 'day').toISOString();
-        const deletedAt = dayjs().add(7, 'day').toISOString(); //测试用，只增加一天
+        const deletedAt = dayjs().add(30, 'day').toISOString(); //测试用，只增加一天
         // 存在即更新，不存在则插入
         const upsertStmt = db.prepare(`
                 INSERT INTO stickys ( uuid, content, content_json, title, created_at, modified_at, deleted_at)
@@ -81,22 +81,13 @@ export const getDraft = (query?: string, limit: number = 50) => {
 
 
 /**
- * 增加天数
+ * 增加天数：刷新删除天数
  */
-export const addDeleteDay = (id: number) => {
+export const refreshDeleteDay = (id: number) => {
     try {
-        // 取出deleted_at
-        const stmt = db.prepare(`
-            SELECT deleted_at FROM stickys WHERE id = ?
-        `);
-        const row = stmt.get(id);
-        if (!row) {
-            logger.error('sticky note not found');
-            return;
-        }
-        const deletedAt = row.deleted_at;
+        logger.info(`刷新删除的时间，草稿ID：${id}`);
         // 增加3天，并更新数据库
-        const newDeletedAt = dayjs(deletedAt).add(3, 'day').toISOString(); // 转换为 ISO 字符串
+        const newDeletedAt = dayjs().add(30, 'day').toISOString(); // 转换为 ISO 字符串
         const updateStmt = db.prepare(`
             UPDATE stickys SET deleted_at = ? WHERE id = ?
         `);
