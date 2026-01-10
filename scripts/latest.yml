@@ -1,0 +1,11 @@
+version: 1.0.1
+files:
+    - url: Osai Setup 0.4.1.exe
+      sha512: r35nPfrACbH0oL9c5DZJJHeJZBbxGE9HhcsAOCO37mxlepveLmTiF2K6Eb+PSZSMckLkpf84S/Zjp2w71raA+A==
+      size: 368585746
+    - url: Osai Setup 0.4.1.exe.blockmap
+      sha512: D+k/5Mm3KFlemVETWo+vR9eyVh/E7C7XaNFk68krxzcCCJZyKBxGm/xMxAGMmDy5mHvXjBmXZ4cRuUgK0M8Frw==
+      size: 379887
+path: Osai Setup 0.4.1.exe
+sha512: r35nPfrACbH0oL9c5DZJJHeJZBbxGE9HhcsAOCO37mxlepveLmTiF2K6Eb+PSZSMckLkpf84S/Zjp2w71raA+A==
+releaseDate: '2025-11-24T03:53:54.049900Z'

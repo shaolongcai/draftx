@@ -8,6 +8,8 @@ import { EventProvider, useEvent } from './contexts/EvenContext'
 import Home from './pages/home'
 import { ToolBar } from './components'
 import DraftList from './pages/draftList'
+import { Routes, Route, HashRouter } from 'react-router-dom';
+import Update from './pages/update'
 
 function App() {
 
@@ -32,8 +34,9 @@ function App() {
     }} >
       <ThemeProvider theme={theme}>
         <EventProvider >
-          <div ref={rootRef} >
-            <style>{`
+          <HashRouter>
+            <div ref={rootRef} >
+              <style>{`
                 /* root隐藏滚动条但保持可滚动 */
                 ::-webkit-scrollbar {
                     display: none;
@@ -45,20 +48,30 @@ function App() {
                     -ms-overflow-style: none;
                 }
             `}</style>
-            <div className={`${currentPage === 'draft' ? '' : 'hidden'}`}>
-              <Home />
+              <Routes>
+                {/* 首页 */}
+                <Route path='/draft'
+                  element={<>
+                    <div className={`${currentPage === 'draft' ? '' : 'hidden'}`}>
+                      <Home />
+                    </div>
+                    <div className={`${currentPage === 'list' ? '' : 'hidden'}`}>
+                      <DraftList setCurrentPage={setCurrentPage} currentPage={currentPage} />
+                    </div>
+                    <Stack className='absolute bottom-6 left-0 right-0 px-4 h-4'>
+                      <ToolBar
+                        currentPage={currentPage}
+                        setCurrentPage={setCurrentPage}
+                      />
+                    </Stack>
+                  </>}
+                />
+                {/* 更新提示 */}
+                <Route path='/' element={<Update />} />
+              </Routes>
+              {/* <ToolBar currentPage='list' /> */}
             </div>
-            <div className={`${currentPage === 'list' ? '' : 'hidden'}`}>
-              <DraftList setCurrentPage={setCurrentPage} currentPage={currentPage} />
-            </div>
-            <Stack className='absolute bottom-6 left-0 right-0 px-4 h-4'>
-              <ToolBar
-                currentPage={currentPage}
-                setCurrentPage={setCurrentPage}
-              />
-            </Stack>
-            {/* <ToolBar currentPage='list' /> */}
-          </div>
+          </HashRouter>
         </EventProvider>
       </ThemeProvider>
     </NotificationsProvider>

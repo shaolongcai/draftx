@@ -19,7 +19,7 @@ export type ConfigParams = {
 
 type ChatData = {
     content: string;
-    type :'stream' | 'done'
+    type: 'stream' | 'done'
 }
 
 
@@ -110,6 +110,16 @@ interface ElectronAPI {
      * 读取系统剪贴板文本
      */
     readClipboardText: () => Promise<string>;
+
+    /**
+     * 检查是否有更新
+     */
+    checkForUpdates: () => Promise<{ isUpdateAvailable: boolean, message: string }>;
+
+    /**
+     * 下载更新
+     */
+    downloadUpdate: () => Promise<void>;
 }
 
 

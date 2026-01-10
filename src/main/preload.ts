@@ -14,6 +14,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   setConfig: (params: ConfigParams) => ipcRenderer.invoke('set-config', params.key, params.value, params.type), // 设置用户配置
   getConfig: (key?: string) => ipcRenderer.invoke('get-config', key),  // 获取用户配置
   resizeWindow: (windowName: 'mainWindow' | 'settingsWindow', size: { width: number, height: number }) => ipcRenderer.send('resize-window', windowName, size), // 变更窗口大小
+  checkForUpdates: () => ipcRenderer.invoke('check-for-updates'), // 检查更新
+  downloadUpdate: () => ipcRenderer.invoke('download-update'),  // 下载新版本
 
   // AI相关
   checkOllamaServer: () => ipcRenderer.invoke('check-ollama-server'), // 检查ollama服务是否可用

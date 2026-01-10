@@ -8,6 +8,7 @@ import { initializeSystemApi } from '../api/system.js';
 import { logger } from '../core/logger.js';
 import { GuidJson, GuidMarkdown } from '../data/data.js';
 import { initializeAIApi } from '../api/ai.js';
+import { initializeUpdateApi } from '../api/update.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -145,6 +146,7 @@ app.whenReady().then(async () => {
   // 注册全局快捷键
   registerGlobalShortcut();
   // 初始化 API
+  initializeUpdateApi()
   initializeDraftApi();
   initializeSystemApi();
   initializeAIApi()
