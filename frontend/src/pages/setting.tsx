@@ -8,7 +8,7 @@ import {
 import { SettingItem, AIProvider, AIToolConfig } from "@/components";
 // import { useTranslation } from '@/contexts/I18nContext';
 import { ConfigParams } from '@/type/electron';
-import AITools from "@/components/AITools";
+import { useNavigate } from 'react-router-dom';
 // import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 
@@ -34,6 +34,7 @@ const Setting = () => {
 
     // const context = useGlobalContext();
     // const { t, isLoading } = useTranslation()
+    const navigate = useNavigate();
 
     // 拉取用户配置
     // useEffect(() => {
@@ -125,24 +126,11 @@ const Setting = () => {
         await window.electronAPI.setAutoLaunch(checked, autoLaunchHidden)
     }
 
-    // 渲染右侧弹窗
-    const genRightDialog = () => {
-        switch (openType) {
-            case 'AIProvider':
-                return <AIProvider onFinish={() => { setOpenType(null) }} />;
-            case 'AITools':
-                return <AITools />;
-            case 'AIconfig':
-            // return <AIToolConfig mode='edit' />;
-            default:
-                return null
-        }
-    }
 
-    return <Stack
-        direction='row'
-        alignItems='flex-start'
-        spacing={3}
+    return <div
+        className="w-full max-h-[680px]!  overflow-y-auto 
+                    scrollbar-thin
+                    "
     >
         {/* {
                 // 同意用户体验改进计划弹窗
@@ -154,59 +142,54 @@ const Setting = () => {
                     }}
                 />
             } */}
-        <Card
-            className="w-[480px] max-h-[680px]!  overflow-y-auto 
-                    scrollbar-thin
-                    "
-        >
-            <Stack direction='row' justifyContent='space-between' alignItems='center' >
-                <Typography variant='headlineSmall' >
-                    Setting
+        <Stack direction='row' justifyContent='space-between' alignItems='center' >
+            <Typography variant='headlineSmall' >
+                Setting
+            </Typography>
+            <IconButton >
+                <CloseIcon />
+            </IconButton>
+        </Stack>
+        <Stack spacing={2} sx={{ marginTop: '16px' }}>
+            <Stack spacing={1}>
+                <Typography variant='titleSmall' className='color-rgba(0, 0, 0, 0.85)' >
+                    AI Sever
                 </Typography>
-                <IconButton >
-                    <CloseIcon />
-                </IconButton>
+                <SettingItem
+                    title='AI Provider'
+                    type='button'
+                    value={aiProvider?.model || 'Set'}
+                    onAction={() => {
+                        navigate('/AIProvider')
+                    }}
+                />
+                <SettingItem
+                    title='AI Tool'
+                    type='button'
+                    value={openType === 'AITools' ? 'Close' : 'Edit'}
+                    onAction={() => { setOpenType(openType === 'AITools' ? null : 'AITools') }}
+                />
             </Stack>
-            <Stack spacing={2} sx={{ marginTop: '16px' }}>
-                <Stack spacing={1}>
-                    <Typography variant='titleSmall' className='color-rgba(0, 0, 0, 0.85)' >
-                        AI Sever
-                    </Typography>
-                    <SettingItem
-                        title='AI Provider'
-                        type='button'
-                        value={aiProvider?.model || 'Set'}
-                        onAction={() => {
-                            setOpenType('AIProvider')
-                        }}
-                    />
-                    <SettingItem
-                        title='AI Tool'
-                        type='button'
-                        value={openType === 'AITools' ? 'Close' : 'Edit'}
-                        onAction={() => { setOpenType(openType === 'AITools' ? null : 'AITools') }}
-                    />
-                </Stack>
-                <Stack spacing={1}>
-                    <Typography variant='titleSmall' className='color-rgba(0, 0, 0, 0.85)' >
-                        System
-                    </Typography>
-                    {/* 打开日志 */}
-                    <SettingItem
-                        title='Log Folder'
-                        value='Open'
-                        onAction={() => window.electronAPI.openDir('runLog')}
-                        type='button'
-                    />
-                    {/* 用户体验计划 */}
-                    {/* <SettingItem
+            <Stack spacing={1}>
+                <Typography variant='titleSmall' className='color-rgba(0, 0, 0, 0.85)' >
+                    System
+                </Typography>
+                {/* 打开日志 */}
+                <SettingItem
+                    title='Log Folder'
+                    value='Open'
+                    onAction={() => window.electronAPI.openDir('runLog')}
+                    type='button'
+                />
+                {/* 用户体验计划 */}
+                {/* <SettingItem
                                 title={t('app.settings.userExperience')}
                                 type='switch'
                                 value={reportAgreement}
                                 onAction={toggleReportAgreement}
                             /> */}
-                    {/* 检查更新 */}
-                    {/* <SettingItem
+                {/* 检查更新 */}
+                {/* <SettingItem
                                 title={t('app.settings.checkUpdate')}
                                 type='custom'
                                 value={updateStatusText}
@@ -225,15 +208,15 @@ const Setting = () => {
                                     </Stack>
                                 }
                             /> */}
-                    {/* 自动启动开关 */}
-                    <SettingItem
-                        title='Auto Launch'
-                        type='switch'
-                        value={autoLaunch}
-                        onAction={toggleAutoLaunch}
-                    />
-                </Stack>
-                {/* 
+                {/* 自动启动开关 */}
+                <SettingItem
+                    title='Auto Launch'
+                    type='switch'
+                    value={autoLaunch}
+                    onAction={toggleAutoLaunch}
+                />
+            </Stack>
+            {/* 
                         静默启动开关
                         <SettingItem
                             title={t('app.settings.autoLaunchHidden')}
@@ -241,7 +224,7 @@ const Setting = () => {
                             value={autoLaunchHidden}
                             onAction={toggleAutoLaunchHidden}
                         /> */}
-                {/* <Stack spacing={1} >
+            {/* <Stack spacing={1} >
                             <Typography variant='titleSmall' >
                                 Language
                             </Typography>
@@ -252,16 +235,15 @@ const Setting = () => {
                                 action={<LanguageSwitcher variant='select' size='small' showLabel={false} />}
                             />
                         </Stack> */}
-                {/* <Stack spacing={1} >
+            {/* <Stack spacing={1} >
                             <Typography variant='titleSmall' >
                                 Contact
                             </Typography>
                             <Contact />
                         </Stack> */}
-            </Stack>
-        </Card>
-        {genRightDialog()}
-    </Stack>
+        </Stack>
+    </div>
+
 }
 
 

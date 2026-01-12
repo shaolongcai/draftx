@@ -66,9 +66,10 @@ interface ElectronAPI {
 
     /**
      * 检查Ollama服务是否可用
+     * @param host Ollama服务地址
      * @returns code: 0 表示成功，1 表示失败 ,errMsg: 错误信息
      */
-    checkOllamaServer: () => Promise<{ code: number, errMsg?: string }>
+    checkOllamaServer: (host: string, modelID: string) => Promise<{ code: number, errMsg?: string }>
 
     /**
      * 保存AI工具

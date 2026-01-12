@@ -91,14 +91,17 @@ class WindowManager {
             height: 700,
             x: 0,               // 后面会计算居中
             y: 0,
-            frame: false,       // 无边框
-            resizable: false,
+            frame: true,       // 无边框
+            resizable: true,
             movable: true,
             alwaysOnTop: true,  // 总在最前
             skipTaskbar: true,  // 不占用任务栏
             show: false,        // 先不显示
-            transparent: true,
-            backgroundColor: '#00000000',
+            roundedCorners: true,
+            hasShadow: true,
+            backgroundColor: '#F9F3E5',
+            transparent: false,
+            titleBarStyle: 'hidden', // 隐藏原生标题栏，保留边框
             // backgroundColor: '#E92828', //测试大小专用色
             webPreferences: {
                 preload: path.join(__dirname, '../main/preload.js'),

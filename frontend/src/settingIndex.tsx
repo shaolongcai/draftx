@@ -4,7 +4,8 @@ import RootProviders from './RootProviders';
 import './index.css'
 import { useRef } from 'react';
 import { useSize, useRequest } from 'ahooks';
-
+import { Routes, Route, HashRouter } from 'react-router-dom';
+import { AIProvider } from './components';
 
 const APP = () => {
 
@@ -12,16 +13,38 @@ const APP = () => {
     const size = useSize(rootRef)
 
     // 触发变更窗口大小
-    useRequest(() => window.electronAPI.resizeWindow('settingsWindow', size), {
-        ready: Boolean(size),
-        refreshDeps: [size],
-    })
+    // useRequest(() => window.electronAPI.resizeWindow('settingsWindow', size), {
+    //     ready: Boolean(size),
+    //     refreshDeps: [size],
+    // })
 
     return (
         <RootProviders>
-            <div ref={rootRef} style={{ display: 'inline-block' }}>
-                <Setting />
-            </div>
+            <HashRouter>
+                <div ref={rootRef} >
+                    {/* 顶部拖拽条 */}
+                    <div
+                        className="drag absolute top-0 left-0 right-0 h-8 z-10 "
+                    />
+                    <style>{`
+                /* root隐藏滚动条但保持可滚动 */
+                ::-webkit-scrollbar {
+                    display: none;
+                }
+                
+                /* 适用于Firefox */
+                * {
+                    scrollbar-width: none;
+                    -ms-overflow-style: none;
+                }
+            `}</style>
+                    <Routes>
+                        <Route path="/" element={<Setting />} />
+                        <Route path="/AIProvider" element={<AIProvider />} />
+                    </Routes>
+                    <div />
+                </div>
+            </HashRouter>
         </RootProviders>
     )
 }

@@ -19,7 +19,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onDownloadProgress: (callback) => ipcRenderer.on('download-progress', (_event, data) => callback(data)),  //监听下载进度,
 
   // AI相关
-  checkOllamaServer: () => ipcRenderer.invoke('check-ollama-server'), // 检查ollama服务是否可用
+  checkOllamaServer: (host: string, modelID: string) => ipcRenderer.invoke('check-ollama-server', host, modelID), // 检查ollama服务是否可用
   saveAITool: (toolData: AITool) => ipcRenderer.send('save-ai-tool', toolData), // 保存AI工具 
   getAITools: (id?: number) => ipcRenderer.invoke('get-ai-tools', id), // 获取AI工具
 

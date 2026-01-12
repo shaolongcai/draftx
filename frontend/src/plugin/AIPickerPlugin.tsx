@@ -99,7 +99,20 @@ export default function AiPickerPlugin(): JSX.Element {
 
 
     // 统一的AI生成 ， 可以考虑放到  onSelectOption 中
-    const createAIRespone = (toolId: number) => {
+    const createAIRespone = async (toolId: number) => {
+        // 检查是否有配置AI
+        const provider = await window.electronAPI.getConfig('ai_provider');
+        if (!provider) {
+            editor.update(() => {
+                const root = $getRoot();
+                const pNode = $createParagraphNode();
+                const tNode = $createTextNode('Please configure the AI provider in settings first');
+                pNode.append(tNode);
+                root.append(pNode);
+                pNode.selectEnd();
+            })
+            return;
+        }
         clearMessages();
         editor.setEditable(false); //先禁用编辑器
         editor.read(() => {

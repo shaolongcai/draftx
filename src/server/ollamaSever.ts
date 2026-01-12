@@ -153,15 +153,36 @@ class OllamaService {
     }
 
     // 检查ollama服务是否可用,尝试5次，2秒超时
-    public async checkOllamaServer(): Promise<boolean> {
+    public async checkOllamaServer(host: string, modelID: string): Promise<boolean> {
         for (let i = 0; i < 5; i++) {
             try {
-                const response = await fetch('http://127.0.0.1:11434/api/tags');
-                if (response.ok) return true;
-            } catch { }
+                const response = await fetch(`${host}/api/tags`);
+                // 解析并检查返回的模型列表
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.models && Array.isArray(data.models) && data.models.length > 0) {
+                        logger.info(`已发现可用模型:${data.models.map((m: any) => m.name).join(', ')}`);
+                        // 检查返回的模型列表中是否包含指定的 modelID
+                        const hasModel = data.models.some((m: any) => m.name === modelID);
+                        if (hasModel) {
+                            logger.info(`已发现指定模型: ${modelID}`);
+                            return true
+                        } else {
+                            throw new Error(`Specified model not found: ${modelID}`); //统一交给catch处理
+                        }
+                        // return true;
+                    } else {
+                        logger.warn('Ollama服务未配置任何模型');
+                        throw new Error('Ollama server has no models configured'); //统一交给catch处理
+                    }
+                }
+                // if (response.ok) return true;
+            } catch (error) {
+                throw new Error(`${error} , Please check the host or modelID.`); //统一交给catch处理
+            }
             await new Promise(resolve => setTimeout(resolve, 2000));
         }
-        throw new Error('Ollama服务启动超时');
+        throw new Error('Check Ollama server timeout');
     }
 
     // 重启 Worker

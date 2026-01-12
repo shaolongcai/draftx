@@ -6,11 +6,10 @@ import { logger } from "../core/logger.js";
 
 
 export function initializeAIApi() {
-
     // 检查ollama服务
-    ipcMain.handle('check-ollama-server', async (event) => {
+    ipcMain.handle('check-ollama-server', async (event, host: string, modelID: string) => {
         try {
-            const checkRes = await ollamaService.checkOllamaServer();
+            const checkRes = await ollamaService.checkOllamaServer(host, modelID);
             return {
                 code: 0,
                 data: checkRes
