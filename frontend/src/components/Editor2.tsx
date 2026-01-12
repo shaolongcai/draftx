@@ -131,7 +131,6 @@ const EditorContext: React.FC<EditorContextProps> = ({
     // 监听加载新的便利贴
     loadStickys$.useSubscription((sticky) => {
         // 新增天数
-        window.electronAPI.addDeleteDay(sticky.id);
         getDeleteDay(sticky.deleted_at)
 
         // 插入新的便利贴内容
@@ -158,6 +157,10 @@ const EditorContext: React.FC<EditorContextProps> = ({
                 uuid: currentUuidRef.current,
                 title: title,
                 content: contentText,
+                contentJson: JSON.stringify({
+                    title: title,
+                    content: contentText,
+                }),
             });
             console.log('已自动保存', { title, contentText });
             // 如需提示可开启：message.success('已自动保存');

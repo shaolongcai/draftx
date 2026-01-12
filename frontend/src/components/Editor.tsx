@@ -1,9 +1,7 @@
-import { Box, Card, Stack, Tooltip, Typography } from "@mui/material"
-
+import { Box } from "@mui/material"
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { CodeHighlightPlugin } from '@/plugin/CodeHighlightPlugin';
 import { CodeActionPlugin } from '@/plugin/CodeActionPlugin';
-import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
@@ -12,11 +10,6 @@ import { MarkdownShortcutPlugin } from "@/plugin/MarkdownShortcutPlugin";
 import { MarkdownPastePlugin } from "@/plugin/MarkdownPastePlugin";
 import { TableKeyboardPlugin } from "@/plugin/TableKeyboardPlugin";
 import { MermaidPlugin } from "@/plugin/MermaidPlugin";
-import { mermaidNode } from "@/nodes/MermaidNode";
-import { ListItemNode, ListNode } from '@lexical/list';
-import { AutoLinkNode, LinkNode } from '@lexical/link';
-import { HeadingNode, QuoteNode } from '@lexical/rich-text';
-import { CodeHighlightNode, CodeNode } from '@lexical/code';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
 import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
@@ -31,23 +24,19 @@ import { v4 as uuidv4 } from 'uuid';
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useNotifications } from "@toolpad/core/useNotifications";
 import { useEvent } from "@/contexts/EvenContext";
-import { HelpOutline } from "@mui/icons-material";
-import dayjs from "dayjs";
 import { $convertFromMarkdownString, TRANSFORMERS } from "@lexical/markdown";
 import TabFocusPlugin from '@/plugin/TabFocusPlugin';
 import { theme } from "@/theme/editorTheme";
 import PickerPlugin from "@/plugin/PickerPlugin";
 import { MathNode } from "@/nodes/MathNode";
 import { MathPlugin } from "@/plugin/MathPlugin";
-import { MathItemNode } from "@/nodes/MathItemNode";
-import { BlockTitleNode } from "@/nodes/BlockTitleNode";
-import { BlockTipNode } from "@/nodes/BlockTipNode";
 import { AutoPastePlugin } from "@/plugin/AutoPastePlugin";
 import { BlockTipPlugin } from "@/plugin/BlockTipPlugin";
 import { PasteNode } from "@/nodes/PasteNode";
 import ToolBar from "./ToolBar";
 import AiPickerPlugin from "@/plugin/AIPickerPlugin";
 import { LoadingNode } from "@/nodes/LoadingNode";
+import { ConfigParams } from "@/type/electron";
 // import { useSettings } from '@/contexts/SettingContext';
 
 
@@ -78,18 +67,10 @@ const EditorContext: React.FC = () => {
     const notification = useNotifications();
 
 
-    // const {
-    //         setOption,
-    //         settings: {
-    //             listStrictIndent,
-    //         },
-    //     } = useSetting();
-
-    //     const isEditable = useLexicalEditable();
-
-    // 初始化uuid
+    // 初始化
     useEffect(() => {
         setCurrentUuid(uuidv4());
+        getGuideMemo();
     }, []);
 
     // 监听点击新建草稿
@@ -123,6 +104,34 @@ const EditorContext: React.FC = () => {
         });
     })
 
+    // 决定展示guide的meomo，还是初始化uuid;由于setData 异步，所以这里需要直接传入实例
+    const getGuideMemo = async () => {
+        // 是否完成引导
+        const isFinishGuide = await window.electronAPI.getConfig('isFinishGuide')
+        console.log('isFinishGuide', isFinishGuide)
+        if (!isFinishGuide) {
+            //展示引导memo
+            const guideMemo = await window.electronAPI.getGuideMemo()
+            editor.update(() => {
+                const root = $getRoot();
+                root.clear();
+                // 创建root
+                root.append($createParagraphNode());
+                const initialEditorState = editor.parseEditorState(guideMemo.content_json);
+                editor.setEditorState(initialEditorState);
+            })
+
+            setCurrentUuid(guideMemo.uuid)
+            // 设置为已引导
+            const configParams: ConfigParams = {
+                key: 'isFinishGuide',
+                value: true,
+                type: 'boolean'
+            }
+            window.electronAPI.setConfig(configParams)
+        }
+    }
+
     // 新建草稿
     const addNewDraft = () => {
         // 保存现在的内容
@@ -144,7 +153,7 @@ const EditorContext: React.FC = () => {
     const { run: scheduleSave } = useDebounceFn(
         async (payload: { title?: string; contentJson: string; contentText: string }) => {
             // 内容为空则跳过
-            if (!payload.contentText) return;
+            // if (!payload.contentText) return;
             // 若无变更则跳过
             // if (payload.contentJson === lastSavedRef.current.contentJson) return
             // 仅在文本变更时保存

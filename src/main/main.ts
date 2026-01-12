@@ -6,7 +6,7 @@ import { initializeDraftApi } from '../api/draft.js';
 import { deleteExpiredStickys, getGuideMemo, saveStickyNote } from '../database/repositories.js';
 import { initializeSystemApi } from '../api/system.js';
 import { logger } from '../core/logger.js';
-import { GuidJson, GuidMarkdown } from '../data/data.js';
+import { GuidJson, GuidContent } from '../data/data.js';
 import { initializeAIApi } from '../api/ai.js';
 import { initializeUpdateApi } from '../api/update.js';
 
@@ -129,7 +129,7 @@ const initializeGuideMemo = () => {
     // 没有引导memo，创建一个
     saveStickyNote({
       uuid: 'guide',
-      content: GuidMarkdown,
+      content: GuidContent,
       contentJson: JSON.stringify(GuidJson),
     });
   }

@@ -55,7 +55,10 @@ const ToolBar: React.FC<Props> = ({
                 icon: <AddIcon />,
                 className: 'hover:bg-[#9F7207]/70',
                 tip: 'Add a new draft  (Alt + N)',
-                onClick: () => handleOnclickTool$.emit('addDraft'),
+                onClick: () => {
+                    setCurrentPage('draft');
+                    handleOnclickTool$.emit('addDraft');
+                },
             }
         ];
 

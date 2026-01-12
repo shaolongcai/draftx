@@ -11,6 +11,16 @@ const db = getDatabase()
  */
 export const saveStickyNote = (stickyNote: StickyParmas) => {
     try {
+        // 若content为空，则删除该草稿
+        if (!stickyNote.content.trim()) {
+            const deleteStmt = db.prepare(`
+                DELETE FROM stickys
+                WHERE uuid = ?
+            `);
+            deleteStmt.run(stickyNote.uuid);
+            return;
+        }
+
         const now = new Date().toISOString();
         // const deletedAt = dayjs().add(30, 'day').toISOString();
         const deletedAt = dayjs().add(30, 'day').toISOString(); //测试用，只增加一天
