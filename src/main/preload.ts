@@ -22,6 +22,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   checkOllamaServer: (host: string, modelID: string) => ipcRenderer.invoke('check-ollama-server', host, modelID), // 检查ollama服务是否可用
   saveAITool: (toolData: AITool) => ipcRenderer.send('save-ai-tool', toolData), // 保存AI工具 
   getAITools: (id?: number) => ipcRenderer.invoke('get-ai-tools', id), // 获取AI工具
+  deleteAITool: (id: number) => ipcRenderer.send('delete-ai-tool', id), // 删除AI工具
 
   // AI流式对话
   chatStream: (message?: string, toolId?: number) => ipcRenderer.send('chat-stream', message, toolId), // 发起流式对话

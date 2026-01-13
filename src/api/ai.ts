@@ -1,5 +1,5 @@
 import { ipcMain, BrowserWindow } from "electron";
-import { getAITools, saveAITool, } from "../database/repositories.js";
+import { deleteAITool, getAITools, saveAITool, } from "../database/repositories.js";
 import { ollamaService } from "../server/ollamaSever.js";
 import { logger } from "../core/logger.js";
 
@@ -39,6 +39,15 @@ export function initializeAIApi() {
             return getAITools(id)
         }
         return getAITools()
+    })
+
+    // 删除AI工具
+    ipcMain.on('delete-ai-tool', (event, id: number) => {
+        try {
+            deleteAITool(id)
+        } catch (error) {
+            logger.error(error)
+        }
     })
 
     // AI流式对话

@@ -3,9 +3,12 @@ import Setting from '@/pages/setting';
 import RootProviders from './RootProviders';
 import './index.css'
 import { useRef } from 'react';
-import { useSize, useRequest } from 'ahooks';
+import { useSize } from 'ahooks';
 import { Routes, Route, HashRouter } from 'react-router-dom';
 import { AIProvider } from './components';
+import AITools from './pages/aitools';
+import AIToolConfig from './pages/AIToolConfig';
+
 
 const APP = () => {
 
@@ -41,6 +44,8 @@ const APP = () => {
                     <Routes>
                         <Route path="/" element={<Setting />} />
                         <Route path="/AIProvider" element={<AIProvider />} />
+                        <Route path="/AITools" element={<AITools />} />
+                        <Route path="/AIToolConfig" element={<AIToolConfig />} />
                     </Routes>
                     <div />
                 </div>

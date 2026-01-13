@@ -181,7 +181,6 @@ export const getStickyById = (id: number) => {
  */
 export const saveAITool = (tool: AITool): void => {
     try {
-        console.log('添加AI工具', tool)
         if (tool.id) {
             // 若有ID则为更新
             const stmt = db.prepare(`
@@ -229,6 +228,21 @@ export const getAITools = (id?: number): AITool | AITool[] | null => {
     } catch (error) {
         logger.error(error);
         return null;
+    }
+}
+
+
+/**
+ * 删除AI工具
+ */
+export const deleteAITool = (id: number): void => {
+    try {
+        const stmt = db.prepare(`
+            DELETE FROM ai_tools WHERE id = ?
+        `);
+        stmt.run(id);
+    } catch (error) {
+        logger.error(error);
     }
 }
 

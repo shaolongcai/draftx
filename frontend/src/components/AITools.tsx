@@ -1,7 +1,7 @@
 import { Card, Grid, Stack, Typography } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
 import { useEffect, useState } from "react";
-import AIToolConfig from "./AIToolConfig";
+import AIToolConfig from "../pages/AIToolConfig";
 import { useRequest } from "ahooks";
 import Chat from "./Chat";
 import { useEvent } from "@/contexts/EvenContext";

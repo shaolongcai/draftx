@@ -166,8 +166,8 @@ const Setting = () => {
                 <SettingItem
                     title='AI Tool'
                     type='button'
-                    value={openType === 'AITools' ? 'Close' : 'Edit'}
-                    onAction={() => { setOpenType(openType === 'AITools' ? null : 'AITools') }}
+                    value='SET'
+                    onAction={() => { navigate('/AITools') }}
                 />
             </Stack>
             <Stack spacing={1}>

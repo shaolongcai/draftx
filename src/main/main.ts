@@ -3,7 +3,7 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { getConfig, initializeDatabase, setConfig } from '../database/sqlite.js';
 import { initializeDraftApi } from '../api/draft.js';
-import { deleteExpiredStickys, getGuideMemo, saveStickyNote } from '../database/repositories.js';
+import { deleteExpiredStickys, getAITools, getGuideMemo, saveAITool, saveStickyNote } from '../database/repositories.js';
 import { initializeSystemApi } from '../api/system.js';
 import { logger } from '../core/logger.js';
 import { GuidJson, GuidContent } from '../data/data.js';
@@ -135,6 +135,21 @@ const initializeGuideMemo = () => {
   }
 }
 
+// 初始化AI工具
+const initializeAITool = () => {
+  // 检查是否有AI配置
+  const tools = getAITools() as AITool[]
+  if (tools.length === 0) {
+    // 没有AI配置，提示用户配置
+    logger.info('没有任何AI工具，初始化一个');
+    // 初始化一个默认的AI工具
+    saveAITool({
+      name: 'Summary the above text',
+      prompt: 'Organize the user input and generate a concise summary in a single paragraph without any markdown formatting',
+    })
+  }
+}
+
 
 app.whenReady().then(async () => {
   // 准备窗口
@@ -154,6 +169,8 @@ app.whenReady().then(async () => {
   createTray();
   // 初始化引导memo
   initializeGuideMemo()
+  // 初始化AI工具
+  initializeAITool()
   // 删除所有过期的便利贴
   deleteExpiredStickys();
 });

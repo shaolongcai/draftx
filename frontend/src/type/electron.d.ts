@@ -72,7 +72,7 @@ interface ElectronAPI {
     checkOllamaServer: (host: string, modelID: string) => Promise<{ code: number, errMsg?: string }>
 
     /**
-     * 保存AI工具
+     * 保存AI工具,带ID表示更新，不带ID表示新增
      */
     saveAITool: (toolData: AITool) => Promise<void>;
 
@@ -80,6 +80,12 @@ interface ElectronAPI {
      * 获取AI工具
      */
     getAITools: (id?: number) => Promise<AIToolItem[] | AIToolItem | null>;
+
+    /**
+     * 删除AI工具
+     */
+    deleteAITool: (id: number) => Promise<void>;
+
 
     /**
      * 发起流式对话

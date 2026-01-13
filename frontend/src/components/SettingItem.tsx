@@ -100,7 +100,7 @@ const SettingItem: React.FC<Props> = ({
     }
 
     return (
-        <Paper className="bg-black px-4 py-3 rounded-2xl" variant='outlined' >
+        <Paper className="bg-black px-4 py-3 rounded-2xl w-full" variant='outlined' >
             <Stack direction='row' justifyContent='space-between' alignItems='center'>
                 <Typography variant='bodyLarge' color="text.primary" className=" text-white" >
                     {title}
