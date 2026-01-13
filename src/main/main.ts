@@ -150,6 +150,17 @@ const initializeAITool = () => {
   }
 }
 
+// 初始化用户配置
+const initializeUserConfig = () => {
+  // 检查是否有用户配置
+  const config = getConfig('autoLaunch');
+  if (!config) {
+    // 没有用户配置，提示用户配置
+    logger.info('没有配置自动启动，初始化一个');
+    setConfig('autoLaunch', true, 'boolean');
+  }
+}
+
 
 app.whenReady().then(async () => {
   // 准备窗口
@@ -171,6 +182,8 @@ app.whenReady().then(async () => {
   initializeGuideMemo()
   // 初始化AI工具
   initializeAITool()
+  // 初始化用户配置
+  initializeUserConfig()
   // 删除所有过期的便利贴
   deleteExpiredStickys();
 });

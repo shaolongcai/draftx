@@ -28,7 +28,7 @@ class OllamaService {
             this.aiWorker = new Worker(path.join(__dirname, '../workers/ai.worker.js'));
 
             // 从数据库获取 Ollama 配置并发送给 Worker
-            const aiProvider = getConfig('ai_provider')
+            const aiProvider = getConfig('ai_provider') as string
             const host = JSON.parse(aiProvider).host
             const model = JSON.parse(aiProvider).model
 

@@ -51,7 +51,7 @@ interface ElectronAPI {
      * 获取配置
      * @param 可选 isFinishGuide 是否完成引导
      */
-    getConfig: (key: ConfigType) => Promise<any>;
+    getConfig: (key?: ConfigType) => Promise<any>;
 
     /**
      * 设置配置
@@ -133,6 +133,28 @@ interface ElectronAPI {
      * @returns 取消监听的函数
      */
     onDownloadProgress: (callback: (progress: number) => void) => () => void;
+
+    /**
+     *  打开系统目录
+     * @param type 目录类型
+     * @param path 可选路径
+     */
+    openDir(type: OpenDirType, path?: string): Promise<void>;
+
+    /**
+     * 自动启动，静默启动
+     */
+    setAutoLaunch: (autoLaunch: boolean) => Promise<void>;
+
+    /**
+     * 打开外部链接
+     */
+    openExternalUrl: (url: string) => Promise<void>;
+
+    /**
+     * 关闭设置窗口
+     */
+    closeSettingsWindow: () => Promise<void>;
 }
 
 

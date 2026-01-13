@@ -89,6 +89,8 @@ class WindowManager {
         this.settingsWindow = new BrowserWindow({
             width: 512,
             height: 700,
+            minWidth: 360,
+            minHeight: 360,
             x: 0,               // 后面会计算居中
             y: 0,
             frame: true,       // 无边框

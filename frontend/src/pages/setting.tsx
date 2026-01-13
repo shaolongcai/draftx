@@ -1,16 +1,13 @@
-import { Button, Paper, Stack, Typography, styled, Card, IconButton } from "@mui/material"
-import { useState, useEffect } from "react";
+import { Stack, Typography, IconButton } from "@mui/material"
+import { useEffect, useState } from "react";
 import {
-    Settings as SettingsIcon,
     Close as CloseIcon
 } from '@mui/icons-material';
 // import { useGlobalContext } from "@/contexts/globalContext";
-import { SettingItem, AIProvider, AIToolConfig } from "@/components";
+import { SettingItem } from "@/components";
 // import { useTranslation } from '@/contexts/I18nContext';
-import { ConfigParams } from '@/type/electron';
 import { useNavigate } from 'react-router-dom';
 // import LanguageSwitcher from '@/components/LanguageSwitcher';
-
 
 
 
@@ -20,8 +17,6 @@ import { useNavigate } from 'react-router-dom';
 const Setting = () => {
 
 
-    const [openReportProtocol, setOpenReportProtocol] = useState(false) //用户体验改进计划弹窗
-    const [reportAgreement, setReportAgreement] = useState(false) //是否已同意用户体验改进计划
     const [aiProvider, setAiProvider] = useState<{ host: string, model: string }>() //是否已设置AI服务
     const [openType, setOpenType] = useState<'AIProvider' | 'AITools' | 'AIconfig' | null>(null)  //打开的弹窗类型
     // 更新檢查相關狀態
@@ -30,32 +25,22 @@ const Setting = () => {
     const [latestVersion, setLatestVersion] = useState<string | null>(null)
     const [updateStatusText, setUpdateStatusText] = useState('')
     const [autoLaunch, setAutoLaunch] = useState(false) //是否開機自啟動
-    const [autoLaunchHidden, setAutoLaunchHidden] = useState(false) //是否靜默啟動
 
     // const context = useGlobalContext();
     // const { t, isLoading } = useTranslation()
     const navigate = useNavigate();
 
     // 拉取用户配置
-    // useEffect(() => {
-    //     if (isLoading) return
-    //     // 改为直接获取
-    //     window.electronAPI.getConfig().then((res: UserConfig) => {
-    //         console.log('config', res)
-    //         setOpenIndexImage(res.visual_index_enabled)
-    //         setHasGPU(res.hasGPU)
-    //         setIsInstallGpu(res.cuda_installed)
-    //         setReportAgreement(res.report_agreement)
-    //         setAiProvider(JSON.parse(res.ai_provider || '{}'))
-    //     })
-    //     // 獲取自啟動狀態
-    //     // window.electronAPI.getAutoLaunch().then((result: { enabled: boolean; openAsHidden: boolean }) => {
-    //     //     setAutoLaunch(result.enabled)
-    //     //     setAutoLaunchHidden(result.openAsHidden)
-    //     // })
-    //     // // 手动检查一次
-    //     // manualCheckUpdate()
-    // }, [isLoading])
+    useEffect(() => {
+        // 改为直接获取
+        window.electronAPI.getConfig().then((res: UserConfig) => {
+            console.log('config', res)
+            setAutoLaunch(res.autoLaunch)
+            setAiProvider(JSON.parse(res.ai_provider || '{}'))
+        })
+        // // 手动检查一次更新
+        // manualCheckUpdate()
+    }, [])
 
     // 監聽更新狀態並在抽屜開啟時自動檢查（在非 Electron 環境下跳過）
     // useEffect(() => {
@@ -123,7 +108,7 @@ const Setting = () => {
     // 切換自啟動開關
     const toggleAutoLaunch = async (checked: boolean) => {
         setAutoLaunch(checked)
-        await window.electronAPI.setAutoLaunch(checked, autoLaunchHidden)
+        await window.electronAPI.setAutoLaunch(checked)
     }
 
 
@@ -146,7 +131,7 @@ const Setting = () => {
             <Typography variant='headlineSmall' >
                 Setting
             </Typography>
-            <IconButton >
+            <IconButton onClick={() => window.electronAPI.closeSettingsWindow()}>
                 <CloseIcon />
             </IconButton>
         </Stack>
@@ -216,14 +201,6 @@ const Setting = () => {
                     onAction={toggleAutoLaunch}
                 />
             </Stack>
-            {/* 
-                        静默启动开关
-                        <SettingItem
-                            title={t('app.settings.autoLaunchHidden')}
-                            type='switch'
-                            value={autoLaunchHidden}
-                            onAction={toggleAutoLaunchHidden}
-                        /> */}
             {/* <Stack spacing={1} >
                             <Typography variant='titleSmall' >
                                 Language
