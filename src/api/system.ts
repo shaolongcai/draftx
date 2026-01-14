@@ -2,6 +2,8 @@ import { ipcMain, app, shell, clipboard } from 'electron';
 import { getConfig, setConfig } from '../database/sqlite.js';
 import pathConfig from '../core/pathConfigs.js';
 import { logger } from '../core/logger.js';
+import pkg from 'node-machine-id';
+const { machineId } = pkg;
 
 export function initializeSystemApi() {
     // 变更视窗大小
@@ -80,5 +82,11 @@ export function initializeSystemApi() {
     ipcMain.on('close-settings-window', async (_event) => {
         const { windowManager } = await import('../core/windowManager.js');
         windowManager.settingsWindow.hide();
+    })
+
+    // 获取唯一机器码
+    ipcMain.handle('get-machine-id', async () => {
+        const id = await machineId(true);
+        return id;
     })
 }

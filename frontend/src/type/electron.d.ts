@@ -155,6 +155,12 @@ interface ElectronAPI {
      * 关闭设置窗口
      */
     closeSettingsWindow: () => Promise<void>;
+
+    /**
+     * 获取唯一机器码
+     * @returns 机器码(原始，未被hash)
+     */
+    getMachineId: () => Promise<string>;
 }
 
 

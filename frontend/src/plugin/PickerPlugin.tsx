@@ -20,13 +20,22 @@ import {
     $getSelection,
 } from 'lexical';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import * as ReactDOM from 'react-dom';
 import { Menu, MenuItem } from '@mui/material';
 import { $createHeadingNode } from '@lexical/rich-text';
 import { INSERT_CHECK_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDERED_LIST_COMMAND } from '@lexical/list';
 import { OPEN_PASTE_COMMAND } from './AutoPastePlugin';
 import { OPEN_CALCULATOR_COMMAND } from './MathPlugin';
-
+// icon
+import {
+    h1 as H1Icon,
+    h2 as H2Icon,
+    h3 as H3Icon,
+    ul as UnorderedListIcon,
+    ol as OrderedListIcon,
+    checklist as ChecklistIcon,
+    autoPaste as AutoPasteIcon,
+    calculator as CalculatorIcon,
+} from '@/assets/icons/editIcon'
 
 
 class ComponentPickerOption extends MenuOption {
@@ -86,7 +95,7 @@ function getBaseOptions(editor: LexicalEditor) {
 
     return [
         new ComponentPickerOption('Calculator', {
-            icon: <i className="icon paragraph" />,
+            icon: CalculatorIcon,
             keywords: ['Calculator', 'Math', '计算', '计数'],
             onSelect: () => {
                 editor.update(() => {
@@ -94,45 +103,45 @@ function getBaseOptions(editor: LexicalEditor) {
                 });
             }
         }),
-        new ComponentPickerOption('Paste', {
-            icon: <i className="icon paragraph" />,
-            keywords: ['复制'],
+        new ComponentPickerOption('Auto paste', {
+            icon: AutoPasteIcon,
+            keywords: ['paste', '自动粘贴'],
             onSelect: () => {
                 // 触发命令
                 editor.dispatchCommand(OPEN_PASTE_COMMAND, undefined);
             }
         }),
         new ComponentPickerOption('Heading 1', {
-            icon: <i className="icon paragraph" />,
+            icon: H1Icon,
             keywords: ['h1'],
             onSelect: () => createHeading(editor, 'h1')
         }),
         new ComponentPickerOption('Heading 2', {
-            icon: <i className="icon table" />,
+            icon: H2Icon,
             keywords: ['h2'],
             onSelect: () => createHeading(editor, 'h2')
         }),
         new ComponentPickerOption('Heading 3', {
-            icon: <i className="icon number" />,
+            icon: H3Icon,
             keywords: ['h3'],
             onSelect: () => createHeading(editor, 'h3')
         }),
         new ComponentPickerOption('Checklist', {
-            icon: <i className="icon bullet" />,
+            icon: ChecklistIcon,
             keywords: ['check', 'todo', 'task'],
             onSelect: () => {
                 editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined);
             }
         }),
         new ComponentPickerOption('Number List', {
-            icon: <i className="icon number" />,
+            icon: OrderedListIcon,
             keywords: ['number', 'ordered', 'ol'],
             onSelect: () => {
                 editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
             }
         }),
         new ComponentPickerOption('Bullet List', {
-            icon: <i className="icon bullet" />,
+            icon: UnorderedListIcon,
             keywords: ['bullet', 'unordered', 'ul'],
             onSelect: () => {
                 editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
@@ -240,7 +249,11 @@ export default function PickerPlugin(): JSX.Element {
                     >
                         {options.map((option, i: number) => (
                             <MenuItem
-                                sx={{ fontSize: '14px' }}
+                                sx={{
+                                    fontSize: '14px',
+                                    gap: '4px',
+                                    '& svg': { width: 24, height: 24 }
+                                }}
                                 onMouseDown={(e) => e.preventDefault()}
                                 selected={selectedIndex === i}
                                 onClick={() => {

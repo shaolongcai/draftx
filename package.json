@@ -29,6 +29,7 @@
     "better-sqlite3": "^12.5.0",
     "dayjs": "^1.11.19",
     "electron-updater": "^6.7.3",
+    "node-machine-id": "^1.1.12",
     "ollama": "^0.6.3",
     "sqlite3": "^5.1.6"
   },
@@ -36,8 +37,8 @@
     "electronDownload": {
       "mirror": "https://npmmirror.com/mirrors/electron/"
     },
-    "appId": "com.altmo.app",
-    "productName": "Altmo",
+    "appId": "com.draftx.app",
+    "productName": "DraftX",
     "files": [
       "!*.traineddata",
       "dist/**/*",
@@ -97,7 +98,7 @@
       "allowElevation": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Altmo",
+      "shortcutName": "DraftX",
       "installerIcon": "./electron/resources/assets/logo-256.ico",
       "uninstallerIcon": "./electron/resources/assets/logo-256.ico",
       "installerHeaderIcon": "./electron/resources/assets/logo-256.ico",

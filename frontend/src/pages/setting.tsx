@@ -25,6 +25,7 @@ const Setting = () => {
     const [latestVersion, setLatestVersion] = useState<string | null>(null)
     const [updateStatusText, setUpdateStatusText] = useState('')
     const [autoLaunch, setAutoLaunch] = useState(false) //是否開機自啟動
+    const [isPro, setIsPro] = useState(false) //是否已激活Pro版 
 
     // const context = useGlobalContext();
     // const { t, isLoading } = useTranslation()
@@ -145,14 +146,16 @@ const Setting = () => {
                     type='button'
                     value={aiProvider?.model || 'Set'}
                     onAction={() => {
-                        navigate('/AIProvider')
+                        isPro ? navigate('/AIProvider') : navigate('/ProTips')
                     }}
                 />
                 <SettingItem
                     title='AI Tool'
                     type='button'
                     value='SET'
-                    onAction={() => { navigate('/AITools') }}
+                    onAction={() => {
+                        isPro ? navigate('/AITools') : navigate('/ProTips')
+                    }}
                 />
             </Stack>
             <Stack spacing={1}>

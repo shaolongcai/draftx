@@ -6,8 +6,10 @@ import { useRef } from 'react';
 import { useSize } from 'ahooks';
 import { Routes, Route, HashRouter } from 'react-router-dom';
 import { AIProvider } from './components';
-import AITools from './pages/AITools';
-import AIToolConfig from './pages/AIToolConfig';
+import AITools from '@/pages/AITools';
+import AIToolConfig from '@/pages/AIToolConfig';
+import ProTips from '@/pages/ProTips';
+import ActivationCode from '@/pages/ActivationCode';
 
 
 const APP = () => {
@@ -46,6 +48,8 @@ const APP = () => {
                         <Route path="/AIProvider" element={<AIProvider />} />
                         <Route path="/AITools" element={<AITools />} />
                         <Route path="/AIToolConfig" element={<AIToolConfig />} />
+                        <Route path="/ActivationCode" element={<ActivationCode />} />
+                        <Route path="/ProTips" element={<ProTips />} />
                     </Routes>
                     <div />
                 </div>

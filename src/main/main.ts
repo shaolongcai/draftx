@@ -70,7 +70,7 @@ function createTray() {
     // 創建托盤菜單
     const contextMenu = Menu.buildFromTemplate([
       {
-        label: isDev ? 'Altmo（Alt + Shift + Z）' : 'Altmo（Alt + Z）',
+        label: isDev ? 'DraftX（Alt + Shift + Z）' : 'DraftX（Alt + Z）',
         click: () => {
           const isVisible = mainWindow?.isVisible();
           isVisible ? mainWindow.hide() : mainWindow.show();
@@ -193,6 +193,26 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
+
+// 防止多开
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+  // 获取锁失败，说明已有实例运行，直接退出
+  logger.info('应用已在运行，退出当前实例');
+  app.quit();
+} else {
+  // 获取锁成功，监听 second-instance 事件
+  app.on('second-instance', () => {
+    logger.info('检测到第二个实例启动，激活现有窗口');
+    // 如果主窗口存在，显示并聚焦
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      if (!mainWindow.isVisible()) mainWindow.show();
+      mainWindow.focus();
+    }
+  });
+}
 
 app.on('will-quit', () => {
   globalShortcut.unregisterAll();
