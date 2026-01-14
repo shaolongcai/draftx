@@ -6,7 +6,7 @@ import { useRef } from 'react';
 import { useSize } from 'ahooks';
 import { Routes, Route, HashRouter } from 'react-router-dom';
 import { AIProvider } from './components';
-import AITools from './pages/aitools';
+import AITools from './pages/AITools';
 import AIToolConfig from './pages/AIToolConfig';
 
 

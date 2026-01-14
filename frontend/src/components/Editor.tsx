@@ -181,11 +181,10 @@ const EditorContext: React.FC = () => {
     })
 
 
-    return <div className="scrollbar-thin!">
+    return <div className="scrollbar-thin!  rounded-xl h-full font-mono  leading-relaxed text-gray-700 ">
         <RichTextPlugin
             contentEditable={
                 <ContentEditable style={{
-                    height: '500px',
                     width: '100%',
                     maxHeight: 'calc(100vh - 64px)',
                     minHeight: '240px',

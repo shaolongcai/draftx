@@ -4,7 +4,7 @@ import {
     Close as CloseIcon
 } from '@mui/icons-material';
 // import { useGlobalContext } from "@/contexts/globalContext";
-import { SettingItem } from "@/components";
+import { Contact, SettingItem } from "@/components";
 // import { useTranslation } from '@/contexts/I18nContext';
 import { useNavigate } from 'react-router-dom';
 // import LanguageSwitcher from '@/components/LanguageSwitcher';
@@ -212,12 +212,12 @@ const Setting = () => {
                                 action={<LanguageSwitcher variant='select' size='small' showLabel={false} />}
                             />
                         </Stack> */}
-            {/* <Stack spacing={1} >
-                            <Typography variant='titleSmall' >
-                                Contact
-                            </Typography>
-                            <Contact />
-                        </Stack> */}
+            <Stack spacing={1} >
+                <Typography variant='titleSmall' >
+                    Contact
+                </Typography>
+                <Contact />
+            </Stack>
         </Stack>
     </div>
 

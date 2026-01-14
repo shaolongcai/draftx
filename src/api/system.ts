@@ -41,7 +41,7 @@ export function initializeSystemApi() {
     });
 
     // 在外部瀏覽器中打開鏈接
-    ipcMain.handle('open-external-url', (_event, url: string) => {
+    ipcMain.on('open-external-url', (_event, url: string) => {
         shell.openExternal(url);
     });
 
