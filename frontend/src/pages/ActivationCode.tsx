@@ -32,6 +32,7 @@ const ActivationCode: React.FC = () => {
                     severity: 'success',
                     autoHideDuration: 1200,
                 });
+                return
             }
             throw res.data.errMsg
         } catch (error) {

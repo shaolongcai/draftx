@@ -42,7 +42,7 @@ class PathConfig {
         // 基础目录配置
         this.baseAppDir = app.isPackaged ? '.Altmo' : '.Altmo-test'; //sqlit 访问不了带.的前缀的文件夹
         this.appDataPath = path.join(this.userHome, this.baseAppDir);
-        this.resources = app && app.isPackaged ? process.resourcesPath : path.join(__dirname, '../../electron/', 'resources'),   // 资源文件
+        this.resources = app && app.isPackaged ? process.resourcesPath : path.join(__dirname, '../../', 'resources'),   // 资源文件
 
             // 初始化所有路径
             this._initializePaths();

@@ -5,7 +5,7 @@
   "description": "Electron app with React frontend and Node.js backend",
   "main": "dist/main/main.js",
   "scripts": {
-    "compile": "tsc -b", 
+    "compile": "tsc -b",
     "obfuscate": "javascript-obfuscator ./dist --output ./dist --compact true --self-defending true --disable-console-output true --dead-code-injection true --string-array true --string-array-rotate true --string-array-shuffle true",
     "electron": "electron .",
     "electron:dev": "concurrently \"npm run frontend:dev\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .\"",
@@ -61,7 +61,9 @@
       "!**/{appveyor.yml,.travis.yml,circle.yml}",
       "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
     ],
-    "extraResources": [],
+    "extraResources": [
+      "resources/license-public.pem"
+    ],
     "directories": {
       "output": "out"
     },
