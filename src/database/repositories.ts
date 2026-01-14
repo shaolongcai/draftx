@@ -252,7 +252,7 @@ export const deleteAITool = (id: number): void => {
  */
 export const getOllamaConfig = (): { host: string; model: string } => {
     try {
-        const aiProvider = getConfig('ai_provider')
+        const aiProvider = getConfig('ai_provider') as string
         const host = JSON.parse(aiProvider).host
         const model = JSON.parse(aiProvider).model
 

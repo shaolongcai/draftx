@@ -12,6 +12,11 @@ declare module '*.png' {
     export default value;
 }
 
+declare module '*.svg' {
+    const content: string;
+    export default content;
+}
+
 declare module '@mui/material/styles' {
 
     interface TypeText {

@@ -69,7 +69,7 @@ export function BlockTipPlugin(): null {
                         if (addTipParagraphKey) {
                             const paragraph = $getNodeByKey(addTipParagraphKey);
                             if (paragraph && $isParagraphNode(paragraph)) {
-                                paragraph.append($createBlockTipNode());
+                                paragraph.append($createBlockTipNode(''));
                             }
                         }
                     });

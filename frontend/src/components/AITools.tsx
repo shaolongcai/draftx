@@ -3,7 +3,7 @@ import { Add as AddIcon } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import AIToolConfig from "../pages/AIToolConfig";
 import { useRequest } from "ahooks";
-import Chat from "./Chat";
+// import Chat from "./Chat";
 import { useEvent } from "@/contexts/EvenContext";
 
 
@@ -71,19 +71,19 @@ const AITools: React.FC<Props> = ({
 
     return (
         <div >
-            <Chat
+            {/* <Chat
                 toolId={currentToolId}
                 toolName={currentToolName}
                 open={openChat}
                 onClose={() => { setOpenChat(false) }}
                 currentContent={currentContent}
-            />
-            <AIToolConfig
+            /> */}
+            {/* <AIToolConfig
                 open={openConfig}
                 mode={mode}
                 onClose={() => { setOpenConfig(false) }}
                 onFinish={() => { setOpenConfig(false) }}
-            />
+            /> */}
             {
                 !openConfig && !openChat &&
                 <Grid container spacing={2}

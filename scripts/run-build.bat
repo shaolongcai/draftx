@@ -34,6 +34,15 @@ echo [INFO] Compiling main process TypeScript...
 call npx tsc -p tsconfig.json --outDir dist
 echo [SUCCESS] Main process compilation completed.
 
+:: 代码混淆 (生产环境)
+echo [INFO] Obfuscating main process code...
+call npm run obfuscate
+if %errorlevel% neq 0 (
+    echo [ERROR] Obfuscation failed
+    pause
+    exit /b 1
+)
+
 
 :: 构建前端
 echo [INFO] Building frontend...

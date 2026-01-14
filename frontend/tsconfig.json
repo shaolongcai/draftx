@@ -16,6 +16,8 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "isolatedModules": true,
+    // 加了这个可以让引用图片的问题消失，缺少对vite客户端类型的引用
+    "types": ["vite/client"],
     "noEmit": true,
     "jsx": "react-jsx",
     /* Linting */

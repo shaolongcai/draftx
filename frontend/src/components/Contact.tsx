@@ -1,9 +1,8 @@
 import React from 'react'
-import { Link, Paper, Stack } from "@mui/material"
+import { Paper, Stack } from "@mui/material"
 import DiscordIcon from '@/assets/icons/discord.svg'
 import EmailIcon from '@/assets/icons/email.svg'
 import { useNotifications } from '@toolpad/core/useNotifications'
-
 
 
 const Contact: React.FC = () => {

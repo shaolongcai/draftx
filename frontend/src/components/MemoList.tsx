@@ -13,12 +13,12 @@ const MemoList: React.FC<Props> = ({
 }) => {
 
     // 获取最近项目
-    const { data } = useRequest(
-        () => window.electronAPI.getRecentStickys(12),
-        {
-            refreshDeps: [isOpen],
-        }
-    );
+    // const { data } = useRequest(
+    //     () => window.electronAPI.getRecentStickys(12),
+    //     {
+    //         refreshDeps: [isOpen],
+    //     }
+    // );
 
     // 根据memo数量渲染列数与宽度
     const genColumsAndWidth = (itemCount: number) => {
@@ -51,7 +51,7 @@ const MemoList: React.FC<Props> = ({
     if (!isOpen) return null
 
     return <>
-        <Grid container columns={genColumsAndWidth(data?.length || 0).columns} sx={{
+        {/* <Grid container columns={genColumsAndWidth(data?.length || 0).columns} sx={{
             width: genColumsAndWidth(data?.length || 0).width, // 根据数量决定容器宽度
         }}>
             {
@@ -70,7 +70,7 @@ const MemoList: React.FC<Props> = ({
                     )
                 })
             }
-        </Grid>
+        </Grid> */}
         <Stack
             className='bg-[#F9F3E5] opacity-85 p-2 rounded-md mx-auto w-fit mt-2'
             direction="row" spacing={0.5} alignItems="center" justifyContent='center'
