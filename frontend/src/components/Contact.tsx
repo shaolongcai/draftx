@@ -22,7 +22,7 @@ const Contact: React.FC = () => {
         <Stack spacing={2} alignItems='center' direction='row'>
             <Paper
                 variant='outlined'
-                onClick={() => window.electronAPI.openExternalUrl('https://discord.gg/qJHfsGXTzP')}
+                onClick={() => window.electronAPI.openExternalUrl('https://discord.gg/TyArpAVf6A')}
                 className='border-[#9F7207] border bg-transparent p-4 rounded-[8px]! box-border cursor-pointer'
             >
                 <img src={DiscordIcon} className='w-10 h-10' />

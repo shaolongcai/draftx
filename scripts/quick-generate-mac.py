@@ -106,7 +106,10 @@ def generate_mac_update_info():
             output_file = 'latest-x64-mac.yml'
         
         # 写入文件
-        with open(f'out/{output_file}', 'w', encoding='utf-8') as f:
+        out_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'out')
+        output_path = os.path.join(out_dir, output_file)
+        
+        with open(output_path, 'w', encoding='utf-8') as f:
             f.write(yml_content)
         
         file_size = os.path.getsize(file_path)

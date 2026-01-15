@@ -32,8 +32,6 @@ import { MathNode } from "@/nodes/MathNode";
 import { MathPlugin } from "@/plugin/MathPlugin";
 import { AutoPastePlugin } from "@/plugin/AutoPastePlugin";
 import { BlockTipPlugin } from "@/plugin/BlockTipPlugin";
-import { PasteNode } from "@/nodes/PasteNode";
-import ToolBar from "./ToolBar";
 import AiPickerPlugin from "@/plugin/AIPickerPlugin";
 import { LoadingNode } from "@/nodes/LoadingNode";
 import { ConfigParams } from "@/type/electron";
@@ -65,7 +63,7 @@ const EditorContext: React.FC = () => {
     const [editor] = useLexicalComposerContext()
     const { loadStickys$, handleOnclickTool$ } = useEvent();
     const notification = useNotifications();
-
+    const isMac = window.electronUtils?.platform === 'darwin' || /macintosh|mac os x/i.test(navigator.userAgent);
 
     // 初始化
     useEffect(() => {
@@ -155,9 +153,7 @@ const EditorContext: React.FC = () => {
             // 内容为空则跳过
             // if (!payload.contentText) return;
             // 若无变更则跳过
-            // if (payload.contentJson === lastSavedRef.current.contentJson) return
-            // 仅在文本变更时保存
-            if (payload.contentText === lastSavedRef.current.contentText) return
+            if (payload.contentJson === lastSavedRef.current.contentJson) return
             try {
                 window.electronAPI.saveSticky({
                     uuid: currentUuid,
@@ -176,7 +172,7 @@ const EditorContext: React.FC = () => {
     );
 
     // 注册Shitf+A 新建便利贴
-    useKeyPress('alt.n', () => {
+    useKeyPress(isMac ? 'meta.n' : 'alt.n', () => {
         addNewDraft();
     })
 

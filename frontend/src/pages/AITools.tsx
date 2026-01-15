@@ -33,7 +33,7 @@ const AITools = () => {
                                         key={item.id}
                                         title={item.name}
                                         type="button"
-                                        value='eidt'
+                                        value='edit'
                                         onAction={() => { navigate(`/AIToolConfig?id=${item.id}`) }}
                                     />
                                 })

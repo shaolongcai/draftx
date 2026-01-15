@@ -54,7 +54,7 @@ class WindowManager {
             hasShadow: true,
             backgroundColor: '#F9F3E5',
             // vibrancy: 'under-window', // macOS 模糊效果，增强边框层次
-            titleBarStyle: 'hidden', // 隐藏原生标题栏，保留边框
+            titleBarStyle: process.platform === 'darwin' ? 'customButtonsOnHover' : 'hidden', // 隐藏原生标题栏，保留边框
             // titleBarStyle: 'hiddenInset',
             webPreferences: {
                 preload: path.join(__dirname, '../main/preload.js'),
@@ -103,7 +103,7 @@ class WindowManager {
             hasShadow: true,
             backgroundColor: '#F9F3E5',
             transparent: false,
-            titleBarStyle: 'hidden', // 隐藏原生标题栏，保留边框
+            titleBarStyle: process.platform === 'darwin' ? 'customButtonsOnHover' : 'hidden', // 隐藏原生标题栏，保留边框
             // backgroundColor: '#E92828', //测试大小专用色
             webPreferences: {
                 preload: path.join(__dirname, '../main/preload.js'),

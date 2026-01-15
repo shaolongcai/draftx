@@ -9,15 +9,33 @@ import { logger } from '../core/logger.js';
 import { GuidJson, GuidContent } from '../data/data.js';
 import { initializeAIApi } from '../api/ai.js';
 import { initializeUpdateApi } from '../api/update.js';
-import { verifyLicense } from '../core/license.js';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const isMac = process.platform === 'darwin';
 
 let tray: Tray | null = null;
 let mainWindow: BrowserWindow | null;
 let settingsWindow: BrowserWindow | null;
 const isDev = process.env.NODE_ENV === 'development';
+
+
+// 根据平台与环境判断快捷键
+const getShortcut = () => {
+  // 正式环境
+  if (isMac && !isDev) {
+    return 'Command+z';
+  } else if (isMac && isDev) {
+    return 'Command+Shift+z';
+  } else if (!isMac && isDev) {
+    return 'Alt+Shift+ Z ';
+  } else {
+    return 'Alt+Z';
+  }
+}
+
+
 
 // 广播事件到所有窗口
 export const sendToRenderer = (channel: ChannelType, data: any) => {
@@ -37,7 +55,7 @@ const registerGlobalShortcut = () => {
   });
 
   // 触发：显示/隐藏主窗口
-  const shortcut = isDev ? 'Alt+Shift+Z' : 'Alt+Z';
+  const shortcut = getShortcut();
   globalShortcut.register(shortcut, () => {
     settingsWindow.hide()
     // 触发：显示/隐藏主窗口
@@ -71,7 +89,7 @@ function createTray() {
     // 創建托盤菜單
     const contextMenu = Menu.buildFromTemplate([
       {
-        label: isDev ? 'DraftX（Alt + Shift + Z）' : 'DraftX（Alt + Z）',
+        label: `DraftX（${getShortcut()}）`,
         click: () => {
           const isVisible = mainWindow?.isVisible();
           isVisible ? mainWindow.hide() : mainWindow.show();
@@ -180,6 +198,12 @@ app.whenReady().then(async () => {
   initializeAIApi()
   // 创建托盘
   createTray();
+  
+  // macOS 上隐藏 Dock 图标（实现 skipTaskbar 效果）
+  if (process.platform === 'darwin') {
+      app.dock.hide();
+  }
+
   // 初始化引导memo
   initializeGuideMemo()
   // 初始化AI工具
