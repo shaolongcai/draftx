@@ -134,7 +134,7 @@ class WindowManager {
             // 获取应用根目录
             const appPath = app.getAppPath();
             const mainPath = path.join(appPath, 'frontend/dist/index.html');
-            const settingPath = path.join(__dirname, '../frontend/dist/setting.html');
+            const settingPath = path.join(appPath, 'frontend/dist/setting.html');
 
             // 檢查文件是否存在
             if (!existsSync(mainPath)) {

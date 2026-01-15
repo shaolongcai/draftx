@@ -124,7 +124,7 @@ class UpdateService {
 
         autoUpdater.on('download-progress', (progressObj) => {
             const progress = Math.round(progressObj.percent);
-            logger.info(`下载进度-${progress}`);
+            logger.info(`下载进度:${progress}`);
             sendToRenderer('download-progress', progress);
         });
 

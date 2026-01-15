@@ -58,7 +58,7 @@ const Update = () => {
                 {
                     checking ? 'Checking for updates...' :
                         downloadProgress > 0 ?
-                            'Downloading update...' :
+                            `${downloadProgress}% Downloading update... ` :
                             'A new version is available'
                 }
             </Typography>

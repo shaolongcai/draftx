@@ -1,4 +1,4 @@
-import { Stack, Typography, IconButton, Chip } from "@mui/material"
+import { Stack, Typography, IconButton } from "@mui/material"
 import { useEffect, useState } from "react";
 import {
     Close as CloseIcon
@@ -15,7 +15,6 @@ import { useNavigate } from 'react-router-dom';
  * 设置面板(主界面)
  */
 const Setting = () => {
-
 
     const [aiProvider, setAiProvider] = useState<{ host: string, model: string }>() //是否已设置AI服务
     const [openType, setOpenType] = useState<'AIProvider' | 'AITools' | 'AIconfig' | null>(null)  //打开的弹窗类型
@@ -140,7 +139,7 @@ const Setting = () => {
                 </Typography>
                 {
                     isPro && (
-                        <span className="inline-flex items-center justify-center px-3 py-1 text-xs font-bold text-white uppercase tracking-wider rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 ">
+                        <span className="inline-flex items-center justify-center px-3 py-1 text-xs font-bold text-white uppercase tracking-wider rounded-full bg-linear-to-r from-purple-500 via-pink-500 to-red-500 ">
                             Pro
                         </span>
                     )
