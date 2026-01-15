@@ -20,7 +20,7 @@ export const useChat = () => {
         // 监听流式数据
         const unsubscribeData = window.electronAPI.onChatStream((chunk) => {
             currentMessageRef.current += chunk.content;
-            console.log('接收到的chunk', chunk);
+            // console.log('接收到的chunk', chunk);
             setAiAnswer(prev => prev + chunk.content)
             if (chunk.type === 'done') {
                 setIsLoading(false);

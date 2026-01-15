@@ -9,7 +9,7 @@ type StickyParmas = {
 }
 
 // 配置类型
-type ConfigType = 'isFinishGuide' | 'ai_provider'
+type ConfigType = 'isFinishGuide' | 'ai_provider' | 'licenseData'
 // 配置参数
 export type ConfigParams = {
     key: ConfigType;
@@ -161,6 +161,11 @@ interface ElectronAPI {
      * @returns 机器码(原始，未被hash)
      */
     getMachineId: () => Promise<string>;
+
+    /**
+     * 验证许可证
+     */
+    verifyLicense: () => Promise<boolean>;
 }
 
 

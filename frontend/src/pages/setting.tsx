@@ -1,4 +1,4 @@
-import { Stack, Typography, IconButton } from "@mui/material"
+import { Stack, Typography, IconButton, Chip } from "@mui/material"
 import { useEffect, useState } from "react";
 import {
     Close as CloseIcon
@@ -30,6 +30,13 @@ const Setting = () => {
     // const context = useGlobalContext();
     // const { t, isLoading } = useTranslation()
     const navigate = useNavigate();
+
+    // 检查是否拥有许可
+    useEffect(() => {
+        window.electronAPI.verifyLicense().then((res: boolean) => {
+            setIsPro(res)
+        })
+    }, [])
 
     // 拉取用户配置
     useEffect(() => {
@@ -114,9 +121,7 @@ const Setting = () => {
 
 
     return <div
-        className="w-full max-h-[680px]!  overflow-y-auto 
-                    scrollbar-thin
-                    "
+        className="w-full max-h-[680px]!  overflow-y-auto scrollbar-thin"
     >
         {/* {
                 // 同意用户体验改进计划弹窗
@@ -129,9 +134,18 @@ const Setting = () => {
                 />
             } */}
         <Stack direction='row' justifyContent='space-between' alignItems='center' >
-            <Typography variant='headlineSmall' >
-                Setting
-            </Typography>
+            <Stack direction='row' spacing={1}>
+                <Typography variant='headlineSmall' >
+                    Setting
+                </Typography>
+                {
+                    isPro && (
+                        <span className="inline-flex items-center justify-center px-3 py-1 text-xs font-bold text-white uppercase tracking-wider rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 ">
+                            Pro
+                        </span>
+                    )
+                }
+            </Stack>
             <IconButton onClick={() => window.electronAPI.closeSettingsWindow()}>
                 <CloseIcon />
             </IconButton>
@@ -142,7 +156,7 @@ const Setting = () => {
                     AI Sever
                 </Typography>
                 <SettingItem
-                    title='AI Provider'
+                    title='AI Provider (Pro)'
                     type='button'
                     value={aiProvider?.model || 'Set'}
                     onAction={() => {
@@ -150,7 +164,7 @@ const Setting = () => {
                     }}
                 />
                 <SettingItem
-                    title='AI Tool'
+                    title='AI Tool (Pro)'
                     type='button'
                     value='SET'
                     onAction={() => {

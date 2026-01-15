@@ -3,6 +3,7 @@ import { getConfig, setConfig } from '../database/sqlite.js';
 import pathConfig from '../core/pathConfigs.js';
 import { logger } from '../core/logger.js';
 import pkg from 'node-machine-id';
+import { verifyLicense } from '../core/license.js';
 const { machineId } = pkg;
 
 export function initializeSystemApi() {
@@ -88,5 +89,10 @@ export function initializeSystemApi() {
     ipcMain.handle('get-machine-id', async () => {
         const id = await machineId(true);
         return id;
+    })
+
+    // 验证许可证
+    ipcMain.handle('verify-license', async () => {
+        return await verifyLicense();
     })
 }

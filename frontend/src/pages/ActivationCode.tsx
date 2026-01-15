@@ -1,8 +1,10 @@
 import { SettingTitle } from "@/components"
-import { Button, Stack, TextField } from "@mui/material"
+import { Button, Stack, TextField, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import axios from 'axios'
 import { useNotifications } from "@toolpad/core/useNotifications"
+import proTipsImg from '@/assets/images/pro.png'
+import { useNavigate } from "react-router-dom"
 
 /**
  * 激活码页面
@@ -12,8 +14,10 @@ const ActivationCode: React.FC = () => {
     const [machineId, setMachineId] = useState('') // 新增状态管理机器码
     const [code, setCode] = useState('')
     const [loading, setLoading] = useState(false)
+    const [isSuccess, setIsSuccess] = useState(false) // 新增状态管理激活成功
 
     const notifications = useNotifications()
+    const navigate = useNavigate()
 
     // 组件挂载时获取机器码
     useEffect(() => {
@@ -32,6 +36,17 @@ const ActivationCode: React.FC = () => {
                     severity: 'success',
                     autoHideDuration: 1200,
                 });
+                const licenseData = {
+                    "payload": res.data.data.payload,
+                    "signature": res.data.data.signature,
+                }
+                // 存入数据库
+                window.electronAPI.setConfig({
+                    key: 'licenseData',
+                    value: JSON.stringify(licenseData),
+                    type: 'string'
+                })
+                setIsSuccess(true) // 激活成功后设置状态为 true
                 return
             }
             throw res.data.errMsg
@@ -45,6 +60,26 @@ const ActivationCode: React.FC = () => {
         } finally {
             setLoading(false)
         }
+    }
+
+    // 激活成功时样式
+    if (isSuccess) {
+        return (
+            <>
+                <SettingTitle title="Activation Success" />
+                <Stack alignItems='center' >
+                    <img src={proTipsImg} className="w-[50%]" alt="proTipsImg" />
+                    <Stack className="mt-6 w-full max-w-[400px] mx-auto" spacing={3} alignItems='center'>
+                        <Typography variant='headlineSmall' className="text-green-500">
+                            ✅ Activation Success
+                        </Typography>
+                        <Button variant='contained' onClick={() => navigate('/')} fullWidth>
+                            Back to Setting
+                        </Button>
+                    </Stack>
+                </Stack>
+            </>
+        )
     }
 
     return (

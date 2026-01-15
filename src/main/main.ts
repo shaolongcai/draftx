@@ -162,19 +162,6 @@ const initializeUserConfig = () => {
   }
 }
 
-// 检查准证
-const checkLicense = async () => {
-  const licenseData = {
-    "payload": "eyJjb2RlIjoiMzU0IiwiZGV2aWNlSGFzaCI6ImJkZGRhMjE4LTQ1NDMtNDIxMC1iYjJlLTllMWM3ODQyMWIwNyJ9",
-    "signature": "2Qwrl5rjbLnEe9iuELFbUStHwNaJ3MaGeacC/IgdMfIGGFKyWUBuhIsBjQ+6CrpbgkhFVuVpdySj3adR1sqocg4Tp8v/RnEdcb211WxBtGc9N1+HfKBi94ypCliPGmv95KoZ4pWwyJdhfDO4xHVBt0ZZmHFj8ZZcXUjDyT/Rhp+br4FCXr3vSqTD4XnUR/vcX67e/KutTuCj29iACTqCRKvuoQjESwlV8hwjA6Wq1k6Xkpip7kSRdQx6AyjiobbYTUwjIZX4coC7Beg+Skej3yAmLL7cmNd27QMT6/FLMz0VtWtj5+Kd45haK+hlHH7DrL/7Xp9ZLvG+suN0qRRVNA==",
-  }
-  const license = await verifyLicense(licenseData);
-  // 与本机的机器码对照
-  // const machineId = await machineId();
-  console.log('license', license);
-  // console.log('machineId', machineId);
-}
-
 
 
 app.whenReady().then(async () => {
@@ -199,8 +186,6 @@ app.whenReady().then(async () => {
   initializeAITool()
   // 初始化用户配置
   initializeUserConfig()
-  // 检查准证
-  checkLicense();
   // 删除所有过期的便利贴
   deleteExpiredStickys();
 });

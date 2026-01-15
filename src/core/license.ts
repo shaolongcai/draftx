@@ -3,6 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import pkg from 'node-machine-id';
 import pathConfig from './pathConfigs.js';
+import { getConfig } from '../database/sqlite.js';
+import { logger } from './logger.js';
 
 const { machineId } = pkg;
 
@@ -20,11 +22,18 @@ export interface LicensePayload {
 
 /**
  * 验证许可证
- * @param license 许可证对象 { payload: string, signature: string }
  * @returns 解密后的数据
  */
-export const verifyLicense = async (license: LicenseData): Promise<LicensePayload> => {
+export const verifyLicense = async (): Promise<boolean> => {
     try {
+        // 向数据库查询许可证
+        const licenseDataString = getConfig('licenseData') as string;
+        if (!licenseDataString) {
+            logger.error('LICENSE_NOT_FOUND'); // 许可证不存在
+            return false
+        }
+        const licenseData = JSON.parse(licenseDataString) as LicenseData;
+
         const resourcesPath = pathConfig.get('resources') as string;
         const publicKeyPath = path.join(resourcesPath, 'license-public.pem');
 
@@ -34,8 +43,8 @@ export const verifyLicense = async (license: LicenseData): Promise<LicensePayloa
 
         const PUBLIC_KEY = fs.readFileSync(publicKeyPath, 'utf-8');
 
-        const payload = Buffer.from(license.payload, 'base64');
-        const signature = Buffer.from(license.signature, 'base64');
+        const payload = Buffer.from(licenseData.payload, 'base64');
+        const signature = Buffer.from(licenseData.signature, 'base64');
 
         // 验证签名
         const verifier = crypto.createVerify('RSA-SHA256');
@@ -55,9 +64,10 @@ export const verifyLicense = async (license: LicenseData): Promise<LicensePayloa
             throw new Error('DEVICE_HASH_MISMATCH'); // 机器码不匹配
         }
 
-        return data;
+        return true;
 
     } catch (error) {
-        throw error;
+        logger.error(`verifyLicense failed: ${error}`);
+        return false;
     }
 };

@@ -22,6 +22,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   openExternalUrl: (url: string) => ipcRenderer.send('open-external-url', url), // 打开外部链接
   closeSettingsWindow: () => ipcRenderer.send('close-settings-window'), // 关闭设置窗口
   getMachineId: () => ipcRenderer.invoke('get-machine-id'), // 获取唯一机器码
+  verifyLicense: () => ipcRenderer.invoke('verify-license'), // 验证许可证
 
   // AI相关
   checkOllamaServer: (host: string, modelID: string) => ipcRenderer.invoke('check-ollama-server', host, modelID), // 检查ollama服务是否可用

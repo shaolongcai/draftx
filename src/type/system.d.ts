@@ -1,7 +1,7 @@
 
 
 
-type ConfigName = 'isFinishGuide' | 'ai_provider' | 'autoLaunch';
+type ConfigName = 'isFinishGuide' | 'ai_provider' | 'autoLaunch' | 'licenseData';
 
 
 
