@@ -209,7 +209,7 @@ const EditorContext: React.FC = () => {
         <CodeActionPlugin />
         <MermaidPlugin />
         <PickerPlugin />
-        <AiPickerPlugin />
+        {/* <AiPickerPlugin /> */}
         <TabFocusPlugin />
         <CheckListPlugin />
         <MathPlugin />

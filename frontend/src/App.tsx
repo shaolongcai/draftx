@@ -4,12 +4,26 @@ import './App.css'
 import { Stack, ThemeProvider } from '@mui/material'
 import { theme } from './theme'
 import { NotificationsProvider } from '@toolpad/core/useNotifications';
-import { EventProvider, useEvent } from './contexts/EvenContext'
+import { EventProvider } from './contexts/EvenContext'
 import Home from './pages/home'
 import { ToolBar } from './components'
 import DraftList from './pages/draftList'
 import { Routes, Route, HashRouter } from 'react-router-dom';
 import Update from './pages/update'
+import { LexicalComposer } from '@lexical/react/LexicalComposer';
+import { mermaidNode } from "@/nodes/MermaidNode";
+import { ListItemNode, ListNode } from '@lexical/list';
+import { AutoLinkNode, LinkNode } from '@lexical/link';
+import { HeadingNode, QuoteNode } from '@lexical/rich-text';
+import { CodeHighlightNode, CodeNode } from '@lexical/code';
+import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
+import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
+import { MathNode } from "@/nodes/MathNode";
+import { MathItemNode } from "@/nodes/MathItemNode";
+import { BlockTitleNode } from "@/nodes/BlockTitleNode";
+import { BlockTipNode } from "@/nodes/BlockTipNode";
+import { PasteNode } from "@/nodes/PasteNode";
+import { LoadingNode } from "@/nodes/LoadingNode";
 
 function App() {
 
@@ -25,6 +39,35 @@ function App() {
   // })
 
 
+  const initialConfig = {
+    namespace: 'MyEditor',
+    theme: theme,
+    onError: (error: Error) => {
+      console.error(error.message);
+    },
+    nodes: [
+      HeadingNode,
+      QuoteNode,
+      ListNode,
+      ListItemNode,
+      CodeNode,
+      CodeHighlightNode,
+      LinkNode,
+      AutoLinkNode,
+      TableNode,
+      TableCellNode,
+      HorizontalRuleNode,
+      TableRowNode,
+      BlockTitleNode,
+      BlockTipNode,
+      mermaidNode,
+      MathNode,
+      MathItemNode,
+      PasteNode,
+      LoadingNode
+    ],
+  };
+
   return (
     <NotificationsProvider slotProps={{
       snackbar: {
@@ -34,13 +77,18 @@ function App() {
     }} >
       <ThemeProvider theme={theme}>
         <EventProvider >
-          <HashRouter>
-            <div ref={rootRef} >
-              {/* 顶部拖拽条 */}
-              <div
-                className="drag absolute top-0 left-0 right-0 h-8 z-10 "
-              />
-              <style>{`
+          <LexicalComposer initialConfig={initialConfig}>
+            <HashRouter>
+              {
+                import.meta.env.DEV &&
+                <div className='absolute top-0 left-0 right-0 h-8 z-10 bg-primary text-primary-contrastText text-center'>开发环境</div>
+              }
+              <div ref={rootRef} >
+                {/* 顶部拖拽条 */}
+                <div
+                  className="drag absolute top-0 left-0 right-0 h-8 z-10 "
+                />
+                <style>{`
                 /* root隐藏滚动条但保持可滚动 */
                 ::-webkit-scrollbar {
                     display: none;
@@ -52,30 +100,30 @@ function App() {
                     -ms-overflow-style: none;
                 }
             `}</style>
-              <Routes>
-                {/* 首页 */}
-                <Route path='/draft'
-                  element={<>
-                    <div className={`${currentPage === 'draft' ? '' : 'hidden'}`}>
-                      <Home />
-                    </div>
-                    <div className={`${currentPage === 'list' ? '' : 'hidden'}`}>
-                      <DraftList setCurrentPage={setCurrentPage} currentPage={currentPage} />
-                    </div>
-                    <Stack className='absolute bottom-6 left-0 right-0 px-4 h-4'>
-                      <ToolBar
-                        currentPage={currentPage}
-                        setCurrentPage={setCurrentPage}
-                      />
-                    </Stack>
-                  </>}
-                />
-                {/* 更新提示 */}
-                <Route path='/' element={<Update />} />
-              </Routes>
-              {/* <ToolBar currentPage='list' /> */}
-            </div>
-          </HashRouter>
+                <Routes>
+                  {/* 首页 */}
+                  <Route path='/draft'
+                    element={<>
+                      <div className={`${currentPage === 'draft' ? '' : 'hidden'}`}>
+                        <Home />
+                      </div>
+                      <div className={`${currentPage === 'list' ? '' : 'hidden'}`}>
+                        <DraftList setCurrentPage={setCurrentPage} currentPage={currentPage} />
+                      </div>
+                      <Stack className='absolute bottom-6 left-0 right-0 px-4 h-4'>
+                        <ToolBar
+                          currentPage={currentPage}
+                          setCurrentPage={setCurrentPage}
+                        />
+                      </Stack>
+                    </>}
+                  />
+                  {/* 更新提示 */}
+                  <Route path='/' element={<Update />} />
+                </Routes>
+              </div>
+            </HashRouter>
+          </LexicalComposer>
         </EventProvider>
       </ThemeProvider>
     </NotificationsProvider>

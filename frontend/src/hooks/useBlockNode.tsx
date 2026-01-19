@@ -99,7 +99,7 @@ const useBlockNode = (editor: LexicalEditor, blockType: 'math' | 'paste') => {
                 containerNode = $createPasteNode();
                 containerNodeKey = containerNode.getKey();
                 containerTitle = 'Paste';
-                containerTip = 'Press Alt + Enter to exit the block and stop auto-pasting.';
+                containerTip = 'Press Alt + Enter stop auto-pasting.';
                 conPlaceholder = 'Auto-paste: everything you copy will be pasted here automatically and wrapped with new lines.';
                 break;
             default:

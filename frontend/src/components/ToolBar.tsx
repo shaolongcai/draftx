@@ -1,12 +1,16 @@
-import { IconButton, Stack, Tooltip } from "@mui/material";
+import { Divider, IconButton, Stack, Tooltip } from "@mui/material";
 import { ReactNode, useMemo, useState } from "react";
 import {
     AddCircleOutline as AddIcon,
-    Search as SearchIcon,
+    Assistant as AIChatIcon,
     GridView as AllIcon,
     Mode as DraftIcon,
+    KeyboardArrowLeft as BackIcon,
+    KeyboardArrowRight as ForwardIcon,
 } from "@mui/icons-material";
 import { useEvent } from "@/contexts/EvenContext";
+import ChatInput from "./ChatInput";
+import { useKeyPress } from "ahooks";
 
 
 
@@ -46,22 +50,59 @@ const ToolBar: React.FC<Props> = ({
 }) => {
 
     const [active, setActive] = useState(false);
+    const [isChatMode, setIsChatMode] = useState(false);
 
     const { handleOnclickTool$ } = useEvent();
 
-    const toolButtons = useMemo<ToolButtonProps[]>(() => {
-        const buttons: ToolButtonProps[] = [
-            {
-                icon: <AddIcon />,
-                className: 'hover:bg-[#9F7207]/70',
-                tip: 'Add a new draft  (Alt + N)',
-                onClick: () => {
-                    setCurrentPage('draft');
-                    handleOnclickTool$.emit('addDraft');
-                },
-            }
-        ];
+    // 监听快捷键ESC 退出聊天模式
+    useKeyPress('Escape', () => {
+        console.log('Escape');
+        setIsChatMode(false);
+    })
 
+    // 获取工具栏按钮
+    const toolButtons = useMemo<(ToolButtonProps | { isDivider: boolean })[]>(() => {
+        const buttons: (ToolButtonProps | { isDivider: boolean })[] = [];
+
+        // 开始配置toolbar
+        if (currentPage === 'draft') {
+            buttons.push({
+                icon: <BackIcon />,
+                className: 'hover:bg-[#9F7207]/70',
+                tip: 'Back to the previous draft  (Alt + ⬅️)',
+                onClick: () => {
+                    // setCurrentPage('draft');
+                    // handleOnclickTool$.emit('backDraft');
+                },
+            });
+
+            buttons.push({
+                icon: <ForwardIcon />,
+                className: 'hover:bg-[#9F7207]/70',
+                tip: 'Forward to the next draft  (Alt + ➡️)',
+                onClick: () => {
+                    // setCurrentPage('draft');
+                    // handleOnclickTool$.emit('nextDraft');
+                },
+            });
+
+            buttons.push({
+                isDivider: true,
+            });
+        }
+
+        // 添加草稿
+        buttons.push({
+            icon: <AddIcon />,
+            className: 'hover:bg-[#9F7207]/70',
+            tip: 'Add a new draft  (Alt + N)',
+            onClick: () => {
+                setCurrentPage('draft');
+                handleOnclickTool$.emit('addDraft');
+            },
+        });
+
+        // 显示所有草稿与搜索
         if (currentPage === 'draft') {
             buttons.push({
                 icon: <AllIcon />,
@@ -71,6 +112,7 @@ const ToolBar: React.FC<Props> = ({
             });
         }
 
+        // 回到草稿
         if (currentPage === 'list') {
             buttons.push({
                 icon: <DraftIcon />,
@@ -80,8 +122,26 @@ const ToolBar: React.FC<Props> = ({
             });
         }
 
+        // 对话
+        if (currentPage === 'draft') {
+            buttons.push({
+                icon: <AIChatIcon />,
+                className: 'hover:bg-[#9F7207]/70',
+                tip: 'Chat with AI (Alt + C)',
+                onClick: () => setIsChatMode(true),
+            });
+        }
+
         return buttons;
     }, [currentPage, setCurrentPage]);
+
+
+    if (isChatMode) {
+        return <ChatInput onClose={() => {
+            setIsChatMode(false)
+            setActive(false);
+        }} />;
+    }
 
 
     return (
@@ -104,9 +164,24 @@ const ToolBar: React.FC<Props> = ({
                     justifyContent="space-between"
                     className={`items-center gap-1 px-2 transition-opacity duration-300 ${active ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
                 >
-                    {toolButtons.map((button, index) => (
-                        <ToolButton key={index} {...button} />
-                    ))}
+                    {toolButtons.map((button, index) => {
+                        if ((button as any).isDivider) {
+                            return (
+                                <Divider
+                                    key={index}
+                                    orientation="vertical"
+                                    variant="middle"
+                                    flexItem
+                                    sx={{
+                                        bgcolor: 'rgba(255,255,255,0.3)',
+                                        my: 1,
+                                        mx: 0.5,
+                                    }}
+                                />
+                            )
+                        }
+                        return <ToolButton key={index} {...button as ToolButtonProps} />
+                    })}
                 </Stack>
             </div>
         </div>

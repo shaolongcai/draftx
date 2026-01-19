@@ -91,9 +91,9 @@ interface ElectronAPI {
      * 发起流式对话
      * @param currentStickyId 便利贴的ID
      * @param message 用户消息
-     * @param toolId 工具ID
+     * @param context 上下文
      */
-    chatStream: (message?: string, toolId?: number) => void;
+    chatStream: (message: string, context?: string) => void;
 
     /**
      * 监听流式数据

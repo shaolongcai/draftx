@@ -65,7 +65,12 @@ export const useChat = () => {
         };
     }, []);
 
-    const sendMessage = useCallback((message: string, toolId: number) => {
+    /**
+     * 发送消息
+     * @param message 用户消息
+     * @param context 上下文
+     */
+    const sendMessage = useCallback((message: string, context: string) => {
         if (isLoading) return;
 
         setError(null);
@@ -80,7 +85,7 @@ export const useChat = () => {
         }]);
 
         // 发起流式请求
-        window.electronAPI.chatStream(message, toolId);
+        window.electronAPI.chatStream(message, context);
     }, [isLoading]);
 
     const clearMessages = useCallback(() => {

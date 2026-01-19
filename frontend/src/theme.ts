@@ -36,13 +36,6 @@ export const theme = createTheme({
 
         MuiChip: {
             styleOverrides: {
-                colorPrimary: {
-                    // 只有在filled变体时才应用这个背景色
-                    '&.MuiChip-filled': {
-                        backgroundColor: '#DBF0FF',
-                        color: '#1890FF', // 设置文字颜色，与主题色匹配
-                    }
-                },
                 outlinedPrimary: {
                     borderColor: '#3AACFF',
                     color: '#1890FF',
@@ -154,8 +147,15 @@ export const theme = createTheme({
             tertiary: 'rgba(0, 0, 0, 0.45)',
             disabled: 'rgba(0, 0, 0, 0.25)',
         },
+        background: {
+            default: '#F9F3E5',
+            paper: '#FFFFFF',
+        },
         primary: {
-            main: '#1890FF',
+            main: '#9F7207',
+            // light: '#FFE5B4',
+            // dark: '#664D03',
+            contrastText: '#FFFFFF',
         },
         // secondary: {
         //     main: '#D4E4F6',

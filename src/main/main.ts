@@ -198,10 +198,10 @@ app.whenReady().then(async () => {
   initializeAIApi()
   // 创建托盘
   createTray();
-  
+
   // macOS 上隐藏 Dock 图标（实现 skipTaskbar 效果）
   if (process.platform === 'darwin') {
-      app.dock.hide();
+    app.dock.hide();
   }
 
   // 初始化引导memo
@@ -225,11 +225,16 @@ const gotTheLock = app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
   // 获取锁失败，说明已有实例运行，直接退出
-  logger.info('应用已在运行，退出当前实例');
-  app.quit();
+  logger.info('应用已在运行，退出当前实例(开发环境下忽略)');
+  process.env.NODE_ENV !== 'development' && app.quit();
 } else {
   // 获取锁成功，监听 second-instance 事件
   app.on('second-instance', () => {
+    // 若为开发环境则忽略多开
+    if (process.env.NODE_ENV === 'development') {
+      logger.info('开发环境，忽略多开限制');
+      return
+    }
     logger.info('检测到第二个实例启动，激活现有窗口');
     // 如果主窗口存在，显示并聚焦
     if (mainWindow) {

@@ -27,34 +27,6 @@ const Editor: React.FC = () => {
     const [cardSize, setCardSize] = useState({ width: 400, height: 400 });
     const [showTips, setShowTips] = useState(true);
 
-    const initialConfig = {
-        namespace: 'MyEditor',
-        theme: theme,
-        onError: (error: Error) => {
-            console.error(error.message);
-        },
-        nodes: [
-            HeadingNode,
-            QuoteNode,
-            ListNode,
-            ListItemNode,
-            CodeNode,
-            CodeHighlightNode,
-            LinkNode,
-            AutoLinkNode,
-            TableNode,
-            TableCellNode,
-            HorizontalRuleNode,
-            TableRowNode,
-            BlockTitleNode,
-            BlockTipNode,
-            mermaidNode,
-            MathNode,
-            MathItemNode,
-            PasteNode,
-            LoadingNode
-        ],
-    };
 
     useEffect(() => {
         const t = setTimeout(() => setShowTips(false), 5000)
@@ -108,43 +80,8 @@ const Editor: React.FC = () => {
         {/* <div
             className="drag absolute top-0 left-0 right-0 h-8 z-10 "
         /> */}
-        {/* 右侧缩放句柄：横向缩放
-        <div
-            onMouseDown={startResize('e')}
-            className="absolute right-0 top-0 h-full w-2 cursor-ew-resize opacity-0 hover:opacity-100 transition-opacity duration-150"
-        />
-        底部缩放句柄：纵向缩放
-        <div
-            onMouseDown={startResize('s')}
-            className="absolute left-0 bottom-0 w-full h-2 cursor-ns-resize opacity-0 hover:opacity-100 transition-opacity duration-150"
-        />
-        右下角缩放句柄：同时缩放
-        <div
-            onMouseDown={startResize('se')}
-            className="absolute right-0 bottom-0 w-3 h-3 cursor-nwse-resize opacity-0 hover:opacity-100 transition-opacity duration-150"
-        /> */}
-        <LexicalComposer initialConfig={initialConfig}>
-            <EditorContext />
-        </LexicalComposer>
-        <Stack direction='row' justifyContent='center' alignItems="center"
-            className="absolute bottom-4 left-0 right-0 px-4 h-4"
-        >
-            {/* <ToolBar currentPage='draft' /> */}
-            {/* <Stack direction="row" spacing={0.5} alignItems="center"
-                className={`transition-opacity duration-700 ${showTips ? 'opacity-100' : 'opacity-0'}`}
-            >
-                <span className="border border-text-secondary border-gray-300 text-gray-600 rounded px-2 py-1 text-xs leading-none">
-                    Alt
-                </span>
-                <Typography variant="bodySmall" color='textTertiary'>+</Typography>
-                <span className="border border-gray-300 rounded px-2 py-1 text-xs text-gray-600 leading-none">
-                    N
-                </span>
-                <Typography variant="bodySmall" color="textTertiary" className="pl-1">
-                    New draft
-                </Typography>
-            </Stack> */}
-        </Stack>
+
+        <EditorContext />
         {/* 删除提示标记点 (应该改为超过30日未查看的草稿将会被删除) */}
         {/* <Tooltip title={`After ${deletedAt ? deletedAt + 3 : 7} days will be deleted`}>
             <div className={`absolute bottom-6 right-6 w-2 h-2  rounded-full 

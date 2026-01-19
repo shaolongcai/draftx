@@ -31,7 +31,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   deleteAITool: (id: number) => ipcRenderer.send('delete-ai-tool', id), // 删除AI工具
 
   // AI流式对话
-  chatStream: (message?: string, toolId?: number) => ipcRenderer.send('chat-stream', message, toolId), // 发起流式对话
+  chatStream: (message: string, context?: string) => ipcRenderer.send('chat-stream', message, context), // 发起流式对话
   onChatStream: (callback: (chunk: string) => void) => {
     const listener = (_event: any, chunk: string) => callback(chunk);
     ipcRenderer.on('chat-stream-data', listener);

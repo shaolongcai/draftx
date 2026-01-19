@@ -47,7 +47,6 @@ class OllamaService {
 
                 // 处理流式数据块
                 if (type === 'stream' && chunk) {
-                    logger.info(`chunk:${chunk}`)
                     const chunkData = {
                         content: chunk,
                         type: 'stream' as 'stream',

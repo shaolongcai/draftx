@@ -157,7 +157,7 @@ export default function AiPickerPlugin(): JSX.Element {
             }
 
             console.log('aboveText', aboveText);
-            sendMessage(aboveText, toolId);
+            // sendMessage(aboveText, toolId);
 
             // 增加一个段落以承载AI内容
             editor.update(() => {
