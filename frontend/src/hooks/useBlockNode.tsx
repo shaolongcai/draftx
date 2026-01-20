@@ -35,10 +35,10 @@ const useBlockNode = (editor: LexicalEditor, blockType: 'math' | 'paste') => {
             while (current && !isBlockNode(current)) {
                 current = current.getParent();
             }
-                console.log('zhaodao ',current);
+            console.log('zhaodao ', current);
             if (!isBlockNode(current)) return false;
 
-        
+
 
             editor.update(() => {
                 const blockNode = current as ElementNode;
@@ -84,8 +84,8 @@ const useBlockNode = (editor: LexicalEditor, blockType: 'math' | 'paste') => {
         const selection = $getSelection();
         let containerNode: MathNode | PasteNode
         let containerNodeKey: string
-        let containerTitle:string  // 容器的标题
-        let containerTip : string // 容器的提示
+        let containerTitle: string  // 容器的标题
+        let containerTip: string // 容器的提示
         let conPlaceholder: string // 占位符
         switch (blockType) {
             case 'math':
@@ -108,18 +108,19 @@ const useBlockNode = (editor: LexicalEditor, blockType: 'math' | 'paste') => {
         // 插入容器到当前位置
         selection.insertNodes([containerNode]);
         // 容器内插入标题节点
-        const titleNode = $createBlockTitleNode(containerTitle,containerTip);
+        const titleNode = $createBlockTitleNode(containerTitle, containerTip);
         containerNode.append(titleNode);
         // 容器内插入段落节点
-        const inputParagraph = $createParagraphNode();
-        containerNode.append(inputParagraph);
+        // const inputParagraph = $createParagraphNode();
+        // containerNode.append(inputParagraph);
         // 段落内插入占位符节点
-        const tipNode = $createBlockTipNode(conPlaceholder);
-        inputParagraph.append(tipNode);
+        // const tipNode = $createBlockTipNode(conPlaceholder);
+        // inputParagraph.append(tipNode);
         // 占位符节点前插入一个文本节点
-        const inputText = $createTextNode('');
-        inputText.selectStart();
-        tipNode.insertBefore(inputText);
+        // const inputText = $createTextNode('');
+        // inputText.selectStart();
+        // containerNode.insertBefore(inputText);
+        // inputParagraph.append(inputText);
         return containerNodeKey;
     };
 

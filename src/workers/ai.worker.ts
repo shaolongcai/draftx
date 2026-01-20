@@ -27,7 +27,7 @@ let ollamaConfig: OllamaConfig = {
 };
 let ollama: Ollama | null = null;
 
-// 初始化 Ollama 实例
+// 初始化 Ollama 实例（todo：没有配置时应该直接返回）
 function initOllama() {
     if (!ollama) {
         ollama = new Ollama({

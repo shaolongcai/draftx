@@ -54,10 +54,10 @@ const ToolBar: React.FC<Props> = ({
 
     const { handleOnclickTool$ } = useEvent();
 
-    // 监听快捷键ESC 退出聊天模式
-    useKeyPress('Escape', () => {
-        console.log('Escape');
-        setIsChatMode(false);
+
+    // 快速开启chat
+    useKeyPress('alt.c', () => {
+        setIsChatMode(!isChatMode);
     })
 
     // 获取工具栏按钮

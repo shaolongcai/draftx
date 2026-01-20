@@ -26,9 +26,7 @@ import { useNotifications } from "@toolpad/core/useNotifications";
 import { useEvent } from "@/contexts/EvenContext";
 import { $convertFromMarkdownString, TRANSFORMERS } from "@lexical/markdown";
 import TabFocusPlugin from '@/plugin/TabFocusPlugin';
-import { theme } from "@/theme/editorTheme";
 import PickerPlugin from "@/plugin/PickerPlugin";
-import { MathNode } from "@/nodes/MathNode";
 import { MathPlugin } from "@/plugin/MathPlugin";
 import { AutoPastePlugin } from "@/plugin/AutoPastePlugin";
 import { BlockTipPlugin } from "@/plugin/BlockTipPlugin";
@@ -43,12 +41,12 @@ function Placeholder() {
         color: '#ccc',
         // overflow: 'hidden',
         position: 'absolute',
-        top: '26px',
+        top: '24px',
         fontSize: '16px',
         userSelect: 'none',
         display: 'inline-block',
         pointerEvents: 'none',
-    }}>Press / bring up the menu <br /> Press ` bring up the AI tool....</Box>;
+    }}>Press / for quick input</Box>;
 }
 
 

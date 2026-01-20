@@ -1,4 +1,4 @@
-import { Chip, IconButton, InputBase, Stack } from "@mui/material"
+import { Chip, IconButton, InputBase, Stack, Tooltip } from "@mui/material"
 import {
     Send as SendIcon,
     SwapHoriz as AiIcon,
@@ -6,7 +6,6 @@ import {
 } from '@mui/icons-material';
 import { useTheme, alpha } from '@mui/material/styles';
 import { useEffect, useRef, useState } from "react";
-import { useEvent } from "@/contexts/EvenContext";
 import { useKeyPress, useUpdateLayoutEffect } from "ahooks";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import useChat from "@/hooks/useChat";
@@ -113,18 +112,20 @@ const ChatInput: React.FC<Props> = ({ onClose }) => {
                 bottom: '24px',
             }}
         >
-            <IconButton
-                onClick={onClose}
-                size="small"
-                sx={{
-                    color: alpha(theme.palette.primary.main, 0.45),
-                    '&:hover': {
-                        color: alpha(theme.palette.primary.main, 0.85),
-                    }
-                }}
-            >
-                <CloseIcon fontSize="small" />
-            </IconButton>
+            <Tooltip title={`Close Chat (${window.electronUtils.platform === 'win32' ? 'Alt' : 'Cmd'} + C)`}>
+                <IconButton
+                    onClick={onClose}
+                    size="small"
+                    sx={{
+                        color: alpha(theme.palette.primary.main, 0.45),
+                        '&:hover': {
+                            color: alpha(theme.palette.primary.main, 0.85),
+                        }
+                    }}
+                >
+                    <CloseIcon fontSize="small" />
+                </IconButton>
+            </Tooltip>
             <Chip
                 icon={<AiIcon />}
                 label={inputMode === 'whitDraft' ? 'Generate with draft' : 'freedom'}
