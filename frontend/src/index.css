@@ -39,8 +39,8 @@ body::before {
   
   /* 背景图设置：叠加半透明黑色遮罩 */
   background-image: 
-    linear-gradient(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)), /* 遮罩层：0.2 表示 20% 黑色 */
-    url('./assets/images/bg1.jpg');
+    linear-gradient(rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.25)), /* 遮罩层：0.2 表示 20% 黑色 */
+    url('./assets/images/bg9.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
