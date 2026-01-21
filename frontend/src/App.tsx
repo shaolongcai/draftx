@@ -3,6 +3,7 @@ import { useRequest, useSize } from 'ahooks'
 import './App.css'
 import { Stack, ThemeProvider } from '@mui/material'
 import { theme } from './theme'
+import { theme as editorTheme } from './theme/editorTheme'
 import { NotificationsProvider } from '@toolpad/core/useNotifications';
 import { EventProvider } from './contexts/EvenContext'
 import Home from './pages/home'
@@ -41,7 +42,7 @@ function App() {
 
   const initialConfig = {
     namespace: 'MyEditor',
-    theme: theme,
+    theme: editorTheme,
     onError: (error: Error) => {
       console.error(error.message);
     },
@@ -79,10 +80,10 @@ function App() {
         <EventProvider >
           <LexicalComposer initialConfig={initialConfig}>
             <HashRouter>
-              {
+              {/* {
                 import.meta.env.DEV &&
                 <div className='absolute top-0 left-0 right-0 h-8 z-10 bg-primary text-primary-contrastText text-center'>开发环境</div>
-              }
+              } */}
               <div ref={rootRef} >
                 {/* 顶部拖拽条 */}
                 <div

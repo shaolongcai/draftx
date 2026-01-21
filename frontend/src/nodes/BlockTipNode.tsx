@@ -1,6 +1,6 @@
 // MathNode.ts
 import { Stack } from '@mui/material';
-import { DecoratorNode, LexicalNode, NodeKey, EditorConfig, RangeSelection, ElementNode, $createParagraphNode, TextNode, LexicalEditor } from 'lexical';
+import { DecoratorNode, LexicalNode, NodeKey, EditorConfig, LexicalEditor, $isTextNode, $isParagraphNode } from 'lexical';
 import { ReactElement, JSXElementConstructor } from 'react';
 
 // ElementNode是普通节点，才拥有append方法
@@ -36,9 +36,24 @@ export class BlockTipNode extends DecoratorNode<React.ReactElement> {
         return true;
     }
 
+    // 是否可以被选中
+    isKeyboardSelectable(): boolean {
+        return false;
+    }
+
     decorate(editor: LexicalEditor, config: EditorConfig): ReactElement<unknown, string | JSXElementConstructor<any>> {
         return (
-            <span className="block-tip-node italic text-xs text-gray-400">
+            <span
+                className="block-tip-node italic text-xs text-gray-400 cursor-text"
+                onClick={() => {
+                    editor.update(() => {
+                        const pNode = this.getParent();
+                        if (pNode && $isParagraphNode(pNode)) {
+                            pNode.selectStart();
+                        }
+                    })
+                }}
+            >
                 {this.__placeholder}
             </span>
         );

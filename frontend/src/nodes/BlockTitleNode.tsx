@@ -34,13 +34,18 @@ export class BlockTitleNode extends DecoratorNode<React.ReactElement> {
         return false;
     }
 
+    // 是否可以被选中
+    // isKeyboardSelectable(): boolean {
+    //     return false;
+    // }
+
     decorate(editor: LexicalEditor, config: EditorConfig): ReactElement<unknown, string | JSXElementConstructor<any>> {
         return (
             <Stack direction="row" alignItems="center" spacing={0.5} className='mb-2' >
                 <span className="block-title-node italic text-xs text-[#264F87]">{this.__title}</span>
-                <span className="block-title-node italic text-xs text-gray-400">
+                {/* <span className="block-title-node italic text-xs text-gray-400">
                     {this.__tip}
-                </span>
+                </span> */}
             </Stack>
         );
     }
