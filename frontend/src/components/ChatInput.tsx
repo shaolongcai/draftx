@@ -65,6 +65,14 @@ const ChatInput: React.FC<Props> = ({ onClose }) => {
     // 更新editor的状态
     useEffect(() => {
         editor.setEditable(!isLoading); // 加载中时禁用编辑器
+        // 去掉loading段落
+        if (isLoading) return;
+        editor.update(() => {
+            const textNode = $getNodeByKey(textNodeKey!);
+            const pNode = textNode.getParent();
+            const loadingNode = pNode?.getChildren().find(child => $isLoadingNode(child));
+            loadingNode?.remove();
+        })
     }, [isLoading])
 
     // 更新消息内容

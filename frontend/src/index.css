@@ -38,12 +38,13 @@ body::before {
   z-index: -1; /* 置于内容底层 */
   
   /* 背景图设置：叠加半透明黑色遮罩 */
-  background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.25)), /* 遮罩层：0.2 表示 20% 黑色 */
+  /* 遮罩层：0.2 表示 20% 黑色 */
+  /* background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.25)),  
     url('./assets/images/bg9.png');
   background-repeat: no-repeat;
   background-size: cover;
-  background-position: center;
+  background-position: center; */
   
   /* 移除 opacity，改用 gradient 遮罩 */
   /* opacity: 0.85; */ 

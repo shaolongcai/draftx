@@ -30,6 +30,7 @@ let ollama: Ollama | null = null;
 // 初始化 Ollama 实例（todo：没有配置时应该直接返回）
 function initOllama() {
     if (!ollama) {
+        console.log('初始化ollama实例')
         ollama = new Ollama({
             host: ollamaConfig.host
         });
@@ -40,94 +41,83 @@ function initOllama() {
 // AI处理的核心逻辑
 async function aiInWorker(data: GenerateRequest & { requestId: string }): Promise<ProcessResponse> {
 
-    let timeoutId: NodeJS.Timeout;
-    // let schema: z.ZodObject<any, any>;
+    let timeoutId: NodeJS.Timeout | null = null;
 
     try {
-        // 设置超时处理
-        const timeoutPromise = new Promise<never>((_, reject) => {
-            timeoutId = setTimeout(() => {
-                return {
-                    requestId: data.requestId,
-                    success: false,
-                    error: '文档处理超时',
-                    // needRestartOllama: true,
-                };
-            }, 4 * 60 * 1000); // 4分钟超时
-        });
-        // JSON结构
-        // if (data.isJson) {
-        //     schema = data.jsonFormat || {
-        //         type: 'object',
-        //         properties: {
-        //             tags: {
-        //                 type: 'array',
-        //                 items: {
-        //                     type: 'string',
-        //                 },
-        //             },
-        //             summary: {
-        //                 type: 'string',
-        //             },
-        //         },
-        //         required: ['tags', 'summary'],
-        //     }
-        // }
-        // const schema =  z.object({
-        //         tags: z.array(z.string()),
-        //         summary: z.string(),
-        //     })
-        const messages: Message[] = [
-            {
-                role: 'system',
-                content: data.prompt
-            },
-            {
-                role: 'user',
-                content: `${data.content}`,
-            }
-        ]
-        // 是否为图片
-        if (data.isImage) {
-            // 读取图片并转换为base64
-            const imageBuffer = await fs.promises.readFile(data.path);
-            const base64Image = imageBuffer.toString('base64');
-            messages[messages.length - 1].images = [base64Image];
-        }
-
         const ollamaInstance = initOllama();
-        const chatResponse = await ollamaInstance.chat({
+
+        const messages: Message[] = [
+            { role: 'system', content: data.prompt },
+            { role: 'user', content: `${data.content}` }
+        ];
+
+        // 是否为图片
+        // if (data.isImage) {
+        //     const imageBuffer = await fs.promises.readFile(data.path);
+        //     const base64Image = imageBuffer.toString('base64');
+        //     messages[messages.length - 1].images = [base64Image];
+        // }
+
+        // 1. 启动请求的超时控制（包括模型加载时间）
+        // 使用 Promise.race 确保 chat 初始化不无限挂起
+        const chatStreamPromise = ollamaInstance.chat({
             model: ollamaConfig.model,
             messages: messages,
             stream: true,
+            keep_alive: '1h',
             options: {
-                num_predict: 1200,
+                num_predict: 4096,
                 temperature: 0,
                 repeat_penalty: 1.2,
             },
-            // format: data.isJson ? schema : undefined,
         });
 
-        // 处理流式响应
-        for await (const chunk of chatResponse) {
-            clearTimeout(timeoutId); // 每次收到数据重置超时
+        // 定义启动超时（例如 5 分钟，模型加载可能很慢）
+        const startTimeoutPromise = new Promise<never>((_, reject) => {
+            timeoutId = setTimeout(() => {
+                reject(new Error('AI 模型加载或响应超时'));
+            }, 5 * 60 * 1000);
+        });
 
-            const content = chunk.message.content;
+        // 等待流建立
+        const chatResponse = await Promise.race([chatStreamPromise, startTimeoutPromise]);
 
-            // 发送流式数据块到主线程
+        // 收到响应，清除启动超时
+        if (timeoutId) clearTimeout(timeoutId);
+
+        // 2. 流式传输过程中的超时控制
+        // 如果两个 chunk 之间间隔过长，认为卡死
+        const streamTimeoutMs = 2 * 60 * 1000; // 2分钟无输出则超时
+
+        const iterator = chatResponse[Symbol.asyncIterator]();
+
+        while (true) {
+            // 为每个 chunk 设置超时
+            const chunkPromise = iterator.next();
+            const chunkTimeoutPromise = new Promise<IteratorResult<any>>((_, reject) => {
+                timeoutId = setTimeout(() => {
+                    reject(new Error('流式传输中断/超时'));
+                }, streamTimeoutMs);
+            });
+
+            const result = await Promise.race([chunkPromise, chunkTimeoutPromise]);
+
+            // console.log('收到chunk', result)
+
+            // 收到数据，清除超时
+            if (timeoutId) clearTimeout(timeoutId);
+
+            if (result.done) break;
+
+            const content = result.value.message.content;
+            if (content.trim() === '') continue; // 思考模式下：message: { role: 'assistant', content: '', thinking: ' sentence' },
             parentPort?.postMessage({
                 requestId: data.requestId,
                 type: 'stream',
                 chunk: content
             });
-
-            // 重新设置超时
-            timeoutId = setTimeout(() => { }, 4 * 60 * 1000);
         }
 
-        clearTimeout(timeoutId);
-
-        // 流式完成，发送完成信号
         return {
             requestId: data.requestId,
             success: true,
@@ -135,14 +125,18 @@ async function aiInWorker(data: GenerateRequest & { requestId: string }): Promis
         };
 
     } catch (error) {
-        clearTimeout(timeoutId);
+        if (timeoutId) clearTimeout(timeoutId);
         const msg = error instanceof Error ? error.message : '文档处理失败';
-        console.error(msg);
+        console.error('Worker AI Error:', msg);
+
+        // 尝试中止 ollama 请求 (如果是 fetch 可以用 abort，这里 ollama-js 封装较深，
+        // 只能依靠断开连接或下次请求重置)
+        // ollamaInstance.abort() // ollama-js 0.5.0+ might support abort logic if exposed
+
         return {
             requestId: data.requestId,
             success: false,
             error: msg,
-            // needRestartOllama: true,
         };
     }
 }

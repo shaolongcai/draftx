@@ -47,6 +47,7 @@ export const useChat = () => {
         // 监听流式结束
         const unsubscribeEnd = window.electronAPI.onChatStreamEnd(() => {
             currentMessageRef.current = '';
+            setIsLoading(false);
         });
 
         // 监听流式错误

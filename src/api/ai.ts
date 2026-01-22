@@ -60,7 +60,7 @@ export function initializeAIApi() {
             // 如果有上下文，需要根据上下文做出回应
             let systemPrompt = '';
             if (context) {
-                systemPrompt = 'Answer the question or generate text based on the context and the user input, staying as close to the context as possible.';
+                systemPrompt = 'You are a direct assistant. Answer strictly based on the context. Do NOT engage in internal monologue, reasoning, or "thinking". Do NOT output <think> tags. Output ONLY the final answer immediately.';
             }
 
             // 调用 ollamaService.generate 并传入流式回调
