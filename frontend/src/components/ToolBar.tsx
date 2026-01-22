@@ -1,5 +1,5 @@
 import { Divider, IconButton, Stack, Tooltip } from "@mui/material";
-import { ReactNode, useMemo, useState } from "react";
+import { ReactNode, useMemo, useRef, useState } from "react";
 import {
     AddCircleOutline as AddIcon,
     Assistant as AIChatIcon,
@@ -52,11 +52,13 @@ const ToolBar: React.FC<Props> = ({
     const [active, setActive] = useState(false);
     const [isChatMode, setIsChatMode] = useState(false);
 
+    const inputRef = useRef<HTMLDivElement>(null);
     const { handleOnclickTool$ } = useEvent();
 
 
     // 快速开启chat
     useKeyPress('alt.c', () => {
+        inputRef.current?.focus();
         setIsChatMode(!isChatMode);
     })
 
@@ -137,10 +139,11 @@ const ToolBar: React.FC<Props> = ({
 
 
     if (isChatMode) {
-        return <ChatInput onClose={() => {
-            setIsChatMode(false)
-            setActive(false);
-        }} />;
+        return <ChatInput
+            onClose={() => {
+                setIsChatMode(false)
+                setActive(false);
+            }} />;
     }
 
 

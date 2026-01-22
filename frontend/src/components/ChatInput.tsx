@@ -28,6 +28,16 @@ const ChatInput: React.FC<Props> = ({ onClose }) => {
     const [editor] = useLexicalComposerContext();
     const inputRef = useRef<HTMLInputElement>(null);
 
+    useEffect(() => {
+        // 确保组件挂载后聚焦
+        const timer = setTimeout(() => {
+            if (inputRef.current) {
+                inputRef.current.focus();
+            }
+        }, 50);
+        return () => clearTimeout(timer);
+    }, []);
+
     // 回车发送消息
     useKeyPress('enter', () => {
         clearMessages();
@@ -158,7 +168,7 @@ const ChatInput: React.FC<Props> = ({ onClose }) => {
                 }}
             />
             <InputBase
-                ref={inputRef}
+                inputRef={inputRef}
                 placeholder="Press Enter to send"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}

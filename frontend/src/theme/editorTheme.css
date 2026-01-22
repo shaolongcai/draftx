@@ -15,9 +15,10 @@
 }
 
 /* 段落 */
-.editor-paragraph{
+.editor-paragraph {
     line-height: 1.8;
-    margin-bottom: 8px; /* 段落之间留出更大间距 */
+    margin-bottom: 8px;
+    /* 段落之间留出更大间距 */
 }
 
 /* 有序列表 */
@@ -43,10 +44,8 @@
 }
 
 
-/* 列表 */
-.editor-nested-listitem {
-    list-style-type: none; /* key：令到缩进在本行缩进，而不需要换行再缩进 */
-}
+
+
 /* 无序列表 */
 .editor-list-ul1 {
     padding: 0;
@@ -56,7 +55,7 @@
 }
 
 .editor-list-ul2 {
-    /* padding-left: 16px; */
+    /* padding-left: -16px; */
     margin: 0;
     list-style-type: circle;
     list-style-position: inside;
@@ -103,6 +102,20 @@
     transform: translateY(-50%);
 }
 
+.editor-listItem {
+    margin: 0 32px;
+    font-family: var(--listitem-marker-font-family);
+    font-size: var(--listitem-marker-font-size);
+    background-color: var(--listitem-marker-background-color);
+}
+
+.editor-listItem::marker {
+    color: var(--listitem-marker-color);
+    background-color: var(--listitem-marker-background-color);
+    font-family: var(--listitem-marker-font-family);
+    font-size: var(--listitem-marker-font-size);
+}
+
 .editor-listItemChecked {
     text-decoration: line-through;
 }
@@ -138,4 +151,18 @@
     height: 0.4em;
     transform: translateY(-50%) rotate(45deg);
     border-width: 0 0.1em 0.1em 0;
+}
+
+/* 
+列表 
+覆盖 listItemUnchecked 样式，使得不会tab缩进时不会出现两个方框
+*/
+.editor-nested-listitem {
+    list-style-type: none;
+    /* key：令到缩进在本行缩进，而不需要换行再缩进 */
+}
+
+.editor-nested-listitem:before,
+.editor-nested-listitem:after {
+    display: none;
 }

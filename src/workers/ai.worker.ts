@@ -66,7 +66,7 @@ async function aiInWorker(data: GenerateRequest & { requestId: string }): Promis
             stream: true,
             keep_alive: '1h',
             options: {
-                num_predict: 4096,
+                num_predict: 4096, // 最大预测 token 数，过少会造成模型卡住
                 temperature: 0,
                 repeat_penalty: 1.2,
             },

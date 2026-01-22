@@ -196,7 +196,6 @@ const EditorContext: React.FC = () => {
         />
         <HistoryPlugin />
         <AutoFocusPlugin />
-
         <TabIndentationPlugin />
         <ListPlugin hasStrictIndent={false} />
         <TablePlugin />
