@@ -26,7 +26,7 @@
     margin: 0;
     list-style-type: decimal;
     list-style-position: inside;
-    padding-left: 16px;
+    /* padding-left: 16px; */
 }
 
 .editor-list-ol2 {
@@ -47,22 +47,27 @@
 
 
 /* 无序列表 */
+.editor-list-ul {
+  padding: 0;
+  margin: 0;
+  list-style-position: outside;
+}
 .editor-list-ul1 {
-    padding: 0;
+    /* padding: 0; */
     margin: 0;
     list-style-type: inherit;
     list-style-position: inside;
 }
 
 .editor-list-ul2 {
-    /* padding-left: -16px; */
+    padding-left: 16px;
     margin: 0;
     list-style-type: circle;
     list-style-position: inside;
 }
 
 .editor-list-ul3 {
-    /* padding-left: 16px; */
+    padding-left: 16px;
     margin: 0;
     list-style-type: square;
     list-style-position: inside;

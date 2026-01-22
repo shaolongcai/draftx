@@ -51,6 +51,7 @@ export const theme: EditorThemeClasses = {
             listitem: 'editor-nested-listitem',
         },
         ol: 'editor-list-ol',
+        ul: 'editor-list-ul',
         listitem: 'editor-listitem',
         listitemChecked: 'editor-listItemChecked',
         listitemUnchecked: 'editor-listItemUnchecked',

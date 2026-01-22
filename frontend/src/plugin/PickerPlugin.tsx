@@ -18,7 +18,10 @@ import {
     TextNode,
     $createTextNode,
     $getSelection,
+    $isRangeSelection,
+    $createParagraphNode,
 } from 'lexical';
+import { $setBlocksType } from '@lexical/selection';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Menu, MenuItem } from '@mui/material';
 import { $createHeadingNode } from '@lexical/rich-text';
@@ -35,6 +38,7 @@ import {
     checklist as ChecklistIcon,
     autoPaste as AutoPasteIcon,
     calculator as CalculatorIcon,
+    paragraph as ParagraphIcon,
 } from '@/assets/icons/editIcon'
 
 
@@ -94,6 +98,19 @@ const createHeading = (editor: LexicalEditor, type: 'h1' | 'h2' | 'h3') => {
 function getBaseOptions(editor: LexicalEditor) {
 
     return [
+        // 普通段落
+        new ComponentPickerOption('Paragraph', {
+            icon: ParagraphIcon,
+            keywords: ['p', '段落'],
+            onSelect: () => {
+                editor.update(() => {
+                    const selection = $getSelection();
+                    if ($isRangeSelection(selection)) {
+                        $setBlocksType(selection, () => $createParagraphNode());
+                    }
+                })
+            }
+        }),
         new ComponentPickerOption('Calculator', {
             icon: CalculatorIcon,
             keywords: ['Calculator', 'Math', '计算', '计数'],
