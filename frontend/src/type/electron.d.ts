@@ -61,8 +61,14 @@ interface ElectronAPI {
 
     /**
      * 获取引导memo
+     * @deprecated 已废弃，使用 getDraftByUuid 替代
      */
     getGuideMemo: () => Promise<StickyResult>
+
+    /**
+     * 根据UUID获取草稿
+     */
+    getDraftByUuid: (uuid: string) => Promise<DraftResult | null>;
 
     /**
      * 检查Ollama服务是否可用
@@ -166,6 +172,8 @@ interface ElectronAPI {
      * 验证许可证
      */
     verifyLicense: () => Promise<boolean>;
+
+
 }
 
 

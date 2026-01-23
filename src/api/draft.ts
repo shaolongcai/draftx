@@ -1,5 +1,5 @@
 import { ipcMain } from "electron";
-import { getGuideMemo, saveStickyNote, getDraft, refreshDeleteDay } from "../database/repositories.js";
+import { getGuideMemo, saveStickyNote, getDraft, refreshDeleteDay, getDraftByUuid } from "../database/repositories.js";
 
 
 
@@ -20,8 +20,16 @@ export function initializeDraftApi() {
         refreshDeleteDay(id);
     });
 
-    // 获取引导memo
+    /**
+     * 根据ID获取草稿
+     * @deprecated 使用 getDraftByUuid 替代
+     */
     ipcMain.handle('get-guide-memo', async (event) => {
         return getGuideMemo();
+    })
+
+    // 根据ID获取草稿
+    ipcMain.handle('get-draft-by-uuid', async (event, uuid: string) => {
+        return getDraftByUuid(uuid);
     })
 }

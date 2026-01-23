@@ -1,4 +1,5 @@
 import { useEvent } from "@/contexts/EvenContext"
+import { historyStack } from "@/utils/histroyStack";
 import { Card, Stack, Typography } from "@mui/material"
 
 
@@ -18,7 +19,8 @@ interface Props {
     snippet?: string,
     height?: string,
     onClick?: (id: number) => void,
-    lineClamp?: number
+    lineClamp?: number,
+    uuid: string,
 }
 /**
  * 搜索结果
@@ -31,6 +33,7 @@ const DraftItem: React.FC<Props> = ({
     height = '160px',
     onClick,
     lineClamp = 8,
+    uuid,
     ...rest
 }) => {
 
@@ -41,7 +44,10 @@ const DraftItem: React.FC<Props> = ({
     // 点击卡片
     const handleClick = () => {
         onClick?.(id)
-        loadStickys$.emit({ ...rest, content, id } as DraftResult)
+        loadStickys$.emit({ ...rest, content, id, uuid } as DraftResult)
+        console.log('点击草稿', uuid)
+        // 压栈
+        // historyStack.push(uuid);
     }
 
     return <Card className="cursor-pointer  border border-[#9F7207]/25 "

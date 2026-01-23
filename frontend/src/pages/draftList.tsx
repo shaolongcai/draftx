@@ -28,7 +28,6 @@ const DraftList: React.FC<Props> = ({
         }
     );
 
-
     return < div
     // className={`${showDraftList ? '' : 'hidden'}`}
     >
@@ -45,6 +44,7 @@ const DraftList: React.FC<Props> = ({
                                     title={item.title}
                                     content={item.content}
                                     snippet={item.snippet}
+                                    uuid={item.uuid}
                                     lineClamp={5}
                                     onClick={() => setCurrentPage('draft')} //点击后跳转回草稿
                                     {...item}

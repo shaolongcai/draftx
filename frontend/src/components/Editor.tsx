@@ -30,9 +30,8 @@ import PickerPlugin from "@/plugin/PickerPlugin";
 import { MathPlugin } from "@/plugin/MathPlugin";
 import { AutoPastePlugin } from "@/plugin/AutoPastePlugin";
 import { BlockTipPlugin } from "@/plugin/BlockTipPlugin";
-import AiPickerPlugin from "@/plugin/AIPickerPlugin";
-import { LoadingNode } from "@/nodes/LoadingNode";
 import { ConfigParams } from "@/type/electron";
+import { historyStack } from "@/utils/histroyStack";
 // import { useSettings } from '@/contexts/SettingContext';
 
 
@@ -65,7 +64,24 @@ const EditorContext: React.FC = () => {
 
     // 初始化
     useEffect(() => {
-        setCurrentUuid(uuidv4());
+        // 获取当前草稿uuid
+        // const uuid = localStorage.getItem('currentUuid');
+        // if (uuid) {
+        //     setCurrentUuid(uuid);
+        //     // 读取草稿
+
+        //     // 记录该草稿到草稿历史
+        // } else {
+        //     // 生成新的uuid
+        //     const newUuid = uuidv4();
+        //     setCurrentUuid(newUuid);
+        //     localStorage.setItem('currentUuid', newUuid);
+        // }
+
+        console.log('初始化')
+        // const newUuid = uuidv4();
+        // setCurrentUuid(newUuid);
+        // localStorage.setItem('currentUuid', newUuid);
         getGuideMemo();
     }, []);
 
@@ -81,6 +97,10 @@ const EditorContext: React.FC = () => {
         console.log('加载新的便利贴', sticky);
         // 刷新删除天数
         window.electronAPI.refreshDeleteDay(sticky.id);
+        // 保存当前的UUID
+        localStorage.setItem('currentUuid', sticky.uuid);
+        // 压栈
+        historyStack.push(sticky.uuid);
         // 清空编辑器内容
         editor.update(() => {
             const root = $getRoot();
@@ -104,10 +124,11 @@ const EditorContext: React.FC = () => {
     const getGuideMemo = async () => {
         // 是否完成引导
         const isFinishGuide = await window.electronAPI.getConfig('isFinishGuide')
-        console.log('isFinishGuide', isFinishGuide)
         if (!isFinishGuide) {
             //展示引导memo
             const guideMemo = await window.electronAPI.getGuideMemo()
+            // 压栈
+            historyStack.push(guideMemo.uuid);
             editor.update(() => {
                 const root = $getRoot();
                 root.clear();
@@ -130,9 +151,13 @@ const EditorContext: React.FC = () => {
 
     // 新建草稿
     const addNewDraft = () => {
+        const uuid = uuidv4();
+        // 添加到历史堆栈
+        historyStack.push(uuid);
         // 保存现在的内容
         scheduleSave(lastSavedRef.current);
-        setCurrentUuid(uuidv4());
+        localStorage.setItem('currentUuid', uuid);
+        setCurrentUuid(uuid);
         // 清空编辑器内容
         editor.update(() => {
             const root = $getRoot();
@@ -223,4 +248,3 @@ const EditorContext: React.FC = () => {
 
 
 export default EditorContext;
-

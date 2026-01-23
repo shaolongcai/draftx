@@ -140,6 +140,7 @@ export const deleteExpiredStickys = () => {
 
 /**
  * 获取UUID为guid 的便利贴
+ * @deprecated 使用 getDraftByUuid 替代
  */
 export const getGuideMemo = () => {
     try {
@@ -157,7 +158,26 @@ export const getGuideMemo = () => {
 }
 
 /**
+ * 通过UUID获取草稿
+ */
+export const getDraftByUuid = (uuid: string) => {
+    try {
+        const stmt = db.prepare(`
+            SELECT id, uuid, title, content, content_json, created_at, modified_at, deleted_at
+            FROM stickys
+            WHERE uuid = ?
+            LIMIT 1
+        `);
+        return stmt.get(uuid);
+    } catch (error) {
+        logger.error(error);
+        return null;
+    }
+}
+
+/**
  * 通过id获取便利贴
+ * @deprecated 使用 getStickyByUuid 替代
  */
 export const getStickyById = (id: number) => {
     try {

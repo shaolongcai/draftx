@@ -11,6 +11,7 @@ import {
 import { useEvent } from "@/contexts/EvenContext";
 import ChatInput from "./ChatInput";
 import { useKeyPress } from "ahooks";
+import { historyStack } from "@/utils/histroyStack";
 
 
 
@@ -19,18 +20,21 @@ interface ToolButtonProps {
     className?: string;
     tip?: string;
     onClick?: () => void;
+    disabled?: boolean;
 }
 // Icon按钮
 const ToolButton: React.FC<ToolButtonProps> = ({
     icon,
     className,
     tip,
-    onClick
+    onClick,
+    disabled = false,
 }) => {
     return (
         <Tooltip title={tip}>
             <IconButton size="small" className={`text-white ${className}`}
                 onClick={onClick}
+                disabled={disabled}
             >
                 {icon}
             </IconButton>
@@ -51,9 +55,10 @@ const ToolBar: React.FC<Props> = ({
 
     const [active, setActive] = useState(false);
     const [isChatMode, setIsChatMode] = useState(false);
+    const [historyVersion, setHistoryVersion] = useState(0); // 历史版本号，用于刷新按钮状态
 
     const inputRef = useRef<HTMLDivElement>(null);
-    const { handleOnclickTool$ } = useEvent();
+    const { handleOnclickTool$, loadStickys$ } = useEvent();
 
 
     // 快速开启chat
@@ -62,30 +67,68 @@ const ToolBar: React.FC<Props> = ({
         setIsChatMode(!isChatMode);
     })
 
+    // 前进快捷键
+    useKeyPress((e) => e.altKey && e.key === ']', (e) => {
+        e.preventDefault();
+        handleForwardOrBack('forward');
+    })
+
+    // 后退快捷键
+    useKeyPress((e) => e.altKey && e.key === '[', (e) => {
+        e.preventDefault();
+        handleForwardOrBack('back');
+    })
+
+    // 前进或后退草稿
+    const handleForwardOrBack = (type: 'forward' | 'back') => {
+        // 判断能否触发
+        const canTrigger = type === 'forward' ? historyStack.canForward() : historyStack.canBack();
+        if (!canTrigger) return
+        const uuid = type === 'forward' ? historyStack.forward() : historyStack.back();
+        // 获取下一个草稿
+        if (uuid) {
+            // 获取草稿详情
+            window.electronAPI.getDraftByUuid(uuid).then(draft => {
+                if (draft) {
+                    loadStickys$.emit({ ...draft, content: draft.content_json } as DraftResult)
+                }
+                // 如果已删掉，则跳过一个,并且把这个uuid从历史堆栈中删除
+                else {
+                    handleForwardOrBack(type);
+                    // 从历史堆栈中删除这个uuid
+                    historyStack.remove(uuid);
+                }
+            });
+        }
+    }
+
+    // 监听外部加载事件（如 Editor 新建草稿或加载列表），也需要刷新按钮状态
+    loadStickys$.useSubscription(() => {
+        setHistoryVersion(v => v + 1);
+    });
+
     // 获取工具栏按钮
     const toolButtons = useMemo<(ToolButtonProps | { isDivider: boolean })[]>(() => {
         const buttons: (ToolButtonProps | { isDivider: boolean })[] = [];
 
         // 开始配置toolbar
         if (currentPage === 'draft') {
+            // 回退到上一个草稿
             buttons.push({
-                icon: <BackIcon />,
+                icon: <BackIcon className={!historyStack.canBack() ? 'text-white/40!' : ''} />,
                 className: 'hover:bg-[#9F7207]/70',
-                tip: 'Back to the previous draft  (Alt + ⬅️)',
-                onClick: () => {
-                    // setCurrentPage('draft');
-                    // handleOnclickTool$.emit('backDraft');
-                },
+                disabled: !historyStack.canBack(),
+                tip: 'Back to the previous draft  (Alt + [)',
+                onClick: () => handleForwardOrBack('back'),
             });
 
+            // 前进到下一个草稿
             buttons.push({
-                icon: <ForwardIcon />,
+                icon: <ForwardIcon className={!historyStack.canForward() ? 'text-white/40!' : ''} />,
                 className: 'hover:bg-[#9F7207]/70',
-                tip: 'Forward to the next draft  (Alt + ➡️)',
-                onClick: () => {
-                    // setCurrentPage('draft');
-                    // handleOnclickTool$.emit('nextDraft');
-                },
+                disabled: !historyStack.canForward(),
+                tip: 'Forward to the next draft  (Alt + ])',
+                onClick: () => handleForwardOrBack('forward'),
             });
 
             buttons.push({
@@ -135,7 +178,7 @@ const ToolBar: React.FC<Props> = ({
         }
 
         return buttons;
-    }, [currentPage, setCurrentPage]);
+    }, [currentPage, setCurrentPage, historyVersion]);
 
 
     if (isChatMode) {
