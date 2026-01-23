@@ -27,7 +27,7 @@ const Update = () => {
                 console.log('有更新', res.message);
             } else {
                 console.log('无更新', res.message);
-                navigate('/draft');
+                navigate('/hotkeys');
             }
         }
         checkUpdate();

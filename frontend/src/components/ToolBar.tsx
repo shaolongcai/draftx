@@ -118,7 +118,7 @@ const ToolBar: React.FC<Props> = ({
                 icon: <BackIcon className={!historyStack.canBack() ? 'text-white/40!' : ''} />,
                 className: 'hover:bg-[#9F7207]/70',
                 disabled: !historyStack.canBack(),
-                tip: 'Back to the previous draft  (Alt + [)',
+                tip: 'Back to the previous draft  ( Alt + [ )',
                 onClick: () => handleForwardOrBack('back'),
             });
 
@@ -127,7 +127,7 @@ const ToolBar: React.FC<Props> = ({
                 icon: <ForwardIcon className={!historyStack.canForward() ? 'text-white/40!' : ''} />,
                 className: 'hover:bg-[#9F7207]/70',
                 disabled: !historyStack.canForward(),
-                tip: 'Forward to the next draft  (Alt + ])',
+                tip: 'Forward to the next draft  ( Alt + ] )',
                 onClick: () => handleForwardOrBack('forward'),
             });
 

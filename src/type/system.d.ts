@@ -1,7 +1,7 @@
 
 
 
-type ConfigName = 'isFinishGuide' | 'ai_provider' | 'autoLaunch' | 'licenseData';
+type ConfigName = 'isFinishGuide' | 'ai_provider' | 'autoLaunch' | 'licenseData' | 'currentUuid' | 'launchShortcut';
 
 
 
@@ -22,4 +22,6 @@ type UserConfig = {
     report_agreement: boolean;
     autoLaunch: boolean;
     ai_provider: string;
+    currentUuid: string;
+    launchShortcut: string;
 }

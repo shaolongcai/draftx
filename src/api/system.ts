@@ -23,6 +23,12 @@ export function initializeSystemApi() {
     // 设置配置
     ipcMain.handle('set-config', async (_event, key: ConfigType, value: any, type?: 'boolean' | 'string' | 'number') => {
         const config = setConfig(key, value, type);
+        console.log('注册的快捷键', value);
+        // 如果是设置快捷键，则重新注册
+        if (value === 'launchShortcut') {
+            const { registerGlobalShortcut } = await import('../main/main.js');
+            registerGlobalShortcut();
+        }
         return config;
     })
 

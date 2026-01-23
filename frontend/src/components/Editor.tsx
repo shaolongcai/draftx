@@ -64,24 +64,29 @@ const EditorContext: React.FC = () => {
 
     // 初始化
     useEffect(() => {
-        // 获取当前草稿uuid
-        // const uuid = localStorage.getItem('currentUuid');
-        // if (uuid) {
-        //     setCurrentUuid(uuid);
-        //     // 读取草稿
-
-        //     // 记录该草稿到草稿历史
-        // } else {
-        //     // 生成新的uuid
-        //     const newUuid = uuidv4();
-        //     setCurrentUuid(newUuid);
-        //     localStorage.setItem('currentUuid', newUuid);
-        // }
-
-        console.log('初始化')
-        // const newUuid = uuidv4();
-        // setCurrentUuid(newUuid);
-        // localStorage.setItem('currentUuid', newUuid);
+        const init = async () => {
+            // 获取当前草稿uuid
+            const uuid = await window.electronAPI.getConfig('currentUuid');
+            if (uuid) {
+                // 读取草稿
+                const draft = await window.electronAPI.getDraftByUuid(uuid)
+                console.log('读取缓存草稿', draft);
+                if (draft) {
+                    setCurrentUuid(uuid);
+                    // 解析草稿内容
+                    const initialEditorState = editor.parseEditorState(draft.content_json);
+                    editor.setEditorState(initialEditorState);
+                    // 记录该草稿到草稿历史
+                    historyStack.push(uuid);
+                    return
+                }
+            }
+            // 当前没有草稿，则生成新的uuid
+            const newUuid = uuidv4();
+            setCurrentUuid(newUuid);
+            window.electronAPI.setConfig({ key: 'currentUuid', value: newUuid, type: 'string' });
+        }
+        init()
         getGuideMemo();
     }, []);
 
@@ -97,8 +102,7 @@ const EditorContext: React.FC = () => {
         console.log('加载新的便利贴', sticky);
         // 刷新删除天数
         window.electronAPI.refreshDeleteDay(sticky.id);
-        // 保存当前的UUID
-        localStorage.setItem('currentUuid', sticky.uuid);
+        window.electronAPI.setConfig({ key: 'currentUuid', value: sticky.uuid, type: 'string' });
         // 压栈
         historyStack.push(sticky.uuid);
         // 清空编辑器内容
@@ -126,7 +130,7 @@ const EditorContext: React.FC = () => {
         const isFinishGuide = await window.electronAPI.getConfig('isFinishGuide')
         if (!isFinishGuide) {
             //展示引导memo
-            const guideMemo = await window.electronAPI.getGuideMemo()
+            const guideMemo = await window.electronAPI.getDraftByUuid('guide');
             // 压栈
             historyStack.push(guideMemo.uuid);
             editor.update(() => {
@@ -146,6 +150,7 @@ const EditorContext: React.FC = () => {
                 type: 'boolean'
             }
             window.electronAPI.setConfig(configParams)
+            window.electronAPI.setConfig({ key: 'currentUuid', value: guideMemo.uuid, type: 'string' });
         }
     }
 
@@ -156,7 +161,7 @@ const EditorContext: React.FC = () => {
         historyStack.push(uuid);
         // 保存现在的内容
         scheduleSave(lastSavedRef.current);
-        localStorage.setItem('currentUuid', uuid);
+        window.electronAPI.setConfig({ key: 'currentUuid', value: uuid, type: 'string' });
         setCurrentUuid(uuid);
         // 清空编辑器内容
         editor.update(() => {
@@ -203,18 +208,20 @@ const EditorContext: React.FC = () => {
     return <div className="scrollbar-thin!  rounded-xl h-full font-mono  leading-relaxed text-gray-700 ">
         <RichTextPlugin
             contentEditable={
-                <ContentEditable style={{
-                    width: '100%',
-                    maxHeight: 'calc(100vh - 64px)',
-                    minHeight: '240px',
-                    overflow: 'auto',
-                    outline: 'none',
-                    boxSizing: 'border-box',
-                    scrollbarColor: 'rgba(0, 0, 0, 0.5) transparent',
-                    scrollbarWidth: 'none',
-                    paddingBottom: '40px', // 增加底部內邊距，方便點擊跳出代碼塊
-                    // scrollbarColor: '#888 #f1f1f1',
-                }} />
+                <ContentEditable
+                    spellCheck={false}
+                    style={{
+                        width: '100%',
+                        maxHeight: 'calc(100vh - 64px)',
+                        minHeight: '240px',
+                        overflow: 'auto',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                        scrollbarColor: 'rgba(0, 0, 0, 0.5) transparent',
+                        scrollbarWidth: 'none',
+                        paddingBottom: '40px', // 增加底部內邊距，方便點擊跳出代碼塊
+                        // scrollbarColor: '#888 #f1f1f1',
+                    }} />
             }
             ErrorBoundary={LexicalErrorBoundary}
             placeholder={Placeholder}

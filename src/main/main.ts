@@ -48,14 +48,14 @@ export const sendToRenderer = (channel: ChannelType, data: any) => {
 };
 
 // 注册全局快捷键
-const registerGlobalShortcut = () => {
+export const registerGlobalShortcut = () => {
   globalShortcut.register('Escape', () => {
     mainWindow.hide();
     settingsWindow.hide();
   });
 
-  // 触发：显示/隐藏主窗口
-  const shortcut = getShortcut();
+  // 获取快捷键
+  const shortcut = getConfig('launchShortcut') as string;
   globalShortcut.register(shortcut, () => {
     settingsWindow.hide()
     // 触发：显示/隐藏主窗口

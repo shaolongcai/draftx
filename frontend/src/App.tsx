@@ -25,6 +25,7 @@ import { BlockTitleNode } from "@/nodes/BlockTitleNode";
 import { BlockTipNode } from "@/nodes/BlockTipNode";
 import { PasteNode } from "@/nodes/PasteNode";
 import { LoadingNode } from "@/nodes/LoadingNode";
+import HotkeysConfig from './pages/HotkeysConfig'
 
 function App() {
 
@@ -121,6 +122,8 @@ function App() {
                   />
                   {/* 更新提示 */}
                   <Route path='/' element={<Update />} />
+                  {/* 配置热键 */}
+                  <Route path='/hotkeys' element={<HotkeysConfig />} />
                 </Routes>
               </div>
             </HashRouter>
