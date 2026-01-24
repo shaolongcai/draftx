@@ -1,7 +1,8 @@
 import { Button, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNotifications } from "@toolpad/core/useNotifications";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { SettingTitle } from "@/components";
 
 
 const HotkeysConfig = () => {
@@ -9,16 +10,22 @@ const HotkeysConfig = () => {
 
     const notification = useNotifications();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
     // 检查是否已完成初始配置，检查热键配置
     useEffect(() => {
-        const init = async () => {
+        const checkConfig = async () => {
             const saved = await window.electronAPI.getConfig('launchShortcut');
             if (saved) {
                 setShortcut(saved);
+                // 需要检查是否已经设置,仅非设置页需要自动跳过
+                const from = searchParams.get('from');
+                if (from !== 'setting') {
+                    navigate('/draft');
+                }
             }
         }
-        init();
+        checkConfig();
     }, []);
 
     // 监听键盘按下
@@ -107,32 +114,60 @@ const HotkeysConfig = () => {
                 type: 'string'
             });
             notification.show('Shortcut saved successfully', { severity: 'success', autoHideDuration: 1200 });
-            // 根据上一个页面的来源判断跳转路径
-            const from = window.history.state?.from || '/';
-            console.log('from', from);
-            navigate(from === '/' ? '/draft' : '/settings'); // 设置页面进入的，保存后回到设置页面
+            // 根据参数判断跳转路径
+            const from = searchParams.get('from');
+            navigate(from === 'setting' ? '/' : '/draft'); // 设置页面进入的，保存后回到设置页面
         } catch (error) {
             console.error('Failed to save shortcut:', error);
             notification.show('Failed to save', { severity: 'error', autoHideDuration: 2000 });
         }
     };
 
+    // 系统保留快捷键列表
+    const reservedShortcuts = ['Alt+[', 'Alt+]', 'Alt+C', 'Alt+N'];
+    // 检查是否为保留快捷键（不区分大小写）
+    const isReserved = reservedShortcuts.some(s => s.toLowerCase() === shortcut.toLowerCase());
+
     return (
-        <Stack spacing={3} alignItems='center' justifyContent='center' className="h-screen pb-20">
-            <Typography variant='bodyLarge' fontWeight={700} textAlign='center'>
-                Press any key combination to set the launch shortcut
-            </Typography>
-            <Typography
-                variant='headlineMedium'
-                className="border-2 border-[#9F7207]  px-4 py-2 rounded-xl"
-            >
-                {formatShortcutForDisplay(shortcut)}
-            </Typography>
-            {/* 如果是系统保留键则标红 */}
-            <Button variant='contained' size='large' onClick={handleSave}>
-                完成设置
-            </Button>
-        </Stack>
+        <>
+            {
+                // 仅设置页面进入需要标题
+                searchParams.get('from') === 'setting' && (
+                    <SettingTitle title="Shortcut" />
+                )
+            }
+            <Stack spacing={3} alignItems='center' justifyContent='center' className="h-screen pb-20">
+                <Typography variant='bodyLarge' fontWeight={700} textAlign='center'>
+                    Press any key combination to set the launch shortcut
+                </Typography>
+                <Stack alignItems="center" spacing={1}>
+                    <Typography
+                        variant='headlineMedium'
+                        className={`border-2 px-4 py-2 rounded-xl transition-colors ${isReserved
+                            ? 'border-red-500 text-red-500 bg-red-50'
+                            : 'border-[#9F7207]'
+                            }`}
+                    >
+                        {formatShortcutForDisplay(shortcut)}
+                    </Typography>
+                    {isReserved && (
+                        <Typography variant="bodySmall" color="error" textAlign='center' >
+                            This is a system-reserved shortcut,<br /> please choose another one.
+                        </Typography>
+                    )}
+                </Stack>
+
+                <Button
+                    variant='contained'
+                    size='large'
+                    onClick={handleSave}
+                    disabled={isReserved}
+                    color={isReserved ? "error" : "primary"}
+                >
+                    Set Shortcut
+                </Button>
+            </Stack>
+        </>
     )
 }
 

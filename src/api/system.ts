@@ -25,7 +25,7 @@ export function initializeSystemApi() {
         const config = setConfig(key, value, type);
         console.log('注册的快捷键', value);
         // 如果是设置快捷键，则重新注册
-        if (value === 'launchShortcut') {
+        if (key === 'launchShortcut') {
             const { registerGlobalShortcut } = await import('../main/main.js');
             registerGlobalShortcut();
         }

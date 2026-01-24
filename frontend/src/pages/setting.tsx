@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom';
 const Setting = () => {
 
     const [aiProvider, setAiProvider] = useState<{ host: string, model: string }>() //是否已设置AI服务
-    const [openType, setOpenType] = useState<'AIProvider' | 'AITools' | 'AIconfig' | null>(null)  //打开的弹窗类型
+    const [shortcut, setShortcut] = useState('') //快捷键
     // 更新檢查相關狀態
     const [isUpdateAvailable, setIsUpdateAvailable] = useState(false)
     const [isCheckingUpdate, setIsCheckingUpdate] = useState(false)
@@ -44,6 +44,7 @@ const Setting = () => {
             console.log('config', res)
             setAutoLaunch(res.autoLaunch)
             setAiProvider(JSON.parse(res.ai_provider || '{}'))
+            setShortcut(res.launchShortcut || '')
         })
         // // 手动检查一次更新
         // manualCheckUpdate()
@@ -181,6 +182,13 @@ const Setting = () => {
                     value='Open'
                     onAction={() => window.electronAPI.openDir('runLog')}
                     type='button'
+                />
+                {/* 快捷键设置 */}
+                <SettingItem
+                    title='Shortcut'
+                    type='button'
+                    value={shortcut}
+                    onAction={() => navigate('/hotkeys?from=setting')}
                 />
                 {/* 用户体验计划 */}
                 {/* <SettingItem

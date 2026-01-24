@@ -10,6 +10,7 @@ import AITools from '@/pages/AITools';
 import AIToolConfig from '@/pages/AIToolConfig';
 import ProTips from '@/pages/ProTips';
 import ActivationCode from '@/pages/ActivationCode';
+import HotkeysConfig from './pages/HotkeysConfig';
 
 
 const APP = () => {
@@ -50,6 +51,7 @@ const APP = () => {
                         <Route path="/AIToolConfig" element={<AIToolConfig />} />
                         <Route path="/ActivationCode" element={<ActivationCode />} />
                         <Route path="/ProTips" element={<ProTips />} />
+                        <Route path="/hotkeys" element={<HotkeysConfig />} />
                     </Routes>
                     <div />
                 </div>

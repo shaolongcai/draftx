@@ -22,7 +22,7 @@ const isDev = process.env.NODE_ENV === 'development';
 
 
 // 根据平台与环境判断快捷键
-const getShortcut = () => {
+const getDefaultShortcut = () => {
   // 正式环境
   if (isMac && !isDev) {
     return 'Command+z';
@@ -35,6 +35,26 @@ const getShortcut = () => {
   }
 }
 
+// 获取快捷键标签
+const getShortcutLabel = () => {
+  // 获取配置键
+  let shortcut = getConfig('launchShortcut') as string;
+  if (!shortcut) {
+    shortcut = getDefaultShortcut();
+  }
+
+  // Mac 下格式化显示
+  if (isMac) {
+    return shortcut
+      .replace(/Command/g, '⌘')
+      .replace(/Control/g, '⌃')
+      .replace(/Alt/g, '⌥')
+      .replace(/Shift/g, '⇧')
+      .replace(/\+/g, ' ');
+  }
+
+  return shortcut;
+}
 
 
 // 广播事件到所有窗口
@@ -49,23 +69,88 @@ export const sendToRenderer = (channel: ChannelType, data: any) => {
 
 // 注册全局快捷键
 export const registerGlobalShortcut = () => {
+  // 先注销所有，防止重复
+  globalShortcut.unregisterAll();
+
   globalShortcut.register('Escape', () => {
     mainWindow.hide();
     settingsWindow.hide();
   });
 
   // 获取快捷键
-  const shortcut = getConfig('launchShortcut') as string;
-  globalShortcut.register(shortcut, () => {
-    settingsWindow.hide()
-    // 触发：显示/隐藏主窗口
-    if (mainWindow?.isVisible()) {
-      mainWindow.hide();
+  let shortcut = getConfig('launchShortcut') as string;
+  // 如果没有配置快捷键，则使用默认值
+  if (!shortcut) {
+    shortcut = getDefaultShortcut();
+  }
+
+  try {
+    const ret = globalShortcut.register(shortcut, () => {
+      settingsWindow.hide()
+      // 触发：显示/隐藏主窗口
+      if (mainWindow?.isVisible()) {
+        mainWindow.hide();
+      } else {
+        mainWindow?.show();
+        mainWindow?.focus();
+      }
+    });
+
+    if (!ret) {
+      logger.error(`注册快捷键失败: ${shortcut}`);
     } else {
-      mainWindow?.show();
-      mainWindow?.focus();
+      logger.info(`快捷键注册成功: ${shortcut}`);
+      // 更新托盘菜单的快捷键显示
+      updateTrayTitle();
     }
-  });
+  } catch (error) {
+    logger.error(`注册快捷键异常: ${error}`);
+  }
+}
+
+// 更新托盘菜单
+const updateTrayTitle = () => {
+  if (!tray) return;
+  try {
+    const contextMenu = Menu.buildFromTemplate([
+      {
+        label: `DraftX（ ${getShortcutLabel()} ）`,
+        click: () => {
+          const isVisible = mainWindow?.isVisible();
+          isVisible ? mainWindow.hide() : mainWindow.show();
+          mainWindow?.focus();
+        }
+      },
+      { type: 'separator' },
+      {
+        label: 'settings',
+        click: () => {
+          mainWindow?.hide();
+          settingsWindow?.focus();
+          const isVisible = settingsWindow?.isVisible();
+          isVisible ? settingsWindow?.hide() : settingsWindow?.show();
+        }
+      },
+      {
+        label: 'restart',
+        click: () => {
+          app.relaunch();
+          app.exit(0);
+        }
+      },
+      { type: 'separator' },
+      {
+        label: 'quit',
+        accelerator: 'CommandOrControl+Q',
+        click: () => {
+          app.quit();
+        }
+      }
+    ]);
+    tray.setContextMenu(contextMenu);
+  } catch (error) {
+    logger.error(`更新托盘菜单失败: ${error}`);
+  }
 }
 
 // 創建系統托盤
@@ -86,49 +171,9 @@ function createTray() {
     // 設置托盤提示文本
     // tray.setToolTip(t.tooltip);
 
-    // 創建托盤菜單
-    const contextMenu = Menu.buildFromTemplate([
-      {
-        label: `DraftX（${getShortcut()}）`,
-        click: () => {
-          const isVisible = mainWindow?.isVisible();
-          isVisible ? mainWindow.hide() : mainWindow.show();
-          mainWindow.focus();
-        }
-      },
-      {
-        type: 'separator'
-      },
-      {
-        label: 'settings',
-        click: () => {
-          mainWindow.hide();
-          settingsWindow.focus();
-          const isVisible = settingsWindow?.isVisible();
-          isVisible ? settingsWindow.hide() : settingsWindow.show();
-        }
-      },
-      {
-        label: 'restart',
-        click: () => {
-          // 重新啟動應用
-          app.relaunch();
-          app.exit(0);
-        }
-      },
-      {
-        type: 'separator'
-      },
-      {
-        label: 'quit',
-        accelerator: 'CommandOrControl+Q',
-        click: () => {
-          app.quit();
-        }
-      }
-    ]);
-    // 設置托盤菜單
-    tray.setContextMenu(contextMenu);
+    // 初始化托盘菜单
+    updateTrayTitle();
+
     // 雙擊托盤圖標顯示主窗口
     tray.on('double-click', () => {
       mainWindow?.show();
