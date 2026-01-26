@@ -163,14 +163,14 @@ const Setting = () => {
                         isPro ? navigate('/AIProvider') : navigate('/ProTips')
                     }}
                 />
-                <SettingItem
+                {/* <SettingItem
                     title='AI Tool (Pro)'
                     type='button'
                     value='SET'
                     onAction={() => {
                         isPro ? navigate('/AITools') : navigate('/ProTips')
                     }}
-                />
+                /> */}
             </Stack>
             <Stack spacing={1}>
                 <Typography variant='titleSmall' className='color-rgba(0, 0, 0, 0.85)' >
