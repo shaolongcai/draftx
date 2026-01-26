@@ -1,4 +1,16 @@
 import { app, BrowserWindow, nativeImage, Tray, globalShortcut, Menu } from 'electron';
+
+// 防止多开：必须在应用启动的最早阶段执行
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  // 获取锁失败，说明已有实例运行，直接退出
+  // 注意：此时 logger 可能还未初始化，直接用 console
+  console.log('应用已在运行，退出当前实例');
+  app.quit();
+  // 强制退出进程，不再执行后续代码
+  process.exit(0);
+}
+
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { getConfig, initializeDatabase, setConfig } from '../database/sqlite.js';
@@ -265,30 +277,21 @@ app.on('window-all-closed', () => {
   }
 });
 
-// 防止多开
-const gotTheLock = app.requestSingleInstanceLock();
-
-if (!gotTheLock) {
-  // 获取锁失败，说明已有实例运行，直接退出
-  logger.info('应用已在运行，退出当前实例(开发环境下忽略)');
-  process.env.NODE_ENV !== 'development' && app.quit();
-} else {
-  // 获取锁成功，监听 second-instance 事件
-  app.on('second-instance', () => {
-    // 若为开发环境则忽略多开
-    if (process.env.NODE_ENV === 'development') {
-      logger.info('开发环境，忽略多开限制');
-      return
-    }
-    logger.info('检测到第二个实例启动，激活现有窗口');
-    // 如果主窗口存在，显示并聚焦
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) mainWindow.restore();
-      if (!mainWindow.isVisible()) mainWindow.show();
-      mainWindow.focus();
-    }
-  });
-}
+// 获取锁成功，监听 second-instance 事件
+app.on('second-instance', () => {
+  // 若为开发环境则忽略多开
+  if (process.env.NODE_ENV === 'development') {
+    logger.info('开发环境，忽略多开限制');
+    return
+  }
+  logger.info('检测到第二个实例启动，激活现有窗口');
+  // 如果主窗口存在，显示并聚焦
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    if (!mainWindow.isVisible()) mainWindow.show();
+    mainWindow.focus();
+  }
+});
 
 app.on('will-quit', () => {
   globalShortcut.unregisterAll();
