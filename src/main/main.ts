@@ -59,10 +59,12 @@ const getShortcutLabel = () => {
   if (isMac) {
     return shortcut
       .replace(/Command/g, '⌘')
+      .replace(/Meta/g, '⌘')
+      .replace(/Ctrl/g, '⌃')
       .replace(/Control/g, '⌃')
       .replace(/Alt/g, '⌥')
       .replace(/Shift/g, '⇧')
-      .replace(/\+/g, ' ');
+    // .replace(/\+/g, ' ');
   }
 
   return shortcut;
@@ -291,6 +293,12 @@ app.on('second-instance', () => {
     if (!mainWindow.isVisible()) mainWindow.show();
     mainWindow.focus();
   }
+});
+
+app.on('before-quit', async () => {
+  // 标记为正在退出，允许窗口关闭
+  const { windowManager } = await import('../core/windowManager.js');
+  windowManager.isQuitting = true;
 });
 
 app.on('will-quit', () => {

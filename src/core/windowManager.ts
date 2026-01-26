@@ -19,6 +19,7 @@ class WindowManager {
     // 这里应该要私有化，提供get方法，暂时公开
     public mainWindow: BrowserWindow; //search 窗口
     public settingsWindow: BrowserWindow; //settings 窗口
+    public isQuitting: boolean = false; // 是否正在退出
 
 
     private constructor() {
@@ -82,6 +83,14 @@ class WindowManager {
                 }
             }
         });
+
+        // 拦截关闭事件：如果是Cmd+W或点击关闭按钮，只隐藏窗口而不销毁
+        this.mainWindow.on('close', (event) => {
+            if (!this.isQuitting) {
+                event.preventDefault();
+                this.mainWindow.hide();
+            }
+        });
     }
 
     // 初始化settings窗口
@@ -113,6 +122,14 @@ class WindowManager {
         });
 
         this.settingsWindow.webContents.on('before-input-event', this.disableDevTools);
+
+        // 拦截关闭事件
+        this.settingsWindow.on('close', (event) => {
+            if (!this.isQuitting) {
+                event.preventDefault();
+                this.settingsWindow.hide();
+            }
+        });
     }
 
     // 返回实例

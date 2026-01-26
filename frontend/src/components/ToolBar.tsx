@@ -59,22 +59,22 @@ const ToolBar: React.FC<Props> = ({
 
     const inputRef = useRef<HTMLDivElement>(null);
     const { handleOnclickTool$, loadStickys$ } = useEvent();
-
+    const isMac = window.electronUtils?.platform === 'darwin' || /macintosh|mac os x/i.test(navigator.userAgent);
 
     // 快速开启chat
-    useKeyPress('alt.c', () => {
+    useKeyPress(isMac ? 'meta.c' : 'alt.c', () => {
         inputRef.current?.focus();
         setIsChatMode(!isChatMode);
     })
 
     // 前进快捷键
-    useKeyPress((e) => e.altKey && e.key === ']', (e) => {
+    useKeyPress((e) => (isMac ? e.metaKey : e.altKey) && e.key === ']', (e) => {
         e.preventDefault();
         handleForwardOrBack('forward');
     })
 
     // 后退快捷键
-    useKeyPress((e) => e.altKey && e.key === '[', (e) => {
+    useKeyPress((e) => (isMac ? e.metaKey : e.altKey) && e.key === '[', (e) => {
         e.preventDefault();
         handleForwardOrBack('back');
     })
@@ -118,7 +118,7 @@ const ToolBar: React.FC<Props> = ({
                 icon: <BackIcon className={!historyStack.canBack() ? 'text-white/40!' : ''} />,
                 className: 'hover:bg-[#9F7207]/70',
                 disabled: !historyStack.canBack(),
-                tip: 'Back to the previous draft  ( Alt + [ )',
+                tip: isMac ? 'Back to the previous draft  ( ⌘ + [ )' : 'Back to the previous draft  ( Alt + [ )',
                 onClick: () => handleForwardOrBack('back'),
             });
 
@@ -127,7 +127,7 @@ const ToolBar: React.FC<Props> = ({
                 icon: <ForwardIcon className={!historyStack.canForward() ? 'text-white/40!' : ''} />,
                 className: 'hover:bg-[#9F7207]/70',
                 disabled: !historyStack.canForward(),
-                tip: 'Forward to the next draft  ( Alt + ] )',
+                tip: isMac ? 'Forward to the next draft  ( ⌘ + ] )' : 'Forward to the next draft  ( Alt + ] )',
                 onClick: () => handleForwardOrBack('forward'),
             });
 
@@ -140,7 +140,7 @@ const ToolBar: React.FC<Props> = ({
         buttons.push({
             icon: <AddIcon />,
             className: 'hover:bg-[#9F7207]/70',
-            tip: 'Add a new draft  (Alt + N)',
+            tip: isMac ? 'Add a new draft  ( ⌘ + N )' : 'Add a new draft  ( Alt + N )',
             onClick: () => {
                 setCurrentPage('draft');
                 handleOnclickTool$.emit('addDraft');
@@ -172,13 +172,13 @@ const ToolBar: React.FC<Props> = ({
             buttons.push({
                 icon: <AIChatIcon />,
                 className: 'hover:bg-[#9F7207]/70',
-                tip: 'Chat with AI (Alt + C)',
+                tip: isMac ? 'Chat with AI (⌘ + C)' : 'Chat with AI (Alt + C)',
                 onClick: () => setIsChatMode(true),
             });
         }
 
         return buttons;
-    }, [currentPage, setCurrentPage, historyVersion]);
+    }, [currentPage, setCurrentPage, historyVersion, isMac]);
 
 
     if (isChatMode) {

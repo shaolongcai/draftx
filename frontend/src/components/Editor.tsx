@@ -60,7 +60,7 @@ const EditorContext: React.FC = () => {
     const [editor] = useLexicalComposerContext()
     const { loadStickys$, handleOnclickTool$ } = useEvent();
     const notification = useNotifications();
-    const isMac = window.electronUtils?.platform === 'darwin' || /macintosh|mac os x/i.test(navigator.userAgent);
+    const isMac = window.electronUtils?.platform === 'darwin' || /macintosh|mac os x/i.test(navigator.userAgent); //考虑放到context中
 
     // 初始化
     useEffect(() => {

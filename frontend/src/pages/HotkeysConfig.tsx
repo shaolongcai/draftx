@@ -37,7 +37,7 @@ const HotkeysConfig = () => {
             const keys: string[] = [];
             // 处理修饰键
             if (e.ctrlKey) keys.push('Ctrl');
-            if (e.metaKey) keys.push('Meta');
+            if (e.metaKey) keys.push('Meta'); // Electron globalShortcut uses 'Command' or 'Cmd' on Mac, 'Super' on Linux, 'Meta' is DOM. We store 'Meta' or 'Command'? Electron prefers 'Command' for Mac.
             if (e.shiftKey) keys.push('Shift');
             if (e.altKey) keys.push('Alt');
 
@@ -48,6 +48,20 @@ const HotkeysConfig = () => {
             if (['CONTROL', 'SHIFT', 'ALT', 'META'].includes(key)) {
                 key = '';
             }
+
+            // Fix: 当按下Option(Alt)键时，e.key会变成特殊字符(如π, œ等)，需要使用e.code来获取物理按键
+            // 另外，Mac下Option+I/N/E会产生'Dead'键，也需要通过code处理
+            // "ß".toUpperCase() ( 大写 )的结果是 "SS" （两个字符），所以会跳过这里的处理，需要直接使用e.key
+            if ((e.altKey && e.key.length === 1) || key === 'DEAD') {
+                // e.code 通常是 'KeyS', 'Digit1' 等格式
+                if (e.code.startsWith('Key')) {
+                    key = e.code.replace('Key', '').toUpperCase();
+                } else if (e.code.startsWith('Digit')) {
+                    key = e.code.replace('Digit', '');
+                }
+                // 其他情况暂时保持原样或继续处理
+            }
+
 
             // 特殊键映射
             const keyMap: Record<string, string> = {
@@ -76,7 +90,12 @@ const HotkeysConfig = () => {
             }
 
             if (key) {
-                keys.push(key);
+                // 如果已经存在该键（例如修饰键），则不重复添加
+                // 也要检查 keys 中是否已经有相同的字符（比如 Alt+S 场景下，keys里可能有 'Alt'，但不能再有 'S' 如果之前误判了）
+                // 这里主要是防止 key 本身已经在 keys 里了
+                if (!keys.includes(key)) {
+                    keys.push(key);
+                }
             }
 
             // 去重（防止修饰键被重复添加）
@@ -97,12 +116,16 @@ const HotkeysConfig = () => {
         const isMac = window.electronUtils?.platform === 'darwin' || /macintosh|mac os x/i.test(navigator.userAgent);
         if (!isMac) return shortcutStr;
 
+        // Electron globalShortcut format vs Display format
+        // Input: "Meta+Shift+S" or "Alt+Z"
+
         return shortcutStr
+            .replace(/Meta/g, '⌘') // 1. Meta -> ⌘
             .replace(/Command/g, '⌘')
-            .replace(/Control/g, '⌃')
+            .replace(/Ctrl/g, '⌃')
             .replace(/Alt/g, '⌥')
             .replace(/Shift/g, '⇧')
-            .replace(/\+/g, ' '); // Mac shortcuts usually don't use + separator in display
+        // .replace(/\+/g, ' '); // 3. 移除这行，保留 + 号链接组合键
     };
 
     // 点击保存
