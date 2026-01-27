@@ -2,6 +2,7 @@ import { createCommand, LexicalCommand, $getSelection, $isRangeSelection, $creat
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useEffect } from 'react';
 import { $createHorizontalRuleNode } from '@/nodes/HorizontalRuleNode';
+import { $createBlockTipNode } from "@/nodes/BlockTipNode";
 
 export const RANDOM_COMMAND: LexicalCommand<undefined> = createCommand('RANDOM_COMMAND')
 
@@ -52,7 +53,15 @@ export default function RandomPlugin(): null {
 
                 console.log('所有段落', candidates);
 
-                if (candidates.length === 0) return true;
+                if (candidates.length === 0) {
+                    // 插入一个引导的段落
+                    const p = $createParagraphNode();
+                    // const text = $createTextNode('请先在段落中添加文字');
+                    const tip = $createBlockTipNode('Please add some text to a paragraph first');
+                    p.append(tip);
+                    $insertNodes([p]);
+                    return true;
+                };
 
                 // 3. 在刚才找到的段落，随机找到一个
                 const randomNode = candidates[Math.floor(Math.random() * candidates.length)];
