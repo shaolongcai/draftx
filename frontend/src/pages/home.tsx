@@ -7,7 +7,7 @@ import { ListItemNode, ListNode } from '@lexical/list';
 import { AutoLinkNode, LinkNode } from '@lexical/link';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { CodeHighlightNode, CodeNode } from '@lexical/code';
-import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
+import { HorizontalRuleNode } from '@/nodes/HorizontalRuleNode';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 import dayjs from "dayjs";
 import { theme } from "@/theme/editorTheme";

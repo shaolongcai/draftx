@@ -1,16 +1,4 @@
 import { app, BrowserWindow, nativeImage, Tray, globalShortcut, Menu } from 'electron';
-
-// 防止多开：必须在应用启动的最早阶段执行
-const gotTheLock = app.requestSingleInstanceLock();
-if (!gotTheLock) {
-  // 获取锁失败，说明已有实例运行，直接退出
-  // 注意：此时 logger 可能还未初始化，直接用 console
-  console.log('应用已在运行，退出当前实例');
-  app.quit();
-  // 强制退出进程，不再执行后续代码
-  process.exit(0);
-}
-
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { getConfig, initializeDatabase, setConfig } from '../database/sqlite.js';
@@ -31,6 +19,17 @@ let tray: Tray | null = null;
 let mainWindow: BrowserWindow | null;
 let settingsWindow: BrowserWindow | null;
 const isDev = process.env.NODE_ENV === 'development';
+
+// 防止多开：必须在应用启动的最早阶段执行
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock && !isDev) {
+  // 获取锁失败，说明已有实例运行，直接退出(开发环境忽略)
+  // 注意：此时 logger 可能还未初始化，直接用 console
+  logger.warn('应用已在运行，退出当前实例');
+  app.quit();
+  // 强制退出进程，不再执行后续代码
+  process.exit(0);
+}
 
 
 // 根据平台与环境判断快捷键
@@ -59,12 +58,10 @@ const getShortcutLabel = () => {
   if (isMac) {
     return shortcut
       .replace(/Command/g, '⌘')
-      .replace(/Meta/g, '⌘')
-      .replace(/Ctrl/g, '⌃')
       .replace(/Control/g, '⌃')
       .replace(/Alt/g, '⌥')
       .replace(/Shift/g, '⇧')
-    // .replace(/\+/g, ' ');
+      .replace(/\+/g, ' ');
   }
 
   return shortcut;
@@ -137,7 +134,7 @@ const updateTrayTitle = () => {
       },
       { type: 'separator' },
       {
-        label: 'settings',
+        label: 'Settings',
         click: () => {
           mainWindow?.hide();
           settingsWindow?.focus();
@@ -146,7 +143,7 @@ const updateTrayTitle = () => {
         }
       },
       {
-        label: 'restart',
+        label: 'Restart',
         click: () => {
           app.relaunch();
           app.exit(0);
@@ -154,7 +151,7 @@ const updateTrayTitle = () => {
       },
       { type: 'separator' },
       {
-        label: 'quit',
+        label: 'Quit',
         accelerator: 'CommandOrControl+Q',
         click: () => {
           app.quit();
@@ -293,12 +290,6 @@ app.on('second-instance', () => {
     if (!mainWindow.isVisible()) mainWindow.show();
     mainWindow.focus();
   }
-});
-
-app.on('before-quit', async () => {
-  // 标记为正在退出，允许窗口关闭
-  const { windowManager } = await import('../core/windowManager.js');
-  windowManager.isQuitting = true;
 });
 
 app.on('will-quit', () => {

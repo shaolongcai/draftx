@@ -39,7 +39,9 @@ import {
     autoPaste as AutoPasteIcon,
     calculator as CalculatorIcon,
     paragraph as ParagraphIcon,
+    random as RandomIcon,
 } from '@/assets/icons/editIcon'
+import { RANDOM_COMMAND } from './RandomPlugin';
 
 
 class ComponentPickerOption extends MenuOption {
@@ -109,6 +111,15 @@ function getBaseOptions(editor: LexicalEditor) {
                         $setBlocksType(selection, () => $createParagraphNode());
                     }
                 })
+            }
+        }),
+        new ComponentPickerOption('Random', {
+            icon: RandomIcon,
+            keywords: ['Random', '随机'],
+            onSelect: () => {
+                editor.update(() => {
+                    editor.dispatchCommand(RANDOM_COMMAND, undefined);
+                });
             }
         }),
         new ComponentPickerOption('Calculator', {

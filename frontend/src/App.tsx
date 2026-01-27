@@ -17,7 +17,7 @@ import { ListItemNode, ListNode } from '@lexical/list';
 import { AutoLinkNode, LinkNode } from '@lexical/link';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { CodeHighlightNode, CodeNode } from '@lexical/code';
-import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
+import { HorizontalRuleNode } from '@/nodes/HorizontalRuleNode';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 import { MathNode } from "@/nodes/MathNode";
 import { MathItemNode } from "@/nodes/MathItemNode";
@@ -66,7 +66,7 @@ function App() {
       MathNode,
       MathItemNode,
       PasteNode,
-      LoadingNode
+      LoadingNode,
     ],
   };
 
