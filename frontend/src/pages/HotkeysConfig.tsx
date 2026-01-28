@@ -21,7 +21,7 @@ const HotkeysConfig = () => {
                 // 需要检查是否已经设置,仅非设置页需要自动跳过
                 const from = searchParams.get('from');
                 if (from !== 'setting') {
-                    navigate('/draft');
+                    navigate('/');
                 }
             }
         }
@@ -139,7 +139,7 @@ const HotkeysConfig = () => {
             notification.show('Shortcut saved successfully', { severity: 'success', autoHideDuration: 1200 });
             // 根据参数判断跳转路径
             const from = searchParams.get('from');
-            navigate(from === 'setting' ? '/' : '/draft'); // 设置页面进入的，保存后回到设置页面
+            navigate(from === 'setting' ? '/' : '/'); // 设置页面进入的，保存后回到设置页面
         } catch (error) {
             console.error('Failed to save shortcut:', error);
             notification.show('Failed to save', { severity: 'error', autoHideDuration: 2000 });

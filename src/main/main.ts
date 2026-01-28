@@ -3,12 +3,15 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { getConfig, initializeDatabase, setConfig } from '../database/sqlite.js';
 import { initializeDraftApi } from '../api/draft.js';
-import { deleteExpiredStickys, getAITools, getGuideMemo, saveAITool, saveStickyNote } from '../database/repositories.js';
+import { deleteExpiredStickys, getAITools, getDraftByUuid, getGuideMemo, saveAITool, saveStickyNote } from '../database/repositories.js';
 import { initializeSystemApi } from '../api/system.js';
 import { logger } from '../core/logger.js';
 import { GuidJson, GuidContent } from '../data/data.js';
 import { initializeAIApi } from '../api/ai.js';
 import { initializeUpdateApi } from '../api/update.js';
+import { reportErrorToWechat } from '../units/report.js';
+import pkg from 'node-machine-id';
+const { machineId } = pkg;
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -83,10 +86,10 @@ export const registerGlobalShortcut = () => {
   // 先注销所有，防止重复
   globalShortcut.unregisterAll();
 
-  globalShortcut.register('Escape', () => {
-    mainWindow.hide();
-    settingsWindow.hide();
-  });
+  // globalShortcut.register('Escape', () => {
+  //   mainWindow.hide();
+  //   settingsWindow.hide();
+  // });
 
   // 获取快捷键
   let shortcut = getConfig('launchShortcut') as string;
@@ -197,10 +200,16 @@ function createTray() {
 
 
 // 初始化引导的memo
-const initializeGuideMemo = () => {
+const initializeGuideMemo = async () => {
   //查询是否已经有引导memo
-  const guideMemo = getGuideMemo();
+  const guideMemo = getDraftByUuid('guide');
   if (!guideMemo) {
+    // 初始化时，发送消息到企业微信
+    const id = await machineId(true);
+    reportErrorToWechat({
+      类型: '新增一个用户',
+      机器码: id,
+    })
     // 没有引导memo，创建一个
     saveStickyNote({
       uuid: 'guide',
@@ -295,5 +304,3 @@ app.on('second-instance', () => {
 app.on('will-quit', () => {
   globalShortcut.unregisterAll();
 });
-
-

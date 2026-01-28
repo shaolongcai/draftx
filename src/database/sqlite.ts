@@ -87,9 +87,9 @@ const convertValue = (value: string, type: string): any => {
 /**
  * 获取配置值
  * @param key 配置键名
- * @returns 配置值，如果不存在返回null
+ * @returns 配置值，根据类型会自动转换为对应类型
  */
-export function getConfig(key?: ConfigName): UserConfig | string {
+export function getConfig(key?: ConfigName): UserConfig | string | boolean | null {
     try {
         const db = getDatabase()
         let result: any | undefined
@@ -134,7 +134,7 @@ export function getConfig(key?: ConfigName): UserConfig | string {
 export function setConfig(key: ConfigName, value: any, type: 'boolean' | 'string' | 'number' | 'json' = 'string'): boolean {
     try {
         const db = getDatabase()
-        let configValue: string
+        let configValue: string // 建表的时候这个值就是字符串
 
         // 根据类型转换值为字符串
         switch (type) {

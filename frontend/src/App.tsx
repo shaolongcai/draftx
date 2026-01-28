@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react'
-import { useRequest, useSize } from 'ahooks'
+import { useState, useRef } from 'react'
+import { useSize } from 'ahooks'
 import './App.css'
 import { Stack, ThemeProvider } from '@mui/material'
 import { theme } from './theme'
@@ -26,6 +26,7 @@ import { BlockTipNode } from "@/nodes/BlockTipNode";
 import { PasteNode } from "@/nodes/PasteNode";
 import { LoadingNode } from "@/nodes/LoadingNode";
 import HotkeysConfig from './pages/HotkeysConfig'
+import ImproveTips from './pages/ImproveTips'
 
 function App() {
 
@@ -104,7 +105,7 @@ function App() {
             `}</style>
                 <Routes>
                   {/* 首页 */}
-                  <Route path='/draft'
+                  <Route path='/'
                     element={<>
                       <div className={`${currentPage === 'draft' ? '' : 'hidden'}`}>
                         <Home />
@@ -121,9 +122,11 @@ function App() {
                     </>}
                   />
                   {/* 更新提示 */}
-                  <Route path='/' element={<Update />} />
+                  {/* <Route path='/' element={<Update />} /> */}
                   {/* 配置热键 */}
                   <Route path='/hotkeys' element={<HotkeysConfig />} />
+                  {/* 提升体验提示 */}
+                  <Route path='/improveTips' element={<ImproveTips />} />
                 </Routes>
               </div>
             </HashRouter>

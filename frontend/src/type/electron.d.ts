@@ -9,7 +9,7 @@ type StickyParmas = {
 }
 
 // 配置类型
-type ConfigType = 'isFinishGuide' | 'ai_provider' | 'licenseData' | 'currentUuid' | 'launchShortcut'
+type ConfigType = 'isFinishGuide' | 'ai_provider' | 'licenseData' | 'currentUuid' | 'launchShortcut' | 'report_agreement'
 // 配置参数
 export type ConfigParams = {
     key: ConfigType;
