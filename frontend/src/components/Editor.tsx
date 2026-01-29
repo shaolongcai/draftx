@@ -33,6 +33,7 @@ import { BlockTipPlugin } from "@/plugin/BlockTipPlugin";
 import { ConfigParams } from "@/type/electron";
 import { historyStack } from "@/utils/histroyStack";
 import RandomPlugin from "@/plugin/RandomPlugin";
+import { CalculatePlugin } from "@/plugin/CalculatePlugin";
 // import { useSettings } from '@/contexts/SettingContext';
 
 
@@ -240,10 +241,11 @@ const EditorContext: React.FC = () => {
         <MermaidPlugin />
         <PickerPlugin />
         {/* <AiPickerPlugin /> */}
+        <CalculatePlugin />
         <RandomPlugin />
         <TabFocusPlugin />
         <CheckListPlugin />
-        <MathPlugin />
+        {/* <MathPlugin /> */}
         <AutoPastePlugin />
         <BlockTipPlugin />
         <OnChangePlugin onChange={(editorState) => {

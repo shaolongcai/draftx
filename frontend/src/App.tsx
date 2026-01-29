@@ -27,6 +27,7 @@ import { PasteNode } from "@/nodes/PasteNode";
 import { LoadingNode } from "@/nodes/LoadingNode";
 import HotkeysConfig from './pages/HotkeysConfig'
 import ImproveTips from './pages/ImproveTips'
+import { CaluResultNode } from './nodes/CaluResultNode'
 
 function App() {
 
@@ -68,6 +69,7 @@ function App() {
       MathItemNode,
       PasteNode,
       LoadingNode,
+      CaluResultNode,
     ],
   };
 
