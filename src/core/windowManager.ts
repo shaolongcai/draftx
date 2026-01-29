@@ -123,7 +123,7 @@ class WindowManager {
 
         this.settingsWindow.webContents.on('before-input-event', this.disableDevTools);
 
-        // 拦截关闭事件
+        // 拦截关闭事件 （是为了防止mac os concrlt+w 直接关闭）
         this.settingsWindow.on('close', (event) => {
             if (!this.isQuitting) {
                 event.preventDefault();

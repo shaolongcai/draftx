@@ -21,6 +21,7 @@ const isMac = process.platform === 'darwin';
 let tray: Tray | null = null;
 let mainWindow: BrowserWindow | null;
 let settingsWindow: BrowserWindow | null;
+let appWindowManager: any = null; // 临时增加，用于正式退出
 const isDev = process.env.NODE_ENV === 'development';
 
 // 防止多开：必须在应用启动的最早阶段执行
@@ -268,6 +269,7 @@ const initializeUserConfig = () => {
 app.whenReady().then(async () => {
   // 准备窗口
   const { windowManager } = await import('../core/windowManager.js');
+  appWindowManager = windowManager;
   mainWindow = windowManager.mainWindow;
   settingsWindow = windowManager.settingsWindow;
   // 初始化数据库
@@ -298,11 +300,13 @@ app.whenReady().then(async () => {
   deleteExpiredStickys();
 });
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
+// 为了解决macOS上的cltr+w 的关闭问题导致没有主体的问题
+// app.on('window-all-closed', () => {
+//   console.log('window-all-closed');
+//   if (process.platform !== 'darwin') {
+//     app.quit();
+//   }
+// });
 
 // 获取锁成功，监听 second-instance 事件
 app.on('second-instance', () => {
@@ -317,6 +321,12 @@ app.on('second-instance', () => {
     if (mainWindow.isMinimized()) mainWindow.restore();
     if (!mainWindow.isVisible()) mainWindow.show();
     mainWindow.focus();
+  }
+});
+
+app.on('before-quit', () => {
+  if (appWindowManager) {
+    appWindowManager.isQuitting = true;
   }
 });
 
