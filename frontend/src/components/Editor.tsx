@@ -34,6 +34,7 @@ import { ConfigParams } from "@/type/electron";
 import { historyStack } from "@/utils/histroyStack";
 import RandomPlugin from "@/plugin/RandomPlugin";
 import { CalculatePlugin } from "@/plugin/CalculatePlugin";
+import { $isHeadingNode } from "@lexical/rich-text";
 // import { useSettings } from '@/contexts/SettingContext';
 
 
@@ -251,8 +252,19 @@ const EditorContext: React.FC = () => {
         <OnChangePlugin onChange={(editorState) => {
             // 获取纯文本内容
             const plain = editorState.read(() => $getRoot().getTextContent());
+            // 获取标题
+            const title = editorState.read(() => {
+                const root = $getRoot();
+                // 遍历根节点的子节点，寻找第一个 h1
+                const children = root.getChildren();
+                for (const child of children) {
+                    if ($isHeadingNode(child) && child.getTag() === 'h1') {
+                        return child.getTextContent();
+                    }
+                }
+            });
             const json = editorState.toJSON();
-            scheduleSave({ contentJson: JSON.stringify(json), contentText: plain });
+            scheduleSave({ contentJson: JSON.stringify(json), contentText: plain, title });
         }} />
     </div>
 }
