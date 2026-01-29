@@ -41,7 +41,6 @@ import {
     paragraph as ParagraphIcon,
     random as RandomIcon,
 } from '@/assets/icons/editIcon'
-import { RANDOM_COMMAND } from './RandomPlugin';
 
 
 class ComponentPickerOption extends MenuOption {
@@ -113,24 +112,24 @@ function getBaseOptions(editor: LexicalEditor) {
                 })
             }
         }),
-        new ComponentPickerOption('Random', {
-            icon: RandomIcon,
-            keywords: ['Random', '随机'],
-            onSelect: () => {
-                editor.update(() => {
-                    editor.dispatchCommand(RANDOM_COMMAND, undefined);
-                });
-            }
-        }),
-        new ComponentPickerOption('Calculator', {
-            icon: CalculatorIcon,
-            keywords: ['Calculator', 'Math', '计算', '计数'],
-            onSelect: () => {
-                editor.update(() => {
-                    editor.dispatchCommand(OPEN_CALCULATOR_COMMAND, undefined);
-                });
-            }
-        }),
+        // new ComponentPickerOption('Random', {
+        //     icon: RandomIcon,
+        //     keywords: ['Random', '随机'],
+        //     onSelect: () => {
+        //         editor.update(() => {
+        //             editor.dispatchCommand(RANDOM_COMMAND, undefined);
+        //         });
+        //     }
+        // }),
+        // new ComponentPickerOption('Calculator', {
+        //     icon: CalculatorIcon,
+        //     keywords: ['Calculator', 'Math', '计算', '计数'],
+        //     onSelect: () => {
+        //         editor.update(() => {
+        //             editor.dispatchCommand(OPEN_CALCULATOR_COMMAND, undefined);
+        //         });
+        //     }
+        // }),
         new ComponentPickerOption('Auto paste', {
             icon: AutoPasteIcon,
             keywords: ['paste', '自动粘贴'],
