@@ -6,7 +6,7 @@ import { initializeDraftApi } from '../api/draft.js';
 import { deleteExpiredStickys, getAITools, getDraftByUuid, getGuideMemo, saveAITool, saveStickyNote } from '../database/repositories.js';
 import { initializeSystemApi } from '../api/system.js';
 import { logger } from '../core/logger.js';
-import { GuidJson, GuidContent } from '../data/data.js';
+import { GuidJson, GuidContent, UpdateContent, UpdateJson } from '../data/data.js';
 import { initializeAIApi } from '../api/ai.js';
 import { initializeUpdateApi } from '../api/update.js';
 import { reportErrorToWechat } from '../units/report.js';
@@ -219,6 +219,25 @@ const initializeGuideMemo = async () => {
   }
 }
 
+// 初始化更新说明草稿
+const initializeUpdateDraft = async () => {
+  // 查询当前版本
+  const currentVersion = app.getVersion();
+  logger.info(`当前版本: ${currentVersion}`);
+  const version = getConfig('version') as string;
+  // 如果版本号相同，则不需要修改更新说明
+  if (version === currentVersion) {
+    return;
+  }
+  saveStickyNote({
+    uuid: 'update',
+    content: UpdateContent,
+    contentJson: JSON.stringify(UpdateJson),
+  });
+}
+
+
+
 // 初始化AI工具
 const initializeAITool = () => {
   // 检查是否有AI配置
@@ -246,7 +265,6 @@ const initializeUserConfig = () => {
 }
 
 
-
 app.whenReady().then(async () => {
   // 准备窗口
   const { windowManager } = await import('../core/windowManager.js');
@@ -268,9 +286,10 @@ app.whenReady().then(async () => {
   if (process.platform === 'darwin') {
     app.dock.hide();
   }
-
   // 初始化引导memo
   initializeGuideMemo()
+  // 初始化更新说明草稿
+  initializeUpdateDraft()
   // 初始化AI工具
   initializeAITool()
   // 初始化用户配置

@@ -9,7 +9,7 @@ type StickyParmas = {
 }
 
 // 配置类型
-type ConfigType = 'isFinishGuide' | 'ai_provider' | 'licenseData' | 'currentUuid' | 'launchShortcut' | 'report_agreement'
+type ConfigType = 'isFinishGuide' | 'ai_provider' | 'licenseData' | 'currentUuid' | 'launchShortcut' | 'report_agreement' | 'version'
 // 配置参数
 export type ConfigParams = {
     key: ConfigType;
@@ -46,6 +46,11 @@ interface ElectronAPI {
      * 变更窗口大小
      */
     resizeWindow: (windowName: 'mainWindow' | 'settingsWindow', size: { width: number, height: number }) => Promise<void>;
+
+    /**
+     * 获取应用版本
+     */
+    getAppVersion: () => Promise<string>;
 
     /**
      * 获取配置

@@ -101,4 +101,9 @@ export function initializeSystemApi() {
     ipcMain.handle('verify-license', async () => {
         return await verifyLicense();
     })
+
+    // 获取应用版本
+    ipcMain.handle('get-app-version', () => {
+        return app.getVersion();
+    });
 }
