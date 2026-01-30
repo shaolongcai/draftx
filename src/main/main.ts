@@ -1,26 +1,17 @@
 import { app, BrowserWindow, nativeImage, Tray, globalShortcut, Menu } from 'electron';
-
-// 防止多开：必须在应用启动的最早阶段执行
-const gotTheLock = app.requestSingleInstanceLock();
-if (!gotTheLock) {
-  // 获取锁失败，说明已有实例运行，直接退出
-  // 注意：此时 logger 可能还未初始化，直接用 console
-  console.log('应用已在运行，退出当前实例');
-  app.quit();
-  // 强制退出进程，不再执行后续代码
-  process.exit(0);
-}
-
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { getConfig, initializeDatabase, setConfig } from '../database/sqlite.js';
 import { initializeDraftApi } from '../api/draft.js';
-import { deleteExpiredStickys, getAITools, getGuideMemo, saveAITool, saveStickyNote } from '../database/repositories.js';
+import { deleteExpiredStickys, getAITools, getDraftByUuid, getGuideMemo, saveAITool, saveStickyNote } from '../database/repositories.js';
 import { initializeSystemApi } from '../api/system.js';
 import { logger } from '../core/logger.js';
-import { GuidJson, GuidContent } from '../data/data.js';
+import { GuidJson, GuidContent, UpdateContent, UpdateJson } from '../data/data.js';
 import { initializeAIApi } from '../api/ai.js';
 import { initializeUpdateApi } from '../api/update.js';
+import { reportErrorToWechat } from '../units/report.js';
+import pkg from 'node-machine-id';
+const { machineId } = pkg;
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -30,7 +21,19 @@ const isMac = process.platform === 'darwin';
 let tray: Tray | null = null;
 let mainWindow: BrowserWindow | null;
 let settingsWindow: BrowserWindow | null;
+let appWindowManager: any = null; // 临时增加，用于正式退出
 const isDev = process.env.NODE_ENV === 'development';
+
+// 防止多开：必须在应用启动的最早阶段执行
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock && !isDev) {
+  // 获取锁失败，说明已有实例运行，直接退出(开发环境忽略)
+  // 注意：此时 logger 可能还未初始化，直接用 console
+  logger.warn('应用已在运行，退出当前实例');
+  app.quit();
+  // 强制退出进程，不再执行后续代码
+  process.exit(0);
+}
 
 
 // 根据平台与环境判断快捷键
@@ -59,12 +62,10 @@ const getShortcutLabel = () => {
   if (isMac) {
     return shortcut
       .replace(/Command/g, '⌘')
-      .replace(/Meta/g, '⌘')
-      .replace(/Ctrl/g, '⌃')
       .replace(/Control/g, '⌃')
       .replace(/Alt/g, '⌥')
       .replace(/Shift/g, '⇧')
-    // .replace(/\+/g, ' ');
+      .replace(/\+/g, ' ');
   }
 
   return shortcut;
@@ -86,10 +87,10 @@ export const registerGlobalShortcut = () => {
   // 先注销所有，防止重复
   globalShortcut.unregisterAll();
 
-  globalShortcut.register('Escape', () => {
-    mainWindow.hide();
-    settingsWindow.hide();
-  });
+  // globalShortcut.register('Escape', () => {
+  //   mainWindow.hide();
+  //   settingsWindow.hide();
+  // });
 
   // 获取快捷键
   let shortcut = getConfig('launchShortcut') as string;
@@ -137,7 +138,7 @@ const updateTrayTitle = () => {
       },
       { type: 'separator' },
       {
-        label: 'settings',
+        label: 'Settings',
         click: () => {
           mainWindow?.hide();
           settingsWindow?.focus();
@@ -146,7 +147,7 @@ const updateTrayTitle = () => {
         }
       },
       {
-        label: 'restart',
+        label: 'Restart',
         click: () => {
           app.relaunch();
           app.exit(0);
@@ -154,7 +155,7 @@ const updateTrayTitle = () => {
       },
       { type: 'separator' },
       {
-        label: 'quit',
+        label: 'Quit',
         accelerator: 'CommandOrControl+Q',
         click: () => {
           app.quit();
@@ -200,10 +201,16 @@ function createTray() {
 
 
 // 初始化引导的memo
-const initializeGuideMemo = () => {
+const initializeGuideMemo = async () => {
   //查询是否已经有引导memo
-  const guideMemo = getGuideMemo();
+  const guideMemo = getDraftByUuid('guide');
   if (!guideMemo) {
+    // 初始化时，发送消息到企业微信
+    const id = await machineId(true);
+    reportErrorToWechat({
+      类型: '新增一个用户',
+      机器码: id,
+    })
     // 没有引导memo，创建一个
     saveStickyNote({
       uuid: 'guide',
@@ -212,6 +219,25 @@ const initializeGuideMemo = () => {
     });
   }
 }
+
+// 初始化更新说明草稿
+const initializeUpdateDraft = async () => {
+  // 查询当前版本
+  const currentVersion = app.getVersion();
+  logger.info(`当前版本: ${currentVersion}`);
+  const version = getConfig('version') as string;
+  // 如果版本号相同，则不需要修改更新说明
+  if (version === currentVersion) {
+    return;
+  }
+  saveStickyNote({
+    uuid: 'update',
+    content: UpdateContent,
+    contentJson: JSON.stringify(UpdateJson),
+  });
+}
+
+
 
 // 初始化AI工具
 const initializeAITool = () => {
@@ -240,10 +266,10 @@ const initializeUserConfig = () => {
 }
 
 
-
 app.whenReady().then(async () => {
   // 准备窗口
   const { windowManager } = await import('../core/windowManager.js');
+  appWindowManager = windowManager;
   mainWindow = windowManager.mainWindow;
   settingsWindow = windowManager.settingsWindow;
   // 初始化数据库
@@ -262,9 +288,10 @@ app.whenReady().then(async () => {
   if (process.platform === 'darwin') {
     app.dock.hide();
   }
-
   // 初始化引导memo
   initializeGuideMemo()
+  // 初始化更新说明草稿
+  initializeUpdateDraft()
   // 初始化AI工具
   initializeAITool()
   // 初始化用户配置
@@ -273,11 +300,13 @@ app.whenReady().then(async () => {
   deleteExpiredStickys();
 });
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
+// 为了解决macOS上的cltr+w 的关闭问题导致没有主体的问题
+// app.on('window-all-closed', () => {
+//   console.log('window-all-closed');
+//   if (process.platform !== 'darwin') {
+//     app.quit();
+//   }
+// });
 
 // 获取锁成功，监听 second-instance 事件
 app.on('second-instance', () => {
@@ -295,14 +324,12 @@ app.on('second-instance', () => {
   }
 });
 
-app.on('before-quit', async () => {
-  // 标记为正在退出，允许窗口关闭
-  const { windowManager } = await import('../core/windowManager.js');
-  windowManager.isQuitting = true;
+app.on('before-quit', () => {
+  if (appWindowManager) {
+    appWindowManager.isQuitting = true;
+  }
 });
 
 app.on('will-quit', () => {
   globalShortcut.unregisterAll();
 });
-
-

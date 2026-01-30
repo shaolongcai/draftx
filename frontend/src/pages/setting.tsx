@@ -7,8 +7,8 @@ import {
 import { Contact, SettingItem } from "@/components";
 // import { useTranslation } from '@/contexts/I18nContext';
 import { useNavigate } from 'react-router-dom';
+import { ConfigParams } from "@/type/electron";
 // import LanguageSwitcher from '@/components/LanguageSwitcher';
-
 
 
 /**
@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
  */
 const Setting = () => {
 
+    const [reportAgreement, setReportAgreement] = useState(false) //是否同意上报问题
     const [aiProvider, setAiProvider] = useState<{ host: string, model: string }>() //是否已设置AI服务
     const [shortcut, setShortcut] = useState('') //快捷键
     // 更新檢查相關狀態
@@ -45,6 +46,7 @@ const Setting = () => {
             setAutoLaunch(res.autoLaunch)
             setAiProvider(JSON.parse(res.ai_provider || '{}'))
             setShortcut(res.launchShortcut || '')
+            setReportAgreement(res.report_agreement || false)
         })
         // // 手动检查一次更新
         // manualCheckUpdate()
@@ -98,20 +100,28 @@ const Setting = () => {
 
 
     // 切换用户体验改进计划
-    // const toggleReportAgreement = async (checked: boolean) => {
-    //     if (checked) {
-    //         // 同意用户体验改进计划，需要弹窗
-    //         setOpenReportProtocol(true)
-    //         setOpenSetting(false)
-    //     }
-    //     setReportAgreement(checked)
-    //     const params: ConfigParams = {
-    //         key: 'report_agreement',
-    //         value: checked,
-    //         type: 'boolean',
-    //     }
-    //     window.electronAPI.setConfig(params)
-    // }
+    const toggleReportAgreement = async (checked: boolean) => {
+        try {
+            if (checked) {
+                // 打开时，先跳转到该页面
+                navigate('/improveTips')
+            }
+            else {
+                // 关闭时，直接设置为false
+                const params: ConfigParams = {
+                    key: 'report_agreement',
+                    value: checked,
+                    type: 'boolean',
+                }
+                window.electronAPI.setConfig(params)
+
+            }
+        } catch (error) {
+            console.error('toggleReportAgreement', error)
+        } finally {
+            setReportAgreement(checked)
+        }
+    }
 
     // 切換自啟動開關
     const toggleAutoLaunch = async (checked: boolean) => {
@@ -120,19 +130,7 @@ const Setting = () => {
     }
 
 
-    return <div
-        className="w-full max-h-[680px]!  overflow-y-auto scrollbar-thin"
-    >
-        {/* {
-                // 同意用户体验改进计划弹窗
-                openReportProtocol &&
-                <ReportProtocol
-                    onFinish={() => {
-                        setOpenReportProtocol(false)
-                        setOpenSetting(true)
-                    }}
-                />
-            } */}
+    return <div className="w-full max-h-[680px]!  overflow-y-auto scrollbar-thin" >
         <Stack direction='row' justifyContent='space-between' alignItems='center' >
             <Stack direction='row' spacing={1}>
                 <Typography variant='headlineSmall' >
@@ -191,12 +189,12 @@ const Setting = () => {
                     onAction={() => navigate('/hotkeys?from=setting')}
                 />
                 {/* 用户体验计划 */}
-                {/* <SettingItem
-                                title={t('app.settings.userExperience')}
-                                type='switch'
-                                value={reportAgreement}
-                                onAction={toggleReportAgreement}
-                            /> */}
+                <SettingItem
+                    title='User experience improvement plan'
+                    type='switch'
+                    value={reportAgreement}
+                    onAction={toggleReportAgreement}
+                />
                 {/* 检查更新 */}
                 {/* <SettingItem
                                 title={t('app.settings.checkUpdate')}
@@ -246,6 +244,5 @@ const Setting = () => {
     </div>
 
 }
-
 
 export default Setting;

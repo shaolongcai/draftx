@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react'
-import { useRequest, useSize } from 'ahooks'
+import { useState, useRef, useEffect } from 'react'
+import { useSize } from 'ahooks'
 import './App.css'
 import { Stack, ThemeProvider } from '@mui/material'
 import { theme } from './theme'
@@ -17,7 +17,7 @@ import { ListItemNode, ListNode } from '@lexical/list';
 import { AutoLinkNode, LinkNode } from '@lexical/link';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { CodeHighlightNode, CodeNode } from '@lexical/code';
-import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
+import { HorizontalRuleNode } from '@/nodes/HorizontalRuleNode';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 import { MathNode } from "@/nodes/MathNode";
 import { MathItemNode } from "@/nodes/MathItemNode";
@@ -26,6 +26,8 @@ import { BlockTipNode } from "@/nodes/BlockTipNode";
 import { PasteNode } from "@/nodes/PasteNode";
 import { LoadingNode } from "@/nodes/LoadingNode";
 import HotkeysConfig from './pages/HotkeysConfig'
+import ImproveTips from './pages/ImproveTips'
+import { CaluResultNode } from './nodes/CaluResultNode'
 
 function App() {
 
@@ -66,7 +68,8 @@ function App() {
       MathNode,
       MathItemNode,
       PasteNode,
-      LoadingNode
+      LoadingNode,
+      CaluResultNode,
     ],
   };
 
@@ -104,7 +107,7 @@ function App() {
             `}</style>
                 <Routes>
                   {/* 首页 */}
-                  <Route path='/draft'
+                  <Route path='/'
                     element={<>
                       <div className={`${currentPage === 'draft' ? '' : 'hidden'}`}>
                         <Home />
@@ -121,9 +124,11 @@ function App() {
                     </>}
                   />
                   {/* 更新提示 */}
-                  <Route path='/' element={<Update />} />
+                  {/* <Route path='/' element={<Update />} /> */}
                   {/* 配置热键 */}
                   <Route path='/hotkeys' element={<HotkeysConfig />} />
+                  {/* 提升体验提示 */}
+                  <Route path='/improveTips' element={<ImproveTips />} />
                 </Routes>
               </div>
             </HashRouter>

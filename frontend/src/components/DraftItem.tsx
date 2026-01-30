@@ -57,9 +57,9 @@ const DraftItem: React.FC<Props> = ({
         }}
     >
         <Stack spacing={1} >
-            {/* <Typography variant='bodyMedium'>
+            <Typography fontWeight={700} variant='bodyMedium'>
                 {title}
-            </Typography> */}
+            </Typography>
             <Typography variant='bodyMedium'
                 className={`${clampClass} overflow-hidden`}
             >
@@ -67,11 +67,11 @@ const DraftItem: React.FC<Props> = ({
                     // 这里要注意，显示的是snippet片段，而不是content，内容数量要在搜索器中调整
                     <span
                         dangerouslySetInnerHTML={{
-                            __html: snippet.replace(/<mark>/g, '<mark class="bg-yellow-200 text-gray-900 font-medium px-1">')
+                            __html: snippet.replace(/<mark>/g, '<mark class="bg-yellow-200 text-gray-800 font-medium px-1">')
                         }}
                     />
                 ) : (
-                    <span className="block">{content}</span>
+                    <span className="block text-gray-800">{content}</span>
                 )}
             </Typography>
         </Stack>

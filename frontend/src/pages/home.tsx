@@ -1,31 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
-import { Card, Grid, Stack, Typography } from '@mui/material'
-import { EditorContext, ToolBar } from '@/components'
-import { LexicalComposer } from '@lexical/react/LexicalComposer';
-import { mermaidNode } from "@/nodes/MermaidNode";
-import { ListItemNode, ListNode } from '@lexical/list';
-import { AutoLinkNode, LinkNode } from '@lexical/link';
-import { HeadingNode, QuoteNode } from '@lexical/rich-text';
-import { CodeHighlightNode, CodeNode } from '@lexical/code';
-import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
-import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
-import dayjs from "dayjs";
-import { theme } from "@/theme/editorTheme";
-import { MathNode } from "@/nodes/MathNode";
-import { MathItemNode } from "@/nodes/MathItemNode";
-import { BlockTitleNode } from "@/nodes/BlockTitleNode";
-import { BlockTipNode } from "@/nodes/BlockTipNode";
-import { PasteNode } from "@/nodes/PasteNode";
-// import ToolBar from "./ToolBar";
-import { LoadingNode } from "@/nodes/LoadingNode";
-import { $createParagraphNode, $getRoot } from 'lexical';
-// import { useSettings } from '@/contexts/SettingContext';
+import { EditorContext } from '@/components'
+import { useNavigate } from 'react-router-dom';
+
 
 const Editor: React.FC = () => {
 
-    const [deletedAt, setDeletedAt] = useState<number>();
-    const [cardSize, setCardSize] = useState({ width: 400, height: 400 });
+
     const [showTips, setShowTips] = useState(true);
+
+    const navigate = useNavigate();
 
 
     useEffect(() => {
@@ -33,60 +16,27 @@ const Editor: React.FC = () => {
         return () => clearTimeout(t)
     }, [])
 
-    // 调整卡片大小
-    const startResize = (edge: 'e' | 's' | 'se') => (e: React.MouseEvent) => {
-        e.preventDefault();
-        try {
-            const startWidth = cardSize.width;
-            const startHeight = cardSize.height;
-            const startX = e.clientX;
-            const startY = e.clientY;
 
-            const onMove = (ev: MouseEvent) => {
-                const dx = ev.clientX - startX;
-                const dy = ev.clientY - startY;
-
-                setCardSize(prev => {
-                    let nextWidth = prev.width;
-                    let nextHeight = prev.height;
-
-                    if (edge === 'e' || edge === 'se') {
-                        nextWidth = Math.min(Math.max(360, startWidth + dx), 800); //最大800，最小360
-                    }
-                    if (edge === 's' || edge === 'se') {
-                        nextHeight = Math.min(Math.max(360, startHeight + dy), 800); //最大800，最小360
-                    }
-                    return { width: nextWidth, height: nextHeight };
-                });
-            };
-
-            const onUp = () => {
-                window.removeEventListener('mousemove', onMove);
-                window.removeEventListener('mouseup', onUp);
-            };
-
-            window.addEventListener('mousemove', onMove);
-            window.addEventListener('mouseup', onUp);
-        } catch (error) {
-            const msg = error instanceof Error ? error.message : '升级失败';
-            console.error(msg);
+    // 初始化路由
+    useEffect(() => {
+        const init = async () => {
+            const hasShowedImproveTips = await window.electronAPI.getConfig('report_agreement');
+            console.log('hasShowedImproveTips', hasShowedImproveTips)
+            if (hasShowedImproveTips === null) {
+                navigate('/improveTips')
+                return
+            }
+            // 检查是否有设置快捷键
+            const hasSetShortcut = await window.electronAPI.getConfig('launchShortcut');
+            if (!hasSetShortcut) {
+                navigate('/hotkeys')
+            }
         }
-    };
+        init()
+    }, [])
 
-    return <div className="overflow-hidden"
-    // style={{ width: cardSize.width, height: cardSize.height }}
-    >
-        {/* 顶部拖动句柄 */}
-        {/* <div
-            className="drag absolute top-0 left-0 right-0 h-8 z-10 "
-        /> */}
-
+    return <div className="overflow-hidden" >
         <EditorContext />
-        {/* 删除提示标记点 (应该改为超过30日未查看的草稿将会被删除) */}
-        {/* <Tooltip title={`After ${deletedAt ? deletedAt + 3 : 7} days will be deleted`}>
-            <div className={`absolute bottom-6 right-6 w-2 h-2  rounded-full 
-            ${deletedAt + 3 > 6 ? 'bg-[#34C759]/0' : 'bg-[#FF8D28]'}`} />
-        </Tooltip> */}
     </div>
 }
 

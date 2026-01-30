@@ -12,7 +12,7 @@ import { TableKeyboardPlugin } from "@/plugin/TableKeyboardPlugin";
 import { MermaidPlugin } from "@/plugin/MermaidPlugin";
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
-import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
+import { HorizontalRuleNode } from '@/nodes/HorizontalRuleNode';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
@@ -32,6 +32,9 @@ import { AutoPastePlugin } from "@/plugin/AutoPastePlugin";
 import { BlockTipPlugin } from "@/plugin/BlockTipPlugin";
 import { ConfigParams } from "@/type/electron";
 import { historyStack } from "@/utils/histroyStack";
+import RandomPlugin from "@/plugin/RandomPlugin";
+import { CalculatePlugin } from "@/plugin/CalculatePlugin";
+import { $isHeadingNode } from "@lexical/rich-text";
 // import { useSettings } from '@/contexts/SettingContext';
 
 
@@ -88,6 +91,7 @@ const EditorContext: React.FC = () => {
         }
         init()
         getGuideMemo();
+        getUpdateDraft();
     }, []);
 
     // 监听点击新建草稿
@@ -151,6 +155,45 @@ const EditorContext: React.FC = () => {
             }
             window.electronAPI.setConfig(configParams)
             window.electronAPI.setConfig({ key: 'currentUuid', value: guideMemo.uuid, type: 'string' });
+        }
+    }
+
+
+    // 决定展示update的草稿，还是初始化uuid;由于setData 异步，所以这里需要直接传入实例
+    const getUpdateDraft = async () => {
+        // 通过将更新后的版本号与数据库版本号（之前的版本作对比）
+        const currentVesion = await window.electronAPI.getAppVersion();
+        console.log('当前版本', currentVesion);
+        const oldVersion = await window.electronAPI.getConfig('version') as string;
+        // 如果数据库没版本号，则代表新用户
+        if (!oldVersion) {
+            // 初始化版本号
+            window.electronAPI.setConfig({ key: 'version', value: currentVesion, type: 'string' });
+            return;
+        }
+        if (currentVesion !== oldVersion) {
+            //展示更新memo
+            const updateMemo = await window.electronAPI.getDraftByUuid('update');
+            // 压栈
+            historyStack.push(updateMemo.uuid);
+            editor.update(() => {
+                const root = $getRoot();
+                root.clear();
+                // 创建root
+                root.append($createParagraphNode());
+                const initialEditorState = editor.parseEditorState(updateMemo.content_json);
+                editor.setEditorState(initialEditorState);
+            })
+
+            setCurrentUuid(updateMemo.uuid)
+            // 设置当前版本号覆盖数据库版本号
+            const configParams: ConfigParams = {
+                key: 'version',
+                value: currentVesion,
+                type: 'string'
+            }
+            window.electronAPI.setConfig(configParams)
+            window.electronAPI.setConfig({ key: 'currentUuid', value: updateMemo.uuid, type: 'string' });
         }
     }
 
@@ -239,16 +282,29 @@ const EditorContext: React.FC = () => {
         <MermaidPlugin />
         <PickerPlugin />
         {/* <AiPickerPlugin /> */}
+        <CalculatePlugin />
+        <RandomPlugin />
         <TabFocusPlugin />
         <CheckListPlugin />
-        <MathPlugin />
+        {/* <MathPlugin /> */}
         <AutoPastePlugin />
         <BlockTipPlugin />
         <OnChangePlugin onChange={(editorState) => {
             // 获取纯文本内容
             const plain = editorState.read(() => $getRoot().getTextContent());
+            // 获取标题
+            const title = editorState.read(() => {
+                const root = $getRoot();
+                // 遍历根节点的子节点，寻找第一个 h1
+                const children = root.getChildren();
+                for (const child of children) {
+                    if ($isHeadingNode(child) && child.getTag() === 'h1') {
+                        return child.getTextContent();
+                    }
+                }
+            });
             const json = editorState.toJSON();
-            scheduleSave({ contentJson: JSON.stringify(json), contentText: plain });
+            scheduleSave({ contentJson: JSON.stringify(json), contentText: plain, title });
         }} />
     </div>
 }

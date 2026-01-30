@@ -35,7 +35,7 @@ const DraftList: React.FC<Props> = ({
         {
             (data?.length > 0) &&
             <div className='max-h-[calc(100vh-144px)] overflow-y-auto mt-4'>
-                <Stack className='flex flex-wrap gap-2' direction='row' justifyContent='space-around'>
+                <Stack className='flex flex-wrap gap-2' direction='row' justifyContent='space-between'>
                     {
                         data.map(item =>
                             <div key={item.id} className='w-[200px] flex-none'>
