@@ -28,6 +28,7 @@ import { LoadingNode } from "@/nodes/LoadingNode";
 import HotkeysConfig from './pages/HotkeysConfig'
 import ImproveTips from './pages/ImproveTips'
 import { CaluResultNode } from './nodes/CaluResultNode'
+import { UnitConversionNode } from './nodes/UnitConversionNode'
 
 function App() {
 
@@ -70,6 +71,7 @@ function App() {
       PasteNode,
       LoadingNode,
       CaluResultNode,
+      UnitConversionNode,
     ],
   };
 
