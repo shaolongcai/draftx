@@ -35,6 +35,7 @@ import { historyStack } from "@/utils/histroyStack";
 import RandomPlugin from "@/plugin/RandomPlugin";
 import { CalculatePlugin } from "@/plugin/CalculatePlugin";
 import { UnitConversionPlugin } from "@/plugin/UnitConversionPlugin";
+import { CurrencyConversionPlugin } from "@/plugin/CurrencyConversionPlugin";
 import { $isHeadingNode } from "@lexical/rich-text";
 // import { useSettings } from '@/contexts/SettingContext';
 
@@ -285,6 +286,7 @@ const EditorContext: React.FC = () => {
         {/* <AiPickerPlugin /> */}
         <CalculatePlugin />
         <UnitConversionPlugin />
+        <CurrencyConversionPlugin />
         <RandomPlugin />
         <TabFocusPlugin />
         <CheckListPlugin />

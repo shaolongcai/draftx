@@ -29,6 +29,7 @@ import HotkeysConfig from './pages/HotkeysConfig'
 import ImproveTips from './pages/ImproveTips'
 import { CaluResultNode } from './nodes/CaluResultNode'
 import { UnitConversionNode } from './nodes/UnitConversionNode'
+import { CurrencyConversionNode } from './nodes/CurrencyConversionNode'
 
 function App() {
 
@@ -72,6 +73,7 @@ function App() {
       LoadingNode,
       CaluResultNode,
       UnitConversionNode,
+      CurrencyConversionNode,
     ],
   };
 
