@@ -30,6 +30,7 @@ import ImproveTips from './pages/ImproveTips'
 import { CaluResultNode } from './nodes/CaluResultNode'
 import { UnitConversionNode } from './nodes/UnitConversionNode'
 import { CurrencyConversionNode } from './nodes/CurrencyConversionNode'
+import { ResponseNode } from './nodes/ResponseNode'
 
 function App() {
 
@@ -74,6 +75,7 @@ function App() {
       CaluResultNode,
       UnitConversionNode,
       CurrencyConversionNode,
+      ResponseNode,
     ],
   };
 

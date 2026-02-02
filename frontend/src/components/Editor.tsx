@@ -38,6 +38,7 @@ import { UnitConversionPlugin } from "@/plugin/UnitConversionPlugin";
 import { CurrencyConversionPlugin } from "@/plugin/CurrencyConversionPlugin";
 import { StatisticsPlugin } from "@/plugin/StatisticsPlugin";
 import { $isHeadingNode } from "@lexical/rich-text";
+import { RequestPlugin } from "@/plugin/RequestPlugin";
 // import { useSettings } from '@/contexts/SettingContext';
 
 
@@ -289,6 +290,7 @@ const EditorContext: React.FC = () => {
         <UnitConversionPlugin />
         <CurrencyConversionPlugin />
         <StatisticsPlugin />
+        <RequestPlugin />
         <RandomPlugin />
         <TabFocusPlugin />
         <CheckListPlugin />
