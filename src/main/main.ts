@@ -25,15 +25,15 @@ let appWindowManager: any = null; // 临时增加，用于正式退出
 const isDev = process.env.NODE_ENV === 'development';
 
 // 防止多开：必须在应用启动的最早阶段执行
-const gotTheLock = app.requestSingleInstanceLock();
-if (!gotTheLock && !isDev) {
-  // 获取锁失败，说明已有实例运行，直接退出(开发环境忽略)
-  // 注意：此时 logger 可能还未初始化，直接用 console
-  logger.warn('应用已在运行，退出当前实例');
-  app.quit();
-  // 强制退出进程，不再执行后续代码
-  process.exit(0);
-}
+// const gotTheLock = app.requestSingleInstanceLock();
+// if (!gotTheLock && !isDev) {
+//   // 获取锁失败，说明已有实例运行，直接退出(开发环境忽略)
+//   // 注意：此时 logger 可能还未初始化，直接用 console
+//   logger.warn('应用已在运行，退出当前实例');
+//   app.quit();
+//   // 强制退出进程，不再执行后续代码
+//   process.exit(0);
+// }
 
 
 // 根据平台与环境判断快捷键
@@ -274,13 +274,16 @@ app.whenReady().then(async () => {
   settingsWindow = windowManager.settingsWindow;
   // 初始化数据库
   initializeDatabase();
+  logger.info('数据库初始化完成');
   // 注册全局快捷键
   registerGlobalShortcut();
+  logger.info('全局快捷键注册完成');
   // 初始化 API
   initializeUpdateApi()
   initializeDraftApi();
   initializeSystemApi();
-  initializeAIApi()
+  initializeAIApi();
+  logger.info('所有API初始化完成');
   // 创建托盘
   createTray();
 
@@ -295,9 +298,11 @@ app.whenReady().then(async () => {
   // 初始化AI工具
   initializeAITool()
   // 初始化用户配置
-  initializeUserConfig()
+  initializeUserConfig();
+  logger.info('用户配置初始化完成');
   // 删除所有过期的便利贴
   deleteExpiredStickys();
+  logger.info('所有过期的便利贴已删除');
 });
 
 // 为了解决macOS上的cltr+w 的关闭问题导致没有主体的问题
