@@ -144,7 +144,7 @@ const ToolBar: React.FC<Props> = ({
             buttons.push({
                 icon: <AIChatIcon />,
                 className: 'hover:bg-[#9F7207]/70',
-                tip: isMac ? 'Chat with AI (⌘ + C)' : 'Chat with AI (Alt + C)',
+                tip: isMac ? 'Chat with AI (⌥ + C)' : 'Chat with AI (Alt + C)',
                 onClick: () => setIsChatMode(true),
             });
         }
@@ -190,7 +190,7 @@ const ToolBar: React.FC<Props> = ({
 
 
     // 快速开启chat
-    useKeyPress(isMac ? 'meta.c' : 'alt.c', () => {
+    useKeyPress(isMac ? '⌥+c' : 'alt.c', () => {
         inputRef.current?.focus();
         setIsChatMode(!isChatMode);
     })
