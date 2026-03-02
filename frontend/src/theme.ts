@@ -5,6 +5,49 @@ import { createTheme } from "@mui/material";
 //主题
 export const theme = createTheme({
 
+    colorSchemes:{
+        light:{
+
+        },
+        dark:{
+            palette: {
+                primary: {
+                    main: '#fff',
+                },
+                // ...other tokens
+            },
+        },
+        red:{
+            palette: {
+                primary: {
+                    main: '#FF5733',
+                },
+                // ...other tokens
+            },
+        }
+    },
+
+//     const theme = createTheme({
+//   colorSchemes: {
+//     light: {
+//       palette: {
+//         primary: {
+//           main: '#FF5733',
+//         },
+//         // ...other tokens
+//       },
+//     },
+//     dark: {
+//       palette: {
+//         primary: {
+//           main: '#E0C2FF',
+//         },
+//         // ...other tokens
+//       },
+//     },
+//   },
+// });
+
     //组件
     components: {
 

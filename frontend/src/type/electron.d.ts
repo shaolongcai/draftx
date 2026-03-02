@@ -178,6 +178,10 @@ interface ElectronAPI {
      */
     verifyLicense: () => Promise<boolean>;
 
+    /**
+     * 导出 Markdown
+     */
+    saveMarkdown: (content: string, name?: string) => Promise<{ success: boolean, message?: string, filePath?: string }>;
 
 }
 

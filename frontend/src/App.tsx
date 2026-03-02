@@ -86,7 +86,7 @@ function App() {
         autoHideDuration: 2000,
       },
     }} >
-      <ThemeProvider theme={theme}>
+      <ThemeProvider theme={theme} defaultMode='dark'>
         <EventProvider >
           <LexicalComposer initialConfig={initialConfig}>
             <HashRouter>

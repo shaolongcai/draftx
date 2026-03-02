@@ -53,6 +53,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // 复制相关
   readClipboardText: () => ipcRenderer.invoke('read-clipboard-text'), // 读取系统剪贴板文本
 
+  // 导出
+  saveMarkdown: (content: string, name?: string) => ipcRenderer.invoke('save-markdown', content, name),
+
 });
 
 // 暴露一些实用工具

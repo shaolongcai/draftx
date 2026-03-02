@@ -24,7 +24,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useNotifications } from "@toolpad/core/useNotifications";
 import { useEvent } from "@/contexts/EvenContext";
-import { $convertFromMarkdownString, TRANSFORMERS } from "@lexical/markdown";
+import { $convertFromMarkdownString, $convertToMarkdownString, TRANSFORMERS } from "@lexical/markdown";
+import { CUSTOM_TRANSFORMERS } from "@/utils/transformers";
 import TabFocusPlugin from '@/plugin/TabFocusPlugin';
 import PickerPlugin from "@/plugin/PickerPlugin";
 import { MathPlugin } from "@/plugin/MathPlugin";
@@ -102,8 +103,28 @@ const EditorContext: React.FC = () => {
     handleOnclickTool$.useSubscription((tool) => {
         if (tool === 'addDraft') {
             addNewDraft();
+        } else if (tool === 'exportMarkdown') {
+            exportMarkdown();
         }
     })
+
+    // 导出 Markdown
+    const exportMarkdown = () => {
+        editor.read(() => {
+            const markdown = $convertToMarkdownString(CUSTOM_TRANSFORMERS);
+            window.electronAPI.saveMarkdown(markdown, lastSavedRef.current?.title).then(res => {
+                if (res.success) {
+                    notification.show('Export successful', {
+                        severity: 'success',
+                    });
+                } else if (res.message !== 'Canceled') {
+                    notification.show(res.message || 'Export failed', {
+                        severity: 'error',
+                    });
+                }
+            });
+        });
+    }
 
     // 监听加载新的便利贴
     loadStickys$.useSubscription((sticky) => {

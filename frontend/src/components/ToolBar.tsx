@@ -1,4 +1,4 @@
-import { Divider, IconButton, Stack, Tooltip, Typography } from "@mui/material";
+import { Divider, IconButton, Stack, Tooltip, Typography, useColorScheme, useTheme } from "@mui/material";
 import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import {
     AddCircleOutline as AddIcon,
@@ -8,6 +8,7 @@ import {
     KeyboardArrowLeft as BackIcon,
     KeyboardArrowRight as ForwardIcon,
     ArrowCircleUp as UpdateIcon,
+    FileDownload as ExportIcon,
 } from "@mui/icons-material";
 import { useEvent } from "@/contexts/EvenContext";
 import ChatInput from "./ChatInput";
@@ -62,6 +63,12 @@ const ToolBar: React.FC<Props> = ({
     const inputRef = useRef<HTMLDivElement>(null);
     const { handleOnclickTool$, loadStickys$ } = useEvent();
     const isMac = window.electronUtils?.platform === 'darwin' || /macintosh|mac os x/i.test(navigator.userAgent);
+
+    // 引入 MUI 主题
+    const theme = useTheme();
+    const { setMode,mode} = useColorScheme() //调用 setMode('red') 即可调用对应主题颜色
+ 
+    // theme.palette.backgroun
 
     // 检查更新
     const { data: updateInfo } = useRequest(async () => {
@@ -146,6 +153,18 @@ const ToolBar: React.FC<Props> = ({
                 className: 'hover:bg-[#9F7207]/70',
                 tip: isMac ? 'Chat with AI (⌥ + C)' : 'Chat with AI (Alt + C)',
                 onClick: () => setIsChatMode(true),
+            });
+
+            buttons.push({
+                isDivider: true,
+            });
+
+            // 导出 Markdown
+            buttons.push({
+                icon: <ExportIcon />,
+                className: 'hover:bg-[#9F7207]/70',
+                tip: 'Export as Markdown',
+                onClick: () => handleOnclickTool$.emit('exportMarkdown'),
             });
         }
 
