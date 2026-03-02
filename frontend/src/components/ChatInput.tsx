@@ -9,7 +9,8 @@ import { useEffect, useRef, useState } from "react";
 import { useKeyPress, useUpdateLayoutEffect } from "ahooks";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import useChat from "@/hooks/useChat";
-import { $convertToMarkdownString, TRANSFORMERS } from "@lexical/markdown";
+import { $convertToMarkdownString } from "@lexical/markdown";
+import { CUSTOM_TRANSFORMERS } from "@/utils/transformers";
 import { $createParagraphNode, $createTextNode, $getNodeByKey, $getRoot, $isTextNode, ParagraphNode } from "lexical";
 import { $createLoadingNode, $isLoadingNode } from "@/nodes/LoadingNode";
 
@@ -78,7 +79,7 @@ const ChatInput: React.FC<Props> = ({ onClose }) => {
         editor.setEditable(false); //先禁用编辑器
         editor.read(() => {
             // 将draft的内容以markdown格式导出
-            const markdown = $convertToMarkdownString(TRANSFORMERS);
+            const markdown = $convertToMarkdownString(CUSTOM_TRANSFORMERS);
             console.log('markdown', markdown)
             // 增加一个段落以承载AI内容
             editor.update(() => {

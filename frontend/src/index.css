@@ -296,7 +296,7 @@ hr {
   background-color: rgba(172, 206, 247, 0.7);
 }
 
-/* 禁用表格選區時的默認選區顏色 */
-.editor-table ::selection {
+/* 禁用表格选区时的默認選區顏色 */
+.editor-tableCellSelected ::selection {
   background-color: transparent;
 }

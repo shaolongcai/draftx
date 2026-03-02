@@ -34,7 +34,11 @@ import { ConfigParams } from "@/type/electron";
 import { historyStack } from "@/utils/histroyStack";
 import RandomPlugin from "@/plugin/RandomPlugin";
 import { CalculatePlugin } from "@/plugin/CalculatePlugin";
+import { UnitConversionPlugin } from "@/plugin/UnitConversionPlugin";
+import { CurrencyConversionPlugin } from "@/plugin/CurrencyConversionPlugin";
+import { StatisticsPlugin } from "@/plugin/StatisticsPlugin";
 import { $isHeadingNode } from "@lexical/rich-text";
+import { RequestPlugin } from "@/plugin/RequestPlugin";
 // import { useSettings } from '@/contexts/SettingContext';
 
 
@@ -283,6 +287,10 @@ const EditorContext: React.FC = () => {
         <PickerPlugin />
         {/* <AiPickerPlugin /> */}
         <CalculatePlugin />
+        <UnitConversionPlugin />
+        <CurrencyConversionPlugin />
+        <StatisticsPlugin />
+        <RequestPlugin />
         <RandomPlugin />
         <TabFocusPlugin />
         <CheckListPlugin />
