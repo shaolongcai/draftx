@@ -48,6 +48,11 @@ interface ElectronAPI {
     resizeWindow: (windowName: 'mainWindow' | 'settingsWindow', size: { width: number, height: number }) => Promise<void>;
 
     /**
+     * 设置窗口背景颜色
+     */
+    setBackgroundColor: (color: string) => void;
+
+    /**
      * 获取应用版本
      */
     getAppVersion: () => Promise<string>;

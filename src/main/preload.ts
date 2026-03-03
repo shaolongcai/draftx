@@ -16,6 +16,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   setConfig: (params: ConfigParams) => ipcRenderer.invoke('set-config', params.key, params.value, params.type), // 设置用户配置
   getConfig: (key?: string) => ipcRenderer.invoke('get-config', key),  // 获取用户配置
   resizeWindow: (windowName: 'mainWindow' | 'settingsWindow', size: { width: number, height: number }) => ipcRenderer.send('resize-window', windowName, size), // 变更窗口大小
+  setBackgroundColor: (color: string) => ipcRenderer.send('set-background-color', color), // 设置窗口背景颜色
   checkForUpdates: () => ipcRenderer.invoke('check-for-updates'), // 检查更新
   downloadUpdate: () => ipcRenderer.invoke('download-update'),  // 下载新版本
   onDownloadProgress: (callback) => ipcRenderer.on('download-progress', (_event, data) => callback(data)),  //监听下载进度,

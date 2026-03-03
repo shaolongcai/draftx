@@ -180,6 +180,16 @@ class WindowManager {
         // }
     }
 
+    // 设置窗口背景颜色
+    public setBackgroundColor(color: string) {
+        if (this.mainWindow && !this.mainWindow.isDestroyed()) {
+            this.mainWindow.setBackgroundColor(color);
+        }
+        if (this.settingsWindow && !this.settingsWindow.isDestroyed()) {
+            this.settingsWindow.setBackgroundColor(color);
+        }
+    }
+
     // 计算屏幕居中
     private centerOnCurrentDisplay = () => {
         const cursor = screen.getCursorScreenPoint();

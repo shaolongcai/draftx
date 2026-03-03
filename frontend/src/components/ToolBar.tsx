@@ -66,9 +66,9 @@ const ToolBar: React.FC<Props> = ({
 
     // 引入 MUI 主题
     const theme = useTheme();
-    const { setMode,mode} = useColorScheme() //调用 setMode('red') 即可调用对应主题颜色
- 
-    // theme.palette.backgroun
+    const { setMode, mode } = useColorScheme() //调用 setMode('主题色的键，例如red') 即可调用对应主题颜色
+    // setMode('default');
+    console.log('mode', mode)
 
     // 检查更新
     const { data: updateInfo } = useRequest(async () => {
@@ -269,14 +269,19 @@ const ToolBar: React.FC<Props> = ({
     return (
         <div className="mx-auto w-fit">
             <div
-                className={`mx-auto rounded-xl overflow-hidden origin-center 
-                        transition-all duration-300 ease-out
-                        ${active
-                        // 展开：固定高度 + 中心缩放到 1
-                        ? 'w-full h-9 px-2 bg-linear-to-r from-[#9F7207]/70 via-[#9F7207]/85 to-[#9F7207] scale-y-100'
-                        // 收起：保持高度为展开值，使用 scaleY 压到近似 1px（对称收缩）
-                        : 'w-20 h-9 bg-[#9F7207]/25 scale-y-[0.12]'
-                    }`}
+                className={`mx-auto rounded-xl overflow-hidden origin-center  transition-all duration-300 ease-out`}
+                style={{
+                    width: active ? '100%' : '5rem',
+                    height: '2.25rem',
+                    paddingLeft: active ? '0.5rem' : 0,
+                    paddingRight: active ? '0.5rem' : 0,
+                    background: active   // 展开：固定高度 + 中心缩放到 1 (B3、D9是AI换算的)
+                        ? `linear-gradient(to right, ${theme.palette.primary.main}B3, ${theme.palette.primary.main}D9, ${theme.palette.primary.main})`
+                        : `${theme.palette.primary.main}`,
+                    transform: `scaleY(${active ? 1 : 0.12})`,  // 收起：保持高度为展开值，使用 scaleY 压到近似 1px（对称收缩）
+                    transition: 'all 300ms ease-out',
+                    transformOrigin: 'center',
+                }}
                 onMouseEnter={() => setActive(true)}
                 onMouseLeave={() => setActive(false)}
             >

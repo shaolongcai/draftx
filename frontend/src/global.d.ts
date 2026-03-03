@@ -19,6 +19,13 @@ declare module '*.svg' {
 
 declare module '@mui/material/styles' {
 
+    // 扩展模块以支持自定义 colorSchemes
+    interface ColorSchemeOverrides {
+        default: true;
+        forest: true;
+        ocean: true;
+    }
+
     interface TypeText {
         tertiary: string
     }

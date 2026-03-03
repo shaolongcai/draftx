@@ -1,4 +1,4 @@
-import { Box } from "@mui/material"
+import { Box, useTheme } from "@mui/material"
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { CodeHighlightPlugin } from '@/plugin/CodeHighlightPlugin';
 import { CodeActionPlugin } from '@/plugin/CodeActionPlugin';
@@ -67,6 +67,7 @@ const EditorContext: React.FC = () => {
 
     const [editor] = useLexicalComposerContext()
     const { loadStickys$, handleOnclickTool$ } = useEvent();
+    const theme = useTheme()
     const notification = useNotifications();
     const isMac = window.electronUtils?.platform === 'darwin' || /macintosh|mac os x/i.test(navigator.userAgent); //考虑放到context中
 
@@ -273,7 +274,10 @@ const EditorContext: React.FC = () => {
     })
 
 
-    return <div className="scrollbar-thin!  rounded-xl h-full font-mono  leading-relaxed text-gray-700 ">
+    return <div className="scrollbar-thin!  rounded-xl h-full font-mono  leading-relaxed " 
+    style={{
+        color:theme.palette.text.primary,
+    }}>
         <RichTextPlugin
             contentEditable={
                 <ContentEditable

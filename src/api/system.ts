@@ -14,6 +14,12 @@ export function initializeSystemApi() {
         windowManager.resizeWindow(windowName, size);
     })
 
+    // 设置窗口背景颜色
+    ipcMain.on('set-background-color', async (_event, color: string) => {
+        const { windowManager } = await import('../core/windowManager.js');
+        windowManager.setBackgroundColor(color);
+    })
+
     // 获取配置
     ipcMain.handle('get-config', async (_event, key?: ConfigType) => {
         // 若没传入key,则返回所有配置

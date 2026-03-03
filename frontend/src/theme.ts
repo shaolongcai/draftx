@@ -1,79 +1,135 @@
-import { createTheme } from "@mui/material";
+import { createTheme, Theme } from "@mui/material";
 // When using TypeScript 3.x and below
 // import '@mui/lab/themeAugmentation';
 
 //主题
 export const theme = createTheme({
 
-    colorSchemes:{
-        light:{
-
-        },
-        dark:{
+    // cssVariables: {
+    //     colorSchemeSelector: 'class', // 使用 class 切换主题，避免闪烁
+    // },
+    colorSchemes: {
+        default: {
             palette: {
                 primary: {
-                    main: '#fff',
+                    main: '#9F7207',
+                    contrastText: '#FFFFFF',
+                },
+                text: {
+                    primary: 'rgba(0, 0, 0, 0.85)',
+                },
+                background: {
+                    default: '#F9F3E5',
+                    paper: '#2D2D2D',
+                },
+            },
+        },
+        light: {
+            palette: {
+                primary: {
+                    main: '#9F7207',
+                    contrastText: '#FFFFFF',
+                },
+                text: {
+                    primary: 'rgba(0, 0, 0, 0.85)',
+                },
+                background: {
+                    default: '#F9F3E5',
+                    paper: '#2D2D2D',
+                },
+            },
+        },
+        ocean: {
+            palette: {
+                primary: {
+                    main: '#0288D1',
+                    contrastText: '#FFFFFF',
+                },
+                background: {
+                    default: '#E3F2FD',
+                    paper: '#FFFFFF',
+                },
+                text: {
+                    primary: '#0D47A1',
+                }
+            },
+        },
+        dark: {
+            palette: {
+                primary: {
+                    main: '#E36F1C',
+                    contrastText: '#FFFFFF',
+                },
+                text: {
+                    primary: '#FFFFFF',
+                },
+                background: {
+                    default: '#0A0A0A',
+                    paper: '#2D2D2D',
+
                 },
                 // ...other tokens
             },
         },
-        red:{
+        forest: {
             palette: {
                 primary: {
                     main: '#FF5733',
+                    contrastText: '#FFFFFF',
+                },
+                text: {
+                    primary: '#FFFFFF',
+                },
+                background: {
+                    default: '#0A0A0A',
+                    paper: '#2D2D2D',
                 },
                 // ...other tokens
             },
         }
     },
 
-//     const theme = createTheme({
-//   colorSchemes: {
-//     light: {
-//       palette: {
-//         primary: {
-//           main: '#FF5733',
-//         },
-//         // ...other tokens
-//       },
-//     },
-//     dark: {
-//       palette: {
-//         primary: {
-//           main: '#E0C2FF',
-//         },
-//         // ...other tokens
-//       },
-//     },
-//   },
-// });
-
     //组件
     components: {
 
         MuiCard: {
             styleOverrides: {
-                root: {
+                root: ({ theme }: { theme: Theme }) => ({
                     borderRadius: '16px',
                     padding: '24px',
-                    backgroundColor: '#F9F3E5',
+                    backgroundColor: theme.palette.background.default,
                     border: '1px solid rgba(0, 0, 0, 0.25)',
                     boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.05)',
-                }
+                }),
+                // root: {
+                //     borderRadius: '16px',
+                //     padding: '24px',
+                //     backgroundColor: '#F9F3E5',
+                //     border: '1px solid rgba(0, 0, 0, 0.25)',
+                //     boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.05)',
+                // }
             }
         },
 
         // 按钮
         MuiButton: {
             styleOverrides: {
-                contained: {
-                    backgroundColor: '#9F7207',
-                    color: '#FFFFFF',
+                contained: ({ theme }: { theme: Theme }) => ({
+                    backgroundColor: theme.palette.primary.main,
+                    color: theme.palette.primary.contrastText,
                     border: 'none',
                     '&:hover': {
                         backgroundColor: '#333333',
                     }
-                }
+                })
+                // contained: {
+                //     backgroundColor: '#9F7207',
+                //     color: '#FFFFFF',
+                //     border: 'none',
+                //     '&:hover': {
+                //         backgroundColor: '#333333',
+                //     }
+                // }
             }
         },
 
@@ -183,28 +239,28 @@ export const theme = createTheme({
 
 
     //调色板
-    palette: {
-        text: {
-            primary: 'rgba(0, 0, 0, 0.85)', //在背景上的颜色
-            secondary: 'rgba(0, 0, 0, 0.65)',
-            tertiary: 'rgba(0, 0, 0, 0.45)',
-            disabled: 'rgba(0, 0, 0, 0.25)',
-        },
-        background: {
-            default: '#F9F3E5',
-            paper: '#FFFFFF',
-        },
-        primary: {
-            main: '#9F7207',
-            // light: '#FFE5B4',
-            // dark: '#664D03',
-            contrastText: '#FFFFFF',
-        },
-        // secondary: {
-        //     main: '#D4E4F6',
-        // },
-        error: {
-            main: '#FF4D4F',
-        },
-    }
+    // palette: {
+    //     text: {
+    //         primary: 'rgba(0, 0, 0, 0.85)', //在背景上的颜色
+    //         secondary: 'rgba(0, 0, 0, 0.65)',
+    //         tertiary: 'rgba(0, 0, 0, 0.45)',
+    //         disabled: 'rgba(0, 0, 0, 0.25)',
+    //     },
+    //     background: {
+    //         default: '#F9F3E5',
+    //         paper: '#FFFFFF',
+    //     },
+    //     primary: {
+    //         main: '#9F7207',
+    //         // light: '#FFE5B4',
+    //         // dark: '#664D03',
+    //         contrastText: '#FFFFFF',
+    //     },
+    //     // secondary: {
+    //     //     main: '#D4E4F6',
+    //     // },
+    //     error: {
+    //         main: '#FF4D4F',
+    //     },
+    // }
 })
