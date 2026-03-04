@@ -1,6 +1,6 @@
 import { DecoratorNode, LexicalNode, NodeKey, EditorConfig, LexicalEditor, $getNodeByKey } from 'lexical';
 import { ReactElement, useState, MouseEvent } from 'react';
-import { Menu, MenuItem, Stack, Typography } from '@mui/material';
+import { Menu, MenuItem, Stack, Typography, useTheme } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { convertUnit, getAvailableUnits, UnitType } from '../utils/unitConversion';
 
@@ -20,6 +20,7 @@ function UnitConversionComponent({
     editor: LexicalEditor;
 }) {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const theme = useTheme()
     const open = Boolean(anchorEl);
 
     const handleClick = (event: MouseEvent<HTMLElement>) => {
@@ -60,12 +61,12 @@ function UnitConversionComponent({
                     }
                 }}
             >
-                <Typography component="span" sx={{ fontWeight: 'bold' }}>
+                <Typography component="span" sx={{ fontWeight: 'bold' }} color={theme.palette.primary.main}>
                     {targetValue} {targetUnit}
                 </Typography>
-                <KeyboardArrowDownIcon fontSize="small" />
+                <KeyboardArrowDownIcon fontSize="small" sx={{ color: theme.palette.primary.main }} />
             </Stack>
-            
+
             <Menu
                 anchorEl={anchorEl}
                 open={open}
@@ -75,8 +76,8 @@ function UnitConversionComponent({
                 }}
             >
                 {availableUnits.map((unit) => (
-                    <MenuItem 
-                        key={unit} 
+                    <MenuItem
+                        key={unit}
                         onClick={() => handleSelect(unit)}
                         selected={unit === targetUnit}
                     >
@@ -160,7 +161,7 @@ export class UnitConversionNode extends DecoratorNode<ReactElement> {
 
     decorate(editor: LexicalEditor, config: EditorConfig): ReactElement {
         const targetValue = convertUnit(this.__originalValue, this.__originalUnit, this.__targetUnit);
-        
+
         return (
             <UnitConversionComponent
                 originalValue={this.__originalValue}

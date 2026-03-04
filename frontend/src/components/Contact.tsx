@@ -4,7 +4,6 @@ import DiscordIcon from '@/assets/icons/discord.svg'
 import EmailIcon from '@/assets/icons/email.svg'
 import { useNotifications } from '@toolpad/core/useNotifications'
 
-
 const Contact: React.FC = () => {
 
     const notifications = useNotifications();
@@ -21,15 +20,17 @@ const Contact: React.FC = () => {
     return (
         <Stack spacing={2} alignItems='center' direction='row'>
             <Paper
-                variant='outlined'
+                elevation={0}
                 onClick={() => window.electronAPI.openExternalUrl('https://discord.gg/TyArpAVf6A')}
-                className='border-[#9F7207] border bg-transparent p-4 rounded-[8px]! box-border cursor-pointer'
+                className='p-4 rounded-[8px]! box-border cursor-pointer'
             >
                 <img src={DiscordIcon} className='w-10 h-10' />
             </Paper>
             <Paper
-                className='border-[#9F7207] border bg-transparent p-4 rounded-[8px]! box-border cursor-pointer'
-                variant='outlined' onClick={copyEmail}>
+                elevation={0}
+                className=' p-4 rounded-[8px]! box-border cursor-pointer'
+                onClick={copyEmail}
+            >
                 <img src={EmailIcon} className='w-10 h-10' />
             </Paper>
         </Stack>

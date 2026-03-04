@@ -218,7 +218,7 @@ export const defaultTheme = createTheme(theme, {
         },
         background: {
             default: '#F9F3E5',
-            paper: '#2D2D2D',
+            paper: '#F9F3E5',
         },
     },
 })
@@ -249,6 +249,7 @@ export const darkTheme = createTheme(theme, {
         },
         text: {
             primary: '#FFFFFF',
+            secondary: '#FFFFFF'
         },
         background: {
             default: '#0A0A0A',

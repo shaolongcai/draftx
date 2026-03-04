@@ -135,10 +135,10 @@ const Setting = () => {
     }
 
 
-    return <div className="w-full max-h-[680px]!  overflow-y-auto scrollbar-thin" >
+    return <div className="w-full max-h-[680px]! pb-6  overflow-y-auto scrollbar-thin" >
         <Stack direction='row' justifyContent='space-between' alignItems='center' >
             <Stack direction='row' spacing={1}>
-                <Typography variant='headlineSmall' >
+                <Typography variant='headlineSmall' color='textPrimary' >
                     Setting
                 </Typography>
                 {
@@ -155,7 +155,7 @@ const Setting = () => {
         </Stack>
         <Stack spacing={2} sx={{ marginTop: '16px' }}>
             <Stack spacing={1}>
-                <Typography variant='titleSmall' className='color-rgba(0, 0, 0, 0.85)' >
+                <Typography variant='titleSmall' color='textPrimary' >
                     AI Sever
                 </Typography>
                 <SettingItem
@@ -176,7 +176,7 @@ const Setting = () => {
                 /> */}
             </Stack>
             <Stack spacing={1}>
-                <Typography variant='titleSmall' className='color-rgba(0, 0, 0, 0.85)' >
+                <Typography variant='titleSmall' color='textPrimary' >
                     System
                 </Typography>
                 {/* 更改主题 */}
@@ -247,7 +247,7 @@ const Setting = () => {
                             />
                         </Stack> */}
             <Stack spacing={1} >
-                <Typography variant='titleSmall' >
+                <Typography variant='titleSmall' color='textPrimary' >
                     Contact
                 </Typography>
                 <Contact />
