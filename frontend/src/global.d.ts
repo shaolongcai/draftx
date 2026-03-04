@@ -19,48 +19,47 @@ declare module '*.svg' {
 
 declare module '@mui/material/styles' {
 
-    // 扩展模块以支持自定义 colorSchemes
-    interface ColorSchemeOverrides {
-        default: true;
-        forest: true;
-        ocean: true;
-    }
-
     interface TypeText {
         tertiary: string
     }
+
+    // 调色板扩展
+    interface Palette {
+        dark: Palette['primary'];
+    }
     interface PaletteOptions {
         text?: Partial<TypeText>
+        dark?: PaletteOptions['primary'];
     }
 
     // allow configuration using `createTheme`
     interface TypographyVariantsOptions {
         headlineLarge?: React.CSSProperties;
         headlineMedium?: React.CSSProperties;
-        headlineSmall: React.CSSProperties;
-        titleMedium: React.CSSProperties;
-        titleSmall: React.CSSProperties;
-        bodyLarge: React.CSSProperties;
-        bodyMedium: React.CSSProperties;
-        labelLarge: React.CSSProperties;
-        labelMedium: React.CSSProperties;
-        titleLarge: React.CSSProperties;
-        labelSmall: React.CSSProperties;
-        bodySmall: React.CSSProperties;
+        headlineSmall?: React.CSSProperties;
+        titleMedium?: React.CSSProperties;
+        titleSmall?: React.CSSProperties;
+        bodyLarge?: React.CSSProperties;
+        bodyMedium?: React.CSSProperties;
+        labelLarge?: React.CSSProperties;
+        labelMedium?: React.CSSProperties;
+        titleLarge?: React.CSSProperties;
+        labelSmall?: React.CSSProperties;
+        bodySmall?: React.CSSProperties;
     }
 
     interface TypographyOptions {
         headlineLarge?: React.CSSProperties;
         headlineMedium?: React.CSSProperties;
-        titleMedium: React.CSSProperties;
-        titleSmall: React.CSSProperties;
-        bodyLarge: React.CSSProperties;
-        bodyMedium: React.CSSProperties;
-        labelLarge: React.CSSProperties;
-        labelMedium: React.CSSProperties;
-        titleLarge: React.CSSProperties;
-        labelSmall: React.CSSProperties;
-        bodySmall: React.CSSProperties;
+        titleMedium?: React.CSSProperties;
+        titleSmall?: React.CSSProperties;
+        bodyLarge?: React.CSSProperties;
+        bodyMedium?: React.CSSProperties;
+        labelLarge?: React.CSSProperties;
+        labelMedium?: React.CSSProperties;
+        titleLarge?: React.CSSProperties;
+        labelSmall?: React.CSSProperties;
+        bodySmall?: React.CSSProperties;
     }
 
     // 允许icon使用

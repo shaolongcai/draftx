@@ -205,7 +205,7 @@ const ChatInput: React.FC<Props> = ({ onClose }) => {
                     flex: 1,
                     color: theme.palette.text.primary,
                     '& input::placeholder': {
-                        color: 'rgba(0, 0, 0, 0.65)', // 45% 透明度
+                        color: theme.palette.text.primary,
                     }
                 }}
             />

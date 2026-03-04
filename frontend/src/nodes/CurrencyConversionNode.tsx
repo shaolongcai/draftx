@@ -115,7 +115,7 @@ function CurrencyConversionComponent({
                     },
                 }}
             >
-                <div style={{ padding: '8px 16px', position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
+                <div style={{ padding: '8px 16px', position: 'sticky', top: 0, zIndex: 1 }}>
                     <TextField
                         size="small"
                         placeholder="Search currency..."
@@ -125,7 +125,7 @@ function CurrencyConversionComponent({
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
-                                    <SearchIcon fontSize="small" />
+                                    <SearchIcon fontSize="small"  />
                                 </InputAdornment>
                             ),
                         }}

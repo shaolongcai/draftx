@@ -67,7 +67,7 @@ const ToolBar: React.FC<Props> = ({
     // 引入 MUI 主题
     const theme = useTheme();
     const { setMode, mode } = useColorScheme() //调用 setMode('主题色的键，例如red') 即可调用对应主题颜色
-    // setMode('default');
+
     console.log('mode', mode)
 
     // 检查更新
@@ -95,7 +95,6 @@ const ToolBar: React.FC<Props> = ({
             // 回退到上一个草稿
             buttons.push({
                 icon: <BackIcon className={!historyStack.canBack() ? 'text-white/40!' : ''} />,
-                className: 'hover:bg-[#9F7207]/70',
                 disabled: !historyStack.canBack(),
                 tip: isMac ? 'Back to the previous draft  ( ⌘ + [ )' : 'Back to the previous draft  ( Alt + [ )',
                 onClick: () => handleForwardOrBack('back'),
@@ -104,7 +103,6 @@ const ToolBar: React.FC<Props> = ({
             // 前进到下一个草稿
             buttons.push({
                 icon: <ForwardIcon className={!historyStack.canForward() ? 'text-white/40!' : ''} />,
-                className: 'hover:bg-[#9F7207]/70',
                 disabled: !historyStack.canForward(),
                 tip: isMac ? 'Forward to the next draft  ( ⌘ + ] )' : 'Forward to the next draft  ( Alt + ] )',
                 onClick: () => handleForwardOrBack('forward'),
@@ -118,7 +116,6 @@ const ToolBar: React.FC<Props> = ({
         // 添加草稿
         buttons.push({
             icon: <AddIcon />,
-            className: 'hover:bg-[#9F7207]/70',
             tip: isMac ? 'Add a new draft  ( ⌘ + N )' : 'Add a new draft  ( Alt + N )',
             onClick: () => {
                 setCurrentPage('draft');
@@ -130,7 +127,6 @@ const ToolBar: React.FC<Props> = ({
         if (currentPage === 'draft') {
             buttons.push({
                 icon: <AllIcon />,
-                className: 'hover:bg-[#9F7207]/70',
                 tip: 'Show all drafts',
                 onClick: () => setCurrentPage('list'),
             });
@@ -140,7 +136,6 @@ const ToolBar: React.FC<Props> = ({
         if (currentPage === 'list') {
             buttons.push({
                 icon: <DraftIcon />,
-                className: 'hover:bg-[#9F7207]/70',
                 tip: 'Back the draft',
                 onClick: () => setCurrentPage('draft'),
             });
@@ -150,7 +145,6 @@ const ToolBar: React.FC<Props> = ({
         if (currentPage === 'draft') {
             buttons.push({
                 icon: <AIChatIcon />,
-                className: 'hover:bg-[#9F7207]/70',
                 tip: isMac ? 'Chat with AI (⌥ + C)' : 'Chat with AI (Alt + C)',
                 onClick: () => setIsChatMode(true),
             });
@@ -162,7 +156,6 @@ const ToolBar: React.FC<Props> = ({
             // 导出 Markdown
             buttons.push({
                 icon: <ExportIcon />,
-                className: 'hover:bg-[#9F7207]/70',
                 tip: 'Export as Markdown',
                 onClick: () => handleOnclickTool$.emit('exportMarkdown'),
             });

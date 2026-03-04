@@ -1,6 +1,8 @@
-import { createTheme, Theme } from "@mui/material";
+import { Theme } from "@mui/material";
+import { createTheme } from '@mui/material/styles';
 // When using TypeScript 3.x and below
 // import '@mui/lab/themeAugmentation';
+
 
 //主题
 export const theme = createTheme({
@@ -9,84 +11,38 @@ export const theme = createTheme({
     //     colorSchemeSelector: 'class', // 使用 class 切换主题，避免闪烁
     // },
     colorSchemes: {
-        default: {
-            palette: {
-                primary: {
-                    main: '#9F7207',
-                    contrastText: '#FFFFFF',
-                },
-                text: {
-                    primary: 'rgba(0, 0, 0, 0.85)',
-                },
-                background: {
-                    default: '#F9F3E5',
-                    paper: '#2D2D2D',
-                },
-            },
-        },
-        light: {
-            palette: {
-                primary: {
-                    main: '#9F7207',
-                    contrastText: '#FFFFFF',
-                },
-                text: {
-                    primary: 'rgba(0, 0, 0, 0.85)',
-                },
-                background: {
-                    default: '#F9F3E5',
-                    paper: '#2D2D2D',
-                },
-            },
-        },
-        ocean: {
-            palette: {
-                primary: {
-                    main: '#0288D1',
-                    contrastText: '#FFFFFF',
-                },
-                background: {
-                    default: '#E3F2FD',
-                    paper: '#FFFFFF',
-                },
-                text: {
-                    primary: '#0D47A1',
-                }
-            },
-        },
-        dark: {
-            palette: {
-                primary: {
-                    main: '#E36F1C',
-                    contrastText: '#FFFFFF',
-                },
-                text: {
-                    primary: '#FFFFFF',
-                },
-                background: {
-                    default: '#0A0A0A',
-                    paper: '#2D2D2D',
+        // light: {
+        //     palette: {
+        //         primary: {
+        //             main: '#0F766E',
+        //             contrastText: '#FFFFFF',
+        //         },
+        //         text: {
+        //             primary: 'rgba(0, 0, 0, 0.85)',
+        //         },
+        //         background: {
+        //             default: '#FFFFFF',
+        //             paper: '#FAFAFA',
+        //         },
+        //     },
+        // },
+        // dark: {
+        //     palette: {
+        //         primary: {
+        //             main: '#E36F1C',
+        //             contrastText: '#FFFFFF',
+        //         },
+        //         text: {
+        //             primary: '#FFFFFF',
+        //         },
+        //         background: {
+        //             default: '#0A0A0A',
+        //             paper: '#2D2D2D',
 
-                },
-                // ...other tokens
-            },
-        },
-        forest: {
-            palette: {
-                primary: {
-                    main: '#FF5733',
-                    contrastText: '#FFFFFF',
-                },
-                text: {
-                    primary: '#FFFFFF',
-                },
-                background: {
-                    default: '#0A0A0A',
-                    paper: '#2D2D2D',
-                },
-                // ...other tokens
-            },
-        }
+        //         },
+        //         // ...other tokens
+        //     },
+        // },
     },
 
     //组件
@@ -101,14 +57,7 @@ export const theme = createTheme({
                     border: '1px solid rgba(0, 0, 0, 0.25)',
                     boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.05)',
                 }),
-                // root: {
-                //     borderRadius: '16px',
-                //     padding: '24px',
-                //     backgroundColor: '#F9F3E5',
-                //     border: '1px solid rgba(0, 0, 0, 0.25)',
-                //     boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.05)',
-                // }
-            }
+            },
         },
 
         // 按钮
@@ -119,17 +68,9 @@ export const theme = createTheme({
                     color: theme.palette.primary.contrastText,
                     border: 'none',
                     '&:hover': {
-                        backgroundColor: '#333333',
+                        backgroundColor: theme.palette.background.paper, // 85% 透明度
                     }
                 })
-                // contained: {
-                //     backgroundColor: '#9F7207',
-                //     color: '#FFFFFF',
-                //     border: 'none',
-                //     '&:hover': {
-                //         backgroundColor: '#333333',
-                //     }
-                // }
             }
         },
 
@@ -263,4 +204,56 @@ export const theme = createTheme({
     //         main: '#FF4D4F',
     //     },
     // }
+})
+
+// 默认主题
+export const defaultTheme = createTheme(theme, {
+    palette: {
+        primary: {
+            main: '#9F7207',
+            contrastText: '#FFFFFF',
+        },
+        text: {
+            primary: 'rgba(0, 0, 0, 0.85)',
+        },
+        background: {
+            default: '#F9F3E5',
+            paper: '#2D2D2D',
+        },
+    },
+})
+
+// 森林主题
+export const forestTheme = createTheme(theme, {
+    palette: {
+        primary: {
+            main: '#51B343',
+            contrastText: '#FFFFFF',
+        },
+        text: {
+            primary: 'rgba(0, 0, 0, 0.85)',
+        },
+        background: {
+            default: '#F5FFF5',
+            paper: '#DEFFDE',
+        },
+    },
+})
+
+// 暗黑主题
+export const darkTheme = createTheme(theme, {
+    palette: {
+        primary: {
+            main: '#E36F1C',
+            contrastText: '#FFFFFF',
+        },
+        text: {
+            primary: '#FFFFFF',
+        },
+        background: {
+            default: '#0A0A0A',
+            paper: '#2D2D2D',
+
+        },
+    },
 })

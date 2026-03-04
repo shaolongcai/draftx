@@ -5,7 +5,7 @@ import { theme } from './theme'
 import { NotificationsProvider } from '@toolpad/core/useNotifications';
 // import { globalContext } from '@/contexts/globalContext';
 import { EventProvider } from './contexts/EvenContext'
-
+import { forestTheme, darkTheme, defaultTheme } from './theme'
 
 // Provider 初始化与订阅（示例）
 function RootProviders({ children }) {
@@ -19,11 +19,23 @@ function RootProviders({ children }) {
 
 
     const [isReadyAI, setIsReadyAI] = useState<boolean>(false);
+    const currentTheme = window.electronAPI.getConfig('theme')
 
+    // 主题变更器
+    const getTheme = () => {
+        if (currentTheme === 'forest') {
+            return forestTheme
+        } else if (currentTheme === 'dark') {
+            return darkTheme
+        } else {
+            // return defaultTheme
+            return forestTheme
+        }
+    }
 
     return (
         // <I18nProvider defaultLanguage={lang}>
-        <ThemeProvider theme={theme}>
+        <ThemeProvider theme={getTheme()}>
             {/* <globalContext.Provider value={{
                     os: getOs(),
                     gpuInfo,
@@ -34,12 +46,9 @@ function RootProviders({ children }) {
             <NotificationsProvider
                 slotProps={{
                     snackbar: {
-                        anchorOrigin: { vertical: 'bottom', horizontal: 'center' },
-                        sx: {
-                            // width: 400,
-                        }
+                        anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
+                        autoHideDuration: 2000,
                     },
-
                 }}>
                 <EventProvider >
                     {children}
