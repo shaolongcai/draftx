@@ -1,4 +1,4 @@
-import { ipcMain, app, shell, clipboard, dialog } from 'electron';
+import { ipcMain, app, shell, clipboard, dialog, BrowserWindow } from 'electron';
 import { getConfig, setConfig } from '../database/sqlite.js';
 import pathConfig from '../core/pathConfigs.js';
 import { logger } from '../core/logger.js';
@@ -36,6 +36,12 @@ export function initializeSystemApi() {
             const { registerGlobalShortcut } = await import('../main/main.js');
             registerGlobalShortcut();
         }
+
+        // 广播配置变更到所有窗口
+        BrowserWindow.getAllWindows().forEach(win => {
+            win.webContents.send('config-changed', { key, value });
+        });
+
         return config;
     })
 

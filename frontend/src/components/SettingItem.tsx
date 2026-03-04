@@ -1,4 +1,4 @@
-import { Paper, Stack, Typography, Button, Switch } from "@mui/material"
+import { Paper, Stack, Typography, Button, Switch, useTheme } from "@mui/material"
 // import { useTranslation } from '@/contexts/I18nContext';
 
 
@@ -32,6 +32,7 @@ const SettingItem: React.FC<Props> = ({
 }) => {
 
     // const { t } = useTranslation();
+    const theme = useTheme()
 
     // 渲染末位的操作
     const generateAction = (type: ActionType) => {
@@ -101,7 +102,11 @@ const SettingItem: React.FC<Props> = ({
     }
 
     return (
-        <Paper className="bg-[#9F7207] px-4 py-3 rounded-2xl w-full" variant='outlined' >
+        <Paper className="px-4 py-3 rounded-2xl w-full" variant='outlined'
+            sx={{
+                backgroundColor: theme.palette.primary.main,
+            }}
+        >
             <Stack direction='row' justifyContent='space-between' alignItems='center'>
                 <Typography variant='bodyLarge' color="text.primary" className=" text-white" >
                     {title}

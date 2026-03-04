@@ -46,7 +46,7 @@ class WindowManager {
             frame: true,       // 有无边框
             resizable: true, // 是否可调整大小
             movable: true,
-            alwaysOnTop: true,  // 总在最前
+            alwaysOnTop: false,  // 总在最前
             skipTaskbar: true,  // 不占用任务栏
             show: false,        // 先不显示
             // transparent: true,
@@ -105,7 +105,7 @@ class WindowManager {
             frame: true,       // 无边框
             resizable: true,
             movable: true,
-            alwaysOnTop: true,  // 总在最前
+            alwaysOnTop: false,  // 总在最前
             skipTaskbar: true,  // 不占用任务栏
             show: false,        // 先不显示
             roundedCorners: true,

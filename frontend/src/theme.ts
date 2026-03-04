@@ -257,3 +257,20 @@ export const darkTheme = createTheme(theme, {
         },
     },
 })
+
+// 白色主题
+export const whiteTheme = createTheme(theme, {
+    palette: {
+        primary: {
+            main: '#0F766E',
+            contrastText: '#FFFFFF',
+        },
+        text: {
+            primary: 'rgba(0, 0, 0, 0.85)',
+        },
+        background: {
+            default: '#FFFFFF',
+            paper: '#FFFFFF',
+        },
+    },
+})

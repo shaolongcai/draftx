@@ -9,7 +9,7 @@ type StickyParmas = {
 }
 
 // 配置类型
-type ConfigType = 'isFinishGuide' | 'ai_provider' | 'licenseData' | 'currentUuid' | 'launchShortcut' | 'report_agreement' | 'version'
+type ConfigType = 'isFinishGuide' | 'ai_provider' | 'licenseData' | 'currentUuid' | 'launchShortcut' | 'report_agreement' | 'version' | 'theme'
 // 配置参数
 export type ConfigParams = {
     key: ConfigType;
@@ -68,6 +68,11 @@ interface ElectronAPI {
      * @param 可选 isFinishGuide 是否完成引导
      */
     setConfig: (params: ConfigParams) => Promise<void>;
+
+    /**
+     * 监听配置变更
+     */
+    onConfigChange: (callback: (config: ConfigParams) => void) => () => void;
 
     /**
      * 获取引导memo

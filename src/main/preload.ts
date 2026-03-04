@@ -50,6 +50,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('chat-stream-error', listener);
     return () => ipcRenderer.removeListener('chat-stream-error', listener);
   }, // 监听流式错误
+  onConfigChange: (callback: (config: ConfigParams) => void) => {
+    const listener = (_event: any, config: ConfigParams) => callback(config);
+    ipcRenderer.on('config-changed', listener);
+    return () => ipcRenderer.removeListener('config-changed', listener);
+  }, // 监听配置变更
 
   // 复制相关
   readClipboardText: () => ipcRenderer.invoke('read-clipboard-text'), // 读取系统剪贴板文本

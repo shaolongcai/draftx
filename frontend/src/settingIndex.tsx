@@ -12,6 +12,7 @@ import ProTips from '@/pages/ProTips';
 import ActivationCode from '@/pages/ActivationCode';
 import HotkeysConfig from './pages/HotkeysConfig';
 import ImproveTips from './pages/ImproveTips';
+import ThemeSelect from './pages/ThemeSelect';
 
 
 const APP = () => {
@@ -54,6 +55,7 @@ const APP = () => {
                         <Route path="/ProTips" element={<ProTips />} />
                         <Route path="/hotkeys" element={<HotkeysConfig />} />
                         <Route path="/improveTips" element={<ImproveTips />} />
+                        <Route path="/ThemeSelect" element={<ThemeSelect />} />
                     </Routes>
                     <div />
                 </div>

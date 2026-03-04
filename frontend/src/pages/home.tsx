@@ -20,10 +20,9 @@ const Editor: React.FC = () => {
     // 监听主题变化，设置窗口背景颜色
     useEffect(() => {
         if (theme.palette.background.default) {
-            console.log('theme.palette.background.default', theme.palette.background.default)
             window.electronAPI.setBackgroundColor(theme.palette.background.default);
         }
-    }, [theme.palette.background.default])
+    }, [window.electronAPI.getConfig('theme')])
 
 
     // 初始化路由

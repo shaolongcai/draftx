@@ -1,4 +1,4 @@
-import { IconButton, Stack, Typography } from "@mui/material"
+import { IconButton, Stack, Typography, useTheme } from "@mui/material"
 import { ArrowBack as BackIcon } from "@mui/icons-material"
 import { useNavigate } from "react-router-dom"
 
@@ -15,13 +15,14 @@ const SettingTitle: React.FC<Props> = ({
 }) => {
 
     const navigate = useNavigate()
+    const theme = useTheme()
 
     return (
         <Stack direction='row' alignItems='center' spacing={1}>
-            <IconButton size='medium' onClick={() => { navigate(-1) }}>
+            <IconButton size='medium' onClick={() => { navigate(-1) }} sx={{ color: theme.palette.text.primary }}>
                 <BackIcon fontSize='medium' />
             </IconButton>
-            <Typography variant='headlineMedium'>
+            <Typography variant='headlineMedium' color={theme.palette.text.primary}>
                 {title}
             </Typography>
 

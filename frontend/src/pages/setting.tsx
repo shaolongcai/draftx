@@ -1,4 +1,4 @@
-import { Stack, Typography, IconButton } from "@mui/material"
+import { Stack, Typography, IconButton, useTheme } from "@mui/material"
 import { useEffect, useState } from "react";
 import {
     Close as CloseIcon
@@ -26,10 +26,12 @@ const Setting = () => {
     const [updateStatusText, setUpdateStatusText] = useState('')
     const [autoLaunch, setAutoLaunch] = useState(false) //是否開機自啟動
     const [isPro, setIsPro] = useState(false) //是否已激活Pro版 
+    const [currentTheme, setCurrentTheme] = useState('default') //当前主题
 
     // const context = useGlobalContext();
     // const { t, isLoading } = useTranslation()
     const navigate = useNavigate();
+    const theme = useTheme()
 
     // 检查是否拥有许可
     useEffect(() => {
@@ -47,7 +49,10 @@ const Setting = () => {
             setAiProvider(JSON.parse(res.ai_provider || '{}'))
             setShortcut(res.launchShortcut || '')
             setReportAgreement(res.report_agreement || false)
+            setCurrentTheme(res.theme || 'default') //设置主题
         })
+        // 设置背景颜色
+        window.electronAPI.setBackgroundColor(theme.palette.background.default);
         // // 手动检查一次更新
         // manualCheckUpdate()
     }, [])
@@ -174,6 +179,13 @@ const Setting = () => {
                 <Typography variant='titleSmall' className='color-rgba(0, 0, 0, 0.85)' >
                     System
                 </Typography>
+                {/* 更改主题 */}
+                <SettingItem
+                    title='Theme'
+                    value={currentTheme}
+                    onAction={() => navigate('/ThemeSelect')}
+                    type='button'
+                />
                 {/* 打开日志 */}
                 <SettingItem
                     title='Log Folder'

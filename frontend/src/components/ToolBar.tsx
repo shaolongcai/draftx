@@ -68,8 +68,6 @@ const ToolBar: React.FC<Props> = ({
     const theme = useTheme();
     const { setMode, mode } = useColorScheme() //调用 setMode('主题色的键，例如red') 即可调用对应主题颜色
 
-    console.log('mode', mode)
-
     // 检查更新
     const { data: updateInfo } = useRequest(async () => {
         return await window.electronAPI.checkForUpdates();
