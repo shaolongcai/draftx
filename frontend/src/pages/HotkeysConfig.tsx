@@ -1,4 +1,4 @@
-import { Button, Stack, Typography } from "@mui/material";
+import { Button, Stack, Typography, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNotifications } from "@toolpad/core/useNotifications";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -13,6 +13,7 @@ const HotkeysConfig = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const { t } = useTranslation();
+    const theme = useTheme()
 
     // 检查是否已完成初始配置，检查热键配置
     useEffect(() => {
@@ -162,7 +163,7 @@ const HotkeysConfig = () => {
                 )
             }
             <Stack spacing={3} alignItems='center' justifyContent='center' className="h-screen pb-20">
-                <Typography variant='bodyLarge' fontWeight={700} textAlign='center'>
+                <Typography variant='bodyLarge' fontWeight={700} textAlign='center' color='textPrimary'>
                     {t('app.shortcut.brief')}
                 </Typography>
                 <Stack alignItems="center" spacing={1}>
@@ -172,6 +173,7 @@ const HotkeysConfig = () => {
                             ? 'border-red-500 text-red-500 bg-red-50'
                             : 'border-[#9F7207]'
                             }`}
+                        color='textPrimary'
                     >
                         {formatShortcutForDisplay(shortcut)}
                     </Typography>
