@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Theme, ThemeProvider } from '@mui/material'
-import { I18nProvider } from '@/contexts/I18nContext';
+import { I18nProvider, useI18n } from '@/contexts/I18nContext';
 import { NotificationsProvider } from '@toolpad/core/useNotifications';
 import { EventProvider } from './contexts/EvenContext'
 import { forestTheme, darkTheme, defaultTheme, whiteTheme } from './theme'
@@ -8,16 +8,14 @@ import { GlobalContext } from '@/contexts/GlobalContext';
 
 // Provider 初始化与订阅（示例）
 function RootProviders({ children }) {
+
     const [lang, setLang] = useState('en-US');
+    const [currentTheme, setCurrentTheme] = useState<Theme>(defaultTheme)
 
     useEffect(() => {
         window.electronAPI.getConfig('app_language').then(setLang);
-        const off = window.electronAPI.onLanguageChanged((l) => setLang(l));
         return () => { /* 如果暴露了移除监听就调用 */ };
     }, []);
-
-    const [currentTheme, setCurrentTheme] = useState<Theme>(defaultTheme)
-
 
     const setTheme = (themeName: string) => {
         console.log('setTheme', themeName)
@@ -46,6 +44,11 @@ function RootProviders({ children }) {
                 const theme = getTheme(config.value)
                 setCurrentTheme(theme)
             }
+            // todo 删除单独的监听语言变更函数
+            if (config.key === 'app_language') {
+                console.log('切换语言', config.value)
+                setLang(config.value)
+            }
         });
 
         return () => {
@@ -69,7 +72,7 @@ function RootProviders({ children }) {
     }
 
     return (
-        <I18nProvider defaultLanguage={lang}>
+        <I18nProvider defaultLanguage={lang} language={lang}>
             <ThemeProvider theme={currentTheme}>
                 <GlobalContext.Provider value={{
                     setTheme,

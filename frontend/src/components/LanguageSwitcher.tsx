@@ -96,6 +96,8 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
         try {
             // 調用上下文中的設定語言函數
             await setLanguage(language);
+            // 设置配置
+            // window.electronAPI.setConfig({ key: 'app_language', value: language });
         } catch (error) {
             // 如果切換失敗，在控制台輸出錯誤信息
             console.error('切换语言失败？请告知我们:', error);

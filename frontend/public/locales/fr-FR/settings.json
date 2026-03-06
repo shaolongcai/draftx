@@ -1,0 +1,21 @@
+{
+    "title": "Paramètres",
+    "userExperience": "Programme d'amélioration de l'expérience utilisateur",
+    "Shortcut": "Raccourci",
+    "autoLaunch": "Lancement auto",
+    "language": "Langue",
+    "logFolder": "Dossier logs",
+    "open": "Ouvrir",
+    "theme": "Thème",
+    "system": "Système",
+    "checkUpdate": "Vérifier les mises à jour",
+    "check": "Vérifier",
+    "checking": "Vérification...",
+    "contact": "Contact",
+    "checkUpdateStatusLatest": "Vous avez la dernière version",
+    "checkUpdateStatusNewVersion": "Nouvelle version trouvée : {{version}}" ,
+    "generalSettings": "Paramètres généraux",
+    "aiSettings": "Serveur IA",
+    "aiProvider": "Fournisseur IA (Pro)",
+    "update": "Mettre à jour"
+}

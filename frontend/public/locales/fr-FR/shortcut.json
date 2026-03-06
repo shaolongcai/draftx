@@ -1,0 +1,6 @@
+{
+    "title": "Raccourci",
+    "brief": "Appuyez sur une combinaison de touches",
+    "button": "Définir le raccourci",
+    "error": "Ceci est un raccourci réservé par le système,\n veuillez en choisir un autre."
+}

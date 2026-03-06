@@ -186,7 +186,7 @@ const ToolBar: React.FC<Props> = ({
         }
 
         return buttons;
-    }, [currentPage, setCurrentPage, historyVersion, isMac, updateInfo, isDownloading, downloadProgress]);
+    }, [currentPage, setCurrentPage, historyVersion, isMac, updateInfo, isDownloading, downloadProgress, t]);
 
 
 

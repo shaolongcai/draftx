@@ -1,0 +1,23 @@
+{
+    "navDraftBack": {
+        "mac": "前の下書きに戻る ( ⌘ + [ )",
+        "win": "前の下書きに戻る ( Alt + [ )"
+    },
+    "navDraftForward": {
+        "mac": "次の下書きに進む ( ⌘ + ] )",
+        "win": "次の下書きに進む ( Alt + ] )"
+    },
+    "addDraft": {
+        "mac": "新しい下書きを追加 ( ⌘ + N )",
+        "win": "新しい下書きを追加 ( Alt + N )"
+    },
+    "showAllDrafts": "すべての下書きを表示",
+    "backDraft": "下書きに戻る",
+    "chatAI": {
+        "mac": "AIとチャット ( ⌥ + C )",
+        "win": "AIとチャット ( Alt + C )"
+    },
+    "exportMarkdown": "Markdownとしてエクスポート",
+    "downloading": "ダウンロード中...",
+    "updateAvailable": "更新が利用可能です"
+}

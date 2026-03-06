@@ -138,7 +138,7 @@ const Setting = () => {
         <Stack direction='row' justifyContent='space-between' alignItems='center' >
             <Stack direction='row' spacing={1}>
                 <Typography variant='headlineSmall' color='textPrimary' >
-                    Setting
+                    {t('app.settings.title')}
                 </Typography>
                 {
                     isPro && (
@@ -160,7 +160,7 @@ const Setting = () => {
                 <SettingItem
                     title={t('app.settings.aiProvider')}
                     type='button'
-                    value={aiProvider?.model || 'Set'}
+                    value={aiProvider?.model || t('app.settings.set')}
                     onAction={() => {
                         isPro ? navigate('/AIProvider') : navigate('/ProTips')
                     }}

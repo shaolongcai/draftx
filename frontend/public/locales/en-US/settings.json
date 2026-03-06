@@ -17,5 +17,6 @@
     "generalSettings": "General Settings",
     "aiSettings": "AI Sever",
     "aiProvider": "AI Provider (Pro)",
-    "update": "Update"
+    "update": "Update",
+    "set": "Set"
 }

@@ -1,0 +1,13 @@
+{
+    "placeholder": "按 Enter 发送",
+    "chip": {
+        "withDraft": "带草稿生成",
+        "freedom": "自由对话"
+    },
+    "close": {
+        "mac": "关闭对话 ( ⌘ + C )",
+        "win": "关闭对话 ( Alt + C )"
+    },
+    "configureTips": "请先在设置中配置 AI 提供商。",
+    "Generating": "AI 生成中..."
+}

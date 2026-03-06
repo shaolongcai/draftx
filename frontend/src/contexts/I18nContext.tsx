@@ -9,12 +9,14 @@ const I18nContext = createContext<I18nContextType | undefined>(undefined);
 interface I18nProviderProps {
     children: ReactNode;
     defaultLanguage?: Language;
+    language?: Language; // 当前的语言
 }
 
 // 翻譯上下文提供者組件
 export const I18nProvider: React.FC<I18nProviderProps> = ({
     children,
-    defaultLanguage = 'en-US'
+    defaultLanguage = 'en-US',
+    language,
 }) => {
     const [currentLanguage, setCurrentLanguage] = useState<Language>(defaultLanguage);
     const [translations, setTranslations] = useState<Partial<TranslationResources>>({});
@@ -39,6 +41,14 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({
         'list',
         'chatWithAI',
     ] as const;
+
+
+    // 变更语言
+    useEffect(() => {
+        if (language) {
+            setCurrentLanguage(language);
+        }
+    }, [language]);
 
     // 動態載入翻譯文件
     const loadTranslation = async (language: Language): Promise<void> => {
@@ -165,7 +175,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({
         // 確保翻譯文件已載入
         await loadTranslation(language);
 
-        setCurrentLanguage(language);
+        setCurrentLanguage(language); //设置页面改了，主页面不生效，因为两个窗口在不一样的内存，是两个独立的组件
 
         // 更新 HTML 元素的 lang 屬性
         document.documentElement.lang = language;
@@ -182,7 +192,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({
                     type: 'string'
                 });
                 // 通知後端更新托盤菜單語言
-                window.electronAPI.updateTrayLanguage(language);
+                // window.electronAPI.updateTrayLanguage(language);
             } catch (error) {
                 console.error('保存語言設置到數據庫失敗:', error);
             }
@@ -228,7 +238,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({
                         type: 'string'
                     });
                     // 更新托盤菜單語言
-                    window.electronAPI.updateTrayLanguage(initialLanguage);
+                    // window.electronAPI.updateTrayLanguage(initialLanguage);
                     console.log(`已將語言設置同步到數據庫: ${initialLanguage}`);
                 } catch (error) {
                     console.error('初始化語言設置到數據庫失敗:', error);

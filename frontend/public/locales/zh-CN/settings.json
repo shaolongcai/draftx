@@ -1,11 +1,13 @@
 {
     "title": "设置",
     "userExperience": "用户体验改进计划",
+    "Shortcut": "快捷键",
     "autoLaunch": "开机自动启动",
     "language": "语言",
     "logFolder": "日志",
     "open": "打开",
-    "feedback": "反馈",
+    "theme": "主题",
+    "system": "跟随系统",
     "checkUpdate": "检查更新",
     "check": "检查",
     "checking": "检查中...",
@@ -14,6 +16,9 @@
     "checkUpdateStatusNewVersion": "发现新版本：{{version}}",
     "generalSettings": "一般设置",
     "aiSettings": "AI 设置",
+    "aiProvider": "AI 提供商 (Pro)",
     "update": "更新",
-    "website": "官方网站"
+    "feedback": "反馈",
+    "website": "官方网站",
+    "set": "设置"
 }
