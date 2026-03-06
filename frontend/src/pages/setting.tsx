@@ -4,11 +4,10 @@ import {
     Close as CloseIcon
 } from '@mui/icons-material';
 // import { useGlobalContext } from "@/contexts/globalContext";
-import { Contact, SettingItem } from "@/components";
-// import { useTranslation } from '@/contexts/I18nContext';
+import { Contact, SettingItem, LanguageSwitcher } from "@/components";
+import { useTranslation } from '@/contexts/I18nContext';
 import { useNavigate } from 'react-router-dom';
 import { ConfigParams } from "@/type/electron";
-// import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 
 /**
@@ -29,7 +28,7 @@ const Setting = () => {
     const [currentTheme, setCurrentTheme] = useState('default') //当前主题
 
     // const context = useGlobalContext();
-    // const { t, isLoading } = useTranslation()
+    const { t, isLoading } = useTranslation()
     const navigate = useNavigate();
     const theme = useTheme()
 
@@ -235,17 +234,17 @@ const Setting = () => {
                     onAction={toggleAutoLaunch}
                 />
             </Stack>
-            {/* <Stack spacing={1} >
-                            <Typography variant='titleSmall' >
-                                Language
-                            </Typography>
-                            <SettingItem
-                                title={t('app.settings.language')}
-                                type='custom'
-                                onAction={() => { }}
-                                action={<LanguageSwitcher variant='select' size='small' showLabel={false} />}
-                            />
-                        </Stack> */}
+            <Stack spacing={1} >
+                <Typography variant='titleSmall' >
+                    Language
+                </Typography>
+                <SettingItem
+                    title={t('app.settings.language')}
+                    type='custom'
+                    onAction={() => { }}
+                    action={<LanguageSwitcher variant='select' size='small' showLabel={false} />}
+                />
+            </Stack>
             <Stack spacing={1} >
                 <Typography variant='titleSmall' color='textPrimary' >
                     Contact

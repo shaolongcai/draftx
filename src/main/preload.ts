@@ -56,6 +56,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return () => ipcRenderer.removeListener('config-changed', listener);
   }, // 监听配置变更
 
+  onLanguageChanged: (callback) => {
+    ipcRenderer.on('language-changed', (event, language) => callback(language));
+    return () => ipcRenderer.removeListener('language-changed', callback);
+  },// 語言更改監聽
+
   // 复制相关
   readClipboardText: () => ipcRenderer.invoke('read-clipboard-text'), // 读取系统剪贴板文本
 

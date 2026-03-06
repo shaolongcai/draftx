@@ -21,12 +21,14 @@ const Contact: React.FC = () => {
         <Stack spacing={2} alignItems='center' direction='row'>
             <Paper
                 elevation={0}
+                variant='outlined'
                 onClick={() => window.electronAPI.openExternalUrl('https://discord.gg/TyArpAVf6A')}
                 className='p-4 rounded-[8px]! box-border cursor-pointer'
             >
                 <img src={DiscordIcon} className='w-10 h-10' />
             </Paper>
             <Paper
+                variant='outlined'
                 elevation={0}
                 className=' p-4 rounded-[8px]! box-border cursor-pointer'
                 onClick={copyEmail}

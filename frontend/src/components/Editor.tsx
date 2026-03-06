@@ -40,21 +40,9 @@ import { CurrencyConversionPlugin } from "@/plugin/CurrencyConversionPlugin";
 import { StatisticsPlugin } from "@/plugin/StatisticsPlugin";
 import { $isHeadingNode } from "@lexical/rich-text";
 import { RequestPlugin } from "@/plugin/RequestPlugin";
-// import { useSettings } from '@/contexts/SettingContext';
+import { useTranslation } from "@/contexts/I18nContext";
 
 
-function Placeholder() {
-    return <Box sx={{
-        color: '#ccc',
-        // overflow: 'hidden',
-        position: 'absolute',
-        top: '24px',
-        fontSize: '16px',
-        userSelect: 'none',
-        display: 'inline-block',
-        pointerEvents: 'none',
-    }}>Press / for quick input</Box>;
-}
 
 
 /**
@@ -65,11 +53,25 @@ const EditorContext: React.FC = () => {
     const [currentUuid, setCurrentUuid] = useState<string>('');
     const lastSavedRef = useRef<{ title?: string; contentJson: string; contentText: string }>({ contentJson: '', contentText: '' }); // 上次已保存
 
-    const [editor] = useLexicalComposerContext()
-    const { loadStickys$, handleOnclickTool$ } = useEvent();
     const theme = useTheme()
     const notification = useNotifications();
+    const [editor] = useLexicalComposerContext()
+    const { loadStickys$, handleOnclickTool$ } = useEvent();
+    const { t, isLoading } = useTranslation()
     const isMac = window.electronUtils?.platform === 'darwin' || /macintosh|mac os x/i.test(navigator.userAgent); //考虑放到context中
+
+    function Placeholder() {
+    return <Box sx={{
+        color: '#ccc',
+        // overflow: 'hidden',
+        position: 'absolute',
+        top: '24px',
+        fontSize: '16px',
+        userSelect: 'none',
+        display: 'inline-block',
+        pointerEvents: 'none',
+    }}>{t('app.edit.placeholder')}</Box>;
+}
 
     // 初始化
     useEffect(() => {

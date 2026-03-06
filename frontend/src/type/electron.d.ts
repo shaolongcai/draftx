@@ -9,7 +9,7 @@ type StickyParmas = {
 }
 
 // 配置类型
-type ConfigType = 'isFinishGuide' | 'ai_provider' | 'licenseData' | 'currentUuid' | 'launchShortcut' | 'report_agreement' | 'version' | 'theme'
+type ConfigType = 'isFinishGuide' | 'ai_provider' | 'licenseData' | 'currentUuid' | 'launchShortcut' | 'report_agreement' | 'version' | 'theme' | 'app_language'
 // 配置参数
 export type ConfigParams = {
     key: ConfigType;
@@ -106,6 +106,10 @@ interface ElectronAPI {
      * 删除AI工具
      */
     deleteAITool: (id: number) => Promise<void>;
+    /**
+     * 更新托盘菜单语言
+     */
+    updateTrayLanguage(language: string): void;
 
 
     /**
@@ -193,6 +197,7 @@ interface ElectronAPI {
      */
     saveMarkdown: (content: string, name?: string) => Promise<{ success: boolean, message?: string, filePath?: string }>;
 
+    onLanguageChanged(callback: (language: string) => void): void; // 語言更改監聽
 }
 
 
