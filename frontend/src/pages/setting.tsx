@@ -155,10 +155,10 @@ const Setting = () => {
         <Stack spacing={2} sx={{ marginTop: '16px' }}>
             <Stack spacing={1}>
                 <Typography variant='titleSmall' color='textPrimary' >
-                    AI Sever
+                    {t('app.settings.aiSettings')}
                 </Typography>
                 <SettingItem
-                    title='AI Provider (Pro)'
+                    title={t('app.settings.aiProvider')}
                     type='button'
                     value={aiProvider?.model || 'Set'}
                     onAction={() => {
@@ -176,32 +176,32 @@ const Setting = () => {
             </Stack>
             <Stack spacing={1}>
                 <Typography variant='titleSmall' color='textPrimary' >
-                    System
+                    {t('app.settings.system')}
                 </Typography>
                 {/* 更改主题 */}
                 <SettingItem
-                    title='Theme'
+                    title={t('app.settings.theme')}
                     value={currentTheme}
                     onAction={() => navigate('/ThemeSelect')}
                     type='button'
                 />
                 {/* 打开日志 */}
                 <SettingItem
-                    title='Log Folder'
-                    value='Open'
+                    title={t('app.settings.logFolder')}
+                    value={t('app.settings.open')}
                     onAction={() => window.electronAPI.openDir('runLog')}
                     type='button'
                 />
                 {/* 快捷键设置 */}
                 <SettingItem
-                    title='Shortcut'
+                    title={t('app.settings.Shortcut')}
                     type='button'
                     value={shortcut}
                     onAction={() => navigate('/hotkeys?from=setting')}
                 />
                 {/* 用户体验计划 */}
                 <SettingItem
-                    title='User experience improvement plan'
+                    title={t('app.settings.userExperience')}
                     type='switch'
                     value={reportAgreement}
                     onAction={toggleReportAgreement}
@@ -228,7 +228,7 @@ const Setting = () => {
                             /> */}
                 {/* 自动启动开关 */}
                 <SettingItem
-                    title='Auto Launch'
+                    title={t('app.settings.autoLaunch')}
                     type='switch'
                     value={autoLaunch}
                     onAction={toggleAutoLaunch}
@@ -236,7 +236,7 @@ const Setting = () => {
             </Stack>
             <Stack spacing={1} >
                 <Typography variant='titleSmall' >
-                    Language
+                    {t('app.settings.language')}
                 </Typography>
                 <SettingItem
                     title={t('app.settings.language')}
@@ -247,7 +247,7 @@ const Setting = () => {
             </Stack>
             <Stack spacing={1} >
                 <Typography variant='titleSmall' color='textPrimary' >
-                    Contact
+                    {t('app.settings.contact')}
                 </Typography>
                 <Contact />
             </Stack>

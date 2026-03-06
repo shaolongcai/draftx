@@ -14,7 +14,7 @@ interface I18nProviderProps {
 // 翻譯上下文提供者組件
 export const I18nProvider: React.FC<I18nProviderProps> = ({
     children,
-    defaultLanguage = 'zh-CN'
+    defaultLanguage = 'en-US'
 }) => {
     const [currentLanguage, setCurrentLanguage] = useState<Language>(defaultLanguage);
     const [translations, setTranslations] = useState<Partial<TranslationResources>>({});
@@ -27,19 +27,17 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({
         'search',
         'edit',
         'settings',
-        'common',
+        'shortcut',
         'language',
-        'indexing',
-        'visualIndexStatus',
-        'aiMarkStatus',
         'preload',
         'reportProtocol',
         'updateTips',
-        'aiMark',
         'contact',
-        'table',
         'tray',
         'aiSever',
+        'toolBar',
+        'list',
+        'chatWithAI',
     ] as const;
 
     // 動態載入翻譯文件
@@ -143,9 +141,9 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({
         if (typeof value === 'string') {
             return value;
         }
-        // 如果沒找到，嘗試回退到中文簡體
-        if (language !== 'zh-CN' && translations['zh-CN']) {
-            value = translations['zh-CN'];
+        // 如果沒找到，嘗試回退到英文
+        if (language !== 'en-US' && translations['en-US']) {
+            value = translations['en-US'];
             for (const k of keys) {
                 if (value && typeof value === 'object' && k in value) {
                     value = value[k];

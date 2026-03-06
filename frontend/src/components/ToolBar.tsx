@@ -14,6 +14,7 @@ import { useEvent } from "@/contexts/EvenContext";
 import ChatInput from "./ChatInput";
 import { useKeyPress, useRequest } from "ahooks";
 import { historyStack } from "@/utils/histroyStack";
+import { useTranslation } from "@/contexts/I18nContext";
 
 
 interface ToolButtonProps {
@@ -66,7 +67,8 @@ const ToolBar: React.FC<Props> = ({
 
     // 引入 MUI 主题
     const theme = useTheme();
-    const { setMode, mode } = useColorScheme() //调用 setMode('主题色的键，例如red') 即可调用对应主题颜色
+    // const { setMode, mode } = useColorScheme() //调用 setMode('主题色的键，例如red') 即可调用对应主题颜色
+    const { t } = useTranslation();
 
     // 检查更新
     const { data: updateInfo } = useRequest(async () => {
@@ -94,7 +96,7 @@ const ToolBar: React.FC<Props> = ({
             buttons.push({
                 icon: <BackIcon className={!historyStack.canBack() ? 'text-white/40!' : ''} />,
                 disabled: !historyStack.canBack(),
-                tip: isMac ? 'Back to the previous draft  ( ⌘ + [ )' : 'Back to the previous draft  ( Alt + [ )',
+                tip: t('app.toolBar.navDraftBack.' + (isMac ? 'mac' : 'win')),
                 onClick: () => handleForwardOrBack('back'),
             });
 
@@ -102,7 +104,7 @@ const ToolBar: React.FC<Props> = ({
             buttons.push({
                 icon: <ForwardIcon className={!historyStack.canForward() ? 'text-white/40!' : ''} />,
                 disabled: !historyStack.canForward(),
-                tip: isMac ? 'Forward to the next draft  ( ⌘ + ] )' : 'Forward to the next draft  ( Alt + ] )',
+                tip: t('app.toolBar.navDraftForward.' + (isMac ? 'mac' : 'win')),
                 onClick: () => handleForwardOrBack('forward'),
             });
 
@@ -114,7 +116,7 @@ const ToolBar: React.FC<Props> = ({
         // 添加草稿
         buttons.push({
             icon: <AddIcon />,
-            tip: isMac ? 'Add a new draft  ( ⌘ + N )' : 'Add a new draft  ( Alt + N )',
+            tip: t('app.toolBar.addDraft.' + (isMac ? 'mac' : 'win')),
             onClick: () => {
                 setCurrentPage('draft');
                 handleOnclickTool$.emit('addDraft');
@@ -125,7 +127,7 @@ const ToolBar: React.FC<Props> = ({
         if (currentPage === 'draft') {
             buttons.push({
                 icon: <AllIcon />,
-                tip: 'Show all drafts',
+                tip: t('app.toolBar.showAllDrafts'),
                 onClick: () => setCurrentPage('list'),
             });
         }
@@ -134,7 +136,7 @@ const ToolBar: React.FC<Props> = ({
         if (currentPage === 'list') {
             buttons.push({
                 icon: <DraftIcon />,
-                tip: 'Back the draft',
+                tip: t('app.toolBar.backDraft'),
                 onClick: () => setCurrentPage('draft'),
             });
         }
@@ -143,7 +145,7 @@ const ToolBar: React.FC<Props> = ({
         if (currentPage === 'draft') {
             buttons.push({
                 icon: <AIChatIcon />,
-                tip: isMac ? 'Chat with AI (⌥ + C)' : 'Chat with AI (Alt + C)',
+                tip: t('app.toolBar.chatAI.' + (isMac ? 'mac' : 'win')),
                 onClick: () => setIsChatMode(true),
             });
 
@@ -154,7 +156,7 @@ const ToolBar: React.FC<Props> = ({
             // 导出 Markdown
             buttons.push({
                 icon: <ExportIcon />,
-                tip: 'Export as Markdown',
+                tip: t('app.toolBar.exportMarkdown'),
                 onClick: () => handleOnclickTool$.emit('exportMarkdown'),
             });
         }
@@ -176,7 +178,7 @@ const ToolBar: React.FC<Props> = ({
                 // 显示更新按钮
                 buttons.push({
                     icon: <UpdateIcon />,
-                    tip: 'Update available',
+                    tip: t('app.toolBar.updateAvailable'),
                     className: 'animate-pulse text-green-400 hover:text-green-300',
                     onClick: handleUpdate,
                 });

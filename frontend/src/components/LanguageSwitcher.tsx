@@ -6,7 +6,7 @@ import { useTranslation } from '@/contexts/I18nContext';
 import { Language } from '@/type/i18n';
 import { LANGUAGE_CONFIGS, getLanguageConfig } from '@/config/languages';
 // 導入 Material-UI 組件
-import { Button, ButtonGroup, Box, Select, MenuItem, FormControl } from '@mui/material';
+import { Button, ButtonGroup, Box, Select, MenuItem, FormControl, useTheme } from '@mui/material';
 // 導入國旗 React 組件
 import {
     ChinaFlag,
@@ -24,6 +24,7 @@ const FLAG_COMPONENTS: Record<string, React.FC<{ width?: number; height?: number
     fr: FranceFlag,
     de: GermanyFlag,
     jp: JapanFlag,
+    tw: ChinaFlag,
     kr: SouthKoreaFlag,
     us: UnitedStatesFlag,
     sa: SaudiArabiaFlag,
@@ -57,6 +58,7 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
 }) => {
     // 從國際化上下文中獲取翻譯函數、當前語言、設定語言函數和載入狀態
     const { t, currentLanguage, setLanguage, isLoading } = useTranslation();
+    const theme = useTheme()
 
     // 支援的語言列表
     // 從統一配置文件中提取所有語言代碼，用於遍歷渲染
@@ -131,10 +133,13 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
                 variant={getButtonVariant(lang)}              // 按鈕變體樣式
                 color={getButtonColor(lang) as any}           // 按鈕顏色主題
                 onClick={() => handleLanguageChange(lang)}    // 點擊事件處理
-                disabled={isLoading}                          // 載入時禁用按鈕
+                disabled={isLoading}                        // 載入時禁用按鈕
+                sx={{
+                    color:'#fff' 
+                }}
             >
                 {/* 按鈕內容：國旗圖示 + 語言名稱 */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1}}>
                     {getFlagByLanguage(lang)}
                     <span>{getLanguageText(lang)}</span>
                 </Box>
@@ -182,6 +187,7 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
                                 alignItems: 'center',
                                 gap: 8,
                                 paddingY: '8px',
+                                color:theme.palette.primary.contrastText,
                             },
                             minHeight: size === 'small' ? 36 : 40,  // 根據尺寸設定最小高度
                             borderRadius: 1.5,                      // 圓角邊框

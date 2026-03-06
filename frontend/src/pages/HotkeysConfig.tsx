@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNotifications } from "@toolpad/core/useNotifications";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { SettingTitle } from "@/components";
+import { useTranslation } from "@/contexts/I18nContext";
 
 
 const HotkeysConfig = () => {
@@ -11,6 +12,7 @@ const HotkeysConfig = () => {
     const notification = useNotifications();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+    const { t } = useTranslation();
 
     // 检查是否已完成初始配置，检查热键配置
     useEffect(() => {
@@ -156,12 +158,12 @@ const HotkeysConfig = () => {
             {
                 // 仅设置页面进入需要标题
                 searchParams.get('from') === 'setting' && (
-                    <SettingTitle title="Shortcut" />
+                    <SettingTitle title={t('app.shortcut.title')} />
                 )
             }
             <Stack spacing={3} alignItems='center' justifyContent='center' className="h-screen pb-20">
                 <Typography variant='bodyLarge' fontWeight={700} textAlign='center'>
-                    Press any key combination to set the launch shortcut
+                    {t('app.shortcut.brief')}
                 </Typography>
                 <Stack alignItems="center" spacing={1}>
                     <Typography
@@ -175,7 +177,7 @@ const HotkeysConfig = () => {
                     </Typography>
                     {isReserved && (
                         <Typography variant="bodySmall" color="error" textAlign='center' >
-                            This is a system-reserved shortcut,<br /> please choose another one.
+                            {t('app.shortcut.error')}
                         </Typography>
                     )}
                 </Stack>
@@ -187,7 +189,7 @@ const HotkeysConfig = () => {
                     disabled={isReserved}
                     color={isReserved ? "error" : "primary"}
                 >
-                    Set Shortcut
+                    {t('app.shortcut.button')}
                 </Button>
             </Stack>
         </>

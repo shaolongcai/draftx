@@ -34,7 +34,7 @@ const LANGUAGE_DATA = [
   ['ko-KR', 'kr', '한국어'],       // Korea
   ['zh-TW', 'tw', '繁體中文'],    // Taiwan
   ['en-US', 'us', 'English'],     // United States
-  ['vi-VN', 'vn', 'Tiếng Việt'],  // Vietnam
+  ['ar-SA', 'sa', 'العربية'],  // Saudi Arabia
 ] as const;
 
 // 動態生成完整的語言配置

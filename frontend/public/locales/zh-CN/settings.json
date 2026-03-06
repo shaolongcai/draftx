@@ -1,0 +1,19 @@
+{
+    "title": "设置",
+    "userExperience": "用户体验改进计划",
+    "autoLaunch": "开机自动启动",
+    "language": "语言",
+    "logFolder": "日志",
+    "open": "打开",
+    "feedback": "反馈",
+    "checkUpdate": "检查更新",
+    "check": "检查",
+    "checking": "检查中...",
+    "contact": "联系我们",
+    "checkUpdateStatusLatest": "目前已是最新版本",
+    "checkUpdateStatusNewVersion": "发现新版本：{{version}}",
+    "generalSettings": "一般设置",
+    "aiSettings": "AI 设置",
+    "update": "更新",
+    "website": "官方网站"
+}

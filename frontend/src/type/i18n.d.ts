@@ -15,6 +15,22 @@ export interface TranslationKeys {
       test: string;
       placeholder: string;
     };
+    // 新增模塊：工具欄
+    toolBar: {
+      addDraft: {
+        mac: string;
+        win: string;
+      };
+      showAllDrafts: string;
+      backDraft: string;
+      chatAI: {
+        mac: string;
+        win: string;
+      };
+      exportMarkdown: string;
+      downloading: string;
+      updateAvailable: string;
+    };
     search: {
       placeholder: string;
       button: string;
@@ -58,52 +74,6 @@ export interface TranslationKeys {
     language: {
       title: string;
     } & LanguageKeys; // 使用映射類型動態生成語言鍵值
-    indexing: {
-      indexed: string;
-      pending: string;
-    };
-    visualIndexStatus: {
-      paused: string;
-      running: string; // 包含剩餘數量 {{count}}
-      finished: string;
-    };
-    // 新增模塊：AI Mark 主介面
-    aiMark: {
-      title: string;
-      requireTitle: string;
-      successTitle: string;
-      step1: {
-        entry: string;
-        desc: string;
-        understand: string;
-        summaryImage: string;
-        ask: string;
-      };
-      step2: {
-        model: string;
-        cuda: string;
-        tips: string;
-      };
-      step3: {
-        done: string;
-      };
-      buttons: {
-        next: string;
-        install: string;
-        finish: string;
-        later: string;
-      };
-    };
-    // 新增模塊：AI Mark 狀態
-    aiMarkStatus: {
-      completed: string;
-      analyzing: string;
-      recording: string;
-      processing?: string;
-      failed?: string;
-      queued?: string;
-      notStarted?: string;
-    };
     // 新增模塊：預載入/更新對話
     preload: {
       loading: string;
@@ -134,20 +104,6 @@ export interface TranslationKeys {
       joinDiscord: string;
       addWechat: string;
     };
-    // 新增模塊：列表表格
-    table: {
-      columns: {
-        name: string;
-        path: string;
-        modifiedAt: string;
-        fileType: string;
-      };
-      menu: {
-        openFile: string;
-        openFolder: string;
-        aiMark: string;
-      };
-    };
   };
 }
 
@@ -162,12 +118,18 @@ export type TranslationKeyPath =
   | 'app.title'
   | 'app.edit.test'
   | 'app.edit.placeholder'
-  | 'app.search.placeholder'
-  | 'app.search.button'
-  | 'app.search.results'
-  | 'app.search.noResults'
-  | 'app.search.noKeyword'
-  | 'app.search.start'
+
+  // 新增模塊：工具欄
+  | 'app.toolBar.addDraft.mac'
+  | 'app.toolBar.addDraft.win'
+  | 'app.toolBar.showAllDrafts'
+  | 'app.toolBar.backDraft'
+  | 'app.toolBar.chatAI.mac'
+  | 'app.toolBar.chatAI.win'
+  | 'app.toolBar.exportMarkdown'
+  | 'app.toolBar.downloading'
+  | 'app.toolBar.updateAvailable'
+  // 设置
   | 'app.settings.title'
   | 'app.settings.visualIndex'
   | 'app.settings.gpuService'
@@ -175,20 +137,14 @@ export type TranslationKeyPath =
   | 'app.settings.language'
   | 'app.settings.logFolder'
   | 'app.settings.open'
-  | 'app.settings.community'
-  | 'app.settings.feedback'
-  | 'app.settings.install'
-  | 'app.settings.reInstall'
   | 'app.settings.checkUpdate'
   | 'app.settings.check'
   | 'app.settings.checking'
   | 'app.settings.checkUpdateStatusLatest'
   | 'app.settings.checkUpdateStatusNewVersion'
-  | 'app.settings.generalSettings'
   | 'app.settings.aiSettings'
   | 'app.settings.update'
   | 'app.settings.about'
-  | 'app.settings.website'
   | 'app.common.confirm'
   | 'app.common.cancel'
   | 'app.common.save'
@@ -198,37 +154,7 @@ export type TranslationKeyPath =
   | 'app.common.settings'
   | 'app.language.title'
   | LanguagePaths // 使用工具類型動態生成語言路徑
-  // 新增的索引與視覺索引狀態鍵
-  | 'app.indexing.indexed'
-  | 'app.indexing.pending'
-  | 'app.visualIndexStatus.paused'
-  | 'app.visualIndexStatus.running'
-  | 'app.visualIndexStatus.finished'
-  // 新增模塊：AI Mark 主介面
-  | 'app.aiMark.title'
-  | 'app.aiMark.requireTitle'
-  | 'app.aiMark.successTitle'
-  | 'app.aiMark.step1.entry'
-  | 'app.aiMark.step1.desc'
-  | 'app.aiMark.step1.understand'
-  | 'app.aiMark.step1.summaryImage'
-  | 'app.aiMark.step1.ask'
-  | 'app.aiMark.step2.model'
-  | 'app.aiMark.step2.cuda'
-  | 'app.aiMark.step2.tips'
-  | 'app.aiMark.step3.done'
-  | 'app.aiMark.buttons.next'
-  | 'app.aiMark.buttons.install'
-  | 'app.aiMark.buttons.finish'
-  | 'app.aiMark.buttons.later'
-  // 新增模塊：AI Mark 狀態
-  | 'app.aiMarkStatus.completed'
-  | 'app.aiMarkStatus.analyzing'
-  | 'app.aiMarkStatus.recording'
-  | 'app.aiMarkStatus.processing'
-  | 'app.aiMarkStatus.failed'
-  | 'app.aiMarkStatus.queued'
-  | 'app.aiMarkStatus.notStarted'
+
   // 新增模塊：預載入/更新對話
   | 'app.preload.loading'
   | 'app.preload.updateTitle'

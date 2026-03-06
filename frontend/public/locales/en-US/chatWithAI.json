@@ -1,0 +1,13 @@
+{
+    "placeholder": "Press Enter to send",
+    "chip": {
+        "withDraft": "Generate with draft",
+        "freedom": "freedom"
+    },
+    "close": {
+        "mac": "Close Chat ( ⌘ + C )",
+        "win": "Close Chat ( Alt + C )"
+    },
+    "configureTips":"Please configure the AI provider in settings first.",
+    "Generating":"AI Generating..."
+}

@@ -1,0 +1,21 @@
+{
+    "title": "Settings",
+    "userExperience": "User experience improvement plan",
+    "Shortcut": "Shortcut",
+    "autoLaunch": "Auto Launch",
+    "language": "Language",
+    "logFolder": "Log Folder",
+    "open": "Open",
+    "theme": "Theme",
+    "system": "System",
+    "checkUpdate": "Check for Updates",
+    "check": "Check",
+    "checking": "Checking...",
+    "contact": "Contact",
+    "checkUpdateStatusLatest": "You are on the latest version",
+    "checkUpdateStatusNewVersion": "New version found: {{version}}",
+    "generalSettings": "General Settings",
+    "aiSettings": "AI Sever",
+    "aiProvider": "AI Provider (Pro)",
+    "update": "Update"
+}
