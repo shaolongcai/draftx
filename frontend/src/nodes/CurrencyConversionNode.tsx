@@ -1,5 +1,5 @@
 
-import { DecoratorNode, LexicalNode, NodeKey, EditorConfig, LexicalEditor, $getNodeByKey } from 'lexical';
+import { DecoratorNode, LexicalNode, NodeKey, EditorConfig, LexicalEditor, $getNodeByKey, $createNodeSelection, $setSelection } from 'lexical';
 import { ReactElement, useState, MouseEvent, useEffect, useMemo } from 'react';
 import { Menu, MenuItem, Stack, Typography, TextField, InputAdornment, IconButton, CircularProgress, useTheme } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -48,8 +48,19 @@ function CurrencyConversionComponent({
     }, [originalUnit, targetUnit, editor, nodeKey]);
 
     const handleClick = (event: MouseEvent<HTMLElement>) => {
+        event.preventDefault();
+        event.stopPropagation();
         setAnchorEl(event.currentTarget);
         setSearchQuery(''); // Reset search on open
+
+        editor.update(() => {
+            const node = $getNodeByKey(nodeKey);
+            if ($isCurrencyConversionNode(node)) {
+                const nodeSelection = $createNodeSelection();
+                nodeSelection.add(nodeKey);
+                $setSelection(nodeSelection);
+            }
+        });
     };
 
     const handleClose = () => {
@@ -110,6 +121,10 @@ function CurrencyConversionComponent({
                 anchorEl={anchorEl}
                 open={open}
                 onClose={handleClose}
+                disableScrollLock={true}
+                autoFocus={false}
+                disableEnforceFocus={true}
+                disableRestoreFocus={true}
                 PaperProps={{
                     style: {
                         maxHeight: 300,
@@ -222,7 +237,7 @@ export class CurrencyConversionNode extends DecoratorNode<ReactElement> {
     }
 
     updateDOM(): boolean {
-        return false;
+        return true;
     }
 
     setTargetUnit(unit: string): void {
