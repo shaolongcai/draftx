@@ -9,7 +9,7 @@ type StickyParmas = {
 }
 
 // 配置类型
-type ConfigType = 'isFinishGuide' | 'ai_provider' | 'licenseData' | 'currentUuid' | 'launchShortcut' | 'report_agreement' | 'version'
+type ConfigType = 'isFinishGuide' | 'ai_provider' | 'licenseData' | 'currentUuid' | 'launchShortcut' | 'report_agreement' | 'version' | 'theme' | 'app_language'
 // 配置参数
 export type ConfigParams = {
     key: ConfigType;
@@ -48,6 +48,11 @@ interface ElectronAPI {
     resizeWindow: (windowName: 'mainWindow' | 'settingsWindow', size: { width: number, height: number }) => Promise<void>;
 
     /**
+     * 设置窗口背景颜色
+     */
+    setBackgroundColor: (color: string) => void;
+
+    /**
      * 获取应用版本
      */
     getAppVersion: () => Promise<string>;
@@ -63,6 +68,11 @@ interface ElectronAPI {
      * @param 可选 isFinishGuide 是否完成引导
      */
     setConfig: (params: ConfigParams) => Promise<void>;
+
+    /**
+     * 监听配置变更
+     */
+    onConfigChange: (callback: (config: ConfigParams) => void) => () => void;
 
     /**
      * 获取引导memo
@@ -96,6 +106,10 @@ interface ElectronAPI {
      * 删除AI工具
      */
     deleteAITool: (id: number) => Promise<void>;
+    /**
+     * 更新托盘菜单语言
+     */
+    updateTrayLanguage(language: string): void;
 
 
     /**
@@ -178,7 +192,12 @@ interface ElectronAPI {
      */
     verifyLicense: () => Promise<boolean>;
 
+    /**
+     * 导出 Markdown
+     */
+    saveMarkdown: (content: string, name?: string) => Promise<{ success: boolean, message?: string, filePath?: string }>;
 
+    onLanguageChanged(callback: (language: string) => void): void; // 語言更改監聽
 }
 
 

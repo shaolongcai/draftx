@@ -62,83 +62,87 @@ class UpdateService {
      * 步骤2：配置自动更新器
      */
     private setupAutoUpdater(): void {
-        // 设置日志
-        autoUpdater.logger = logger;
-        // 禁用差异更新，强制完整下载
-        // autoUpdater.disableDifferentialDownload = true;
-        // 禁用自动下载，只检查更新
-        autoUpdater.autoDownload = false;
-        // mac测试
-        autoUpdater.allowPrerelease = true;
-        // 禁用降级更新：不允许从高版本降级到低版本
-        autoUpdater.allowDowngrade = false;
+        try {
+            // 设置日志
+            autoUpdater.logger = logger;
+            // 禁用差异更新，强制完整下载
+            // autoUpdater.disableDifferentialDownload = true;
+            // 禁用自动下载，只检查更新
+            autoUpdater.autoDownload = false;
+            // mac测试
+            autoUpdater.allowPrerelease = true;
+            // 禁用降级更新：不允许从高版本降级到低版本
+            autoUpdater.allowDowngrade = false;
 
-        // 设置架构特定的更新文件
-        const updateFileName = this.getArchSpecificUpdateFile();
-        logger.info(`使用更新文件: ${updateFileName}`);
+            // 设置架构特定的更新文件
+            const updateFileName = this.getArchSpecificUpdateFile();
+            logger.info(`使用更新文件: ${updateFileName}`);
 
 
-        // 设置更新服务器地址和特定的更新文件
-        autoUpdater.setFeedURL({
-            provider: 'generic',
-            url: 'http://kodo.osai.click/last/',
-            channel: updateFileName.replace('.yml', '') //获取不同的更新yml
-        });
+            // 设置更新服务器地址和特定的更新文件
+            autoUpdater.setFeedURL({
+                provider: 'generic',
+                url: 'http://kodo.osai.click/last/',
+                channel: updateFileName.replace('.yml', '') //获取不同的更新yml
+            });
 
-        // 强制开发环境也进行更新检查（仅用于测试更新）
-        if (process.env.NODE_ENV === 'development') {
-            autoUpdater.forceDevUpdateConfig = true;
-            //不检查更新
-            // autoUpdater.forceDevUpdateConfig = false;
-            // 或者设置更新服务器地址
-            // autoUpdater.setFeedURL({
-            //     provider: 'generic',
-            //     url: 'http://kodo.osai.click/V1.0-test/'
-            // });
+            // 强制开发环境也进行更新检查（仅用于测试更新）
+            if (process.env.NODE_ENV === 'development') {
+                autoUpdater.forceDevUpdateConfig = true;
+                //不检查更新
+                // autoUpdater.forceDevUpdateConfig = false;
+                // 或者设置更新服务器地址
+                // autoUpdater.setFeedURL({
+                //     provider: 'generic',
+                //     url: 'http://kodo.osai.click/V1.0-test/'
+                // });
+            }
+
+            // 监听更新事件
+            autoUpdater.on('checking-for-update', () => {
+                logger.info('正在检查更新...');
+                // sendToRenderer('update-status', { type: 'checking', message: '正在检查更新...' });
+            });
+
+            autoUpdater.on('update-available', (info) => {
+                logger.info(`发现新版本: ${info.version}`);
+                const updateType = this.resolveUpdateType(info);
+                this.currentUpdateType = updateType;
+                logger.info(`发现新版本: ${info.version}，更新类型: ${updateType === 'differential' ? '差分(块图)' : '完整'}`);
+            });
+
+            autoUpdater.on('update-not-available', () => {
+                logger.info('当前已是最新版本');
+            });
+
+
+
+            autoUpdater.on('error', (error) => {
+                const msg = error instanceof Error ? error.message : '更新检查失败';
+                logger.error(`更新错误: ${msg}`);
+
+            });
+
+            autoUpdater.on('download-progress', (progressObj) => {
+                const progress = Math.round(progressObj.percent);
+                logger.info(`下载进度:${progress}`);
+                sendToRenderer('download-progress', progress);
+            });
+
+            autoUpdater.on('update-downloaded', () => {
+                logger.info('更新下载完成');
+                // const notification: INotification = {
+                //     id: 'download-progress',
+                //     text: '更新下载完成，准备安装',
+                //     type: 'success',
+                // }
+                // sendToRenderer('system-info', notification);
+                // 显示重启对话框
+                this.showRestartDialog();
+            });
+        } catch (error) {
+            logger.error(`配置自动更新器失败: ${error}`);
         }
-
-        // 监听更新事件
-        autoUpdater.on('checking-for-update', () => {
-            logger.info('正在检查更新...');
-            // sendToRenderer('update-status', { type: 'checking', message: '正在检查更新...' });
-        });
-
-        autoUpdater.on('update-available', (info) => {
-            logger.info(`发现新版本: ${info.version}`);
-            const updateType = this.resolveUpdateType(info);
-            this.currentUpdateType = updateType;
-            logger.info(`发现新版本: ${info.version}，更新类型: ${updateType === 'differential' ? '差分(块图)' : '完整'}`);
-        });
-
-        autoUpdater.on('update-not-available', () => {
-            logger.info('当前已是最新版本');
-        });
-
-
-
-        autoUpdater.on('error', (error) => {
-            const msg = error instanceof Error ? error.message : '更新检查失败';
-            logger.error(`更新错误: ${msg}`);
-
-        });
-
-        autoUpdater.on('download-progress', (progressObj) => {
-            const progress = Math.round(progressObj.percent);
-            logger.info(`下载进度:${progress}`);
-            sendToRenderer('download-progress', progress);
-        });
-
-        autoUpdater.on('update-downloaded', () => {
-            logger.info('更新下载完成');
-            // const notification: INotification = {
-            //     id: 'download-progress',
-            //     text: '更新下载完成，准备安装',
-            //     type: 'success',
-            // }
-            // sendToRenderer('system-info', notification);
-            // 显示重启对话框
-            this.showRestartDialog();
-        });
     }
 
     /**

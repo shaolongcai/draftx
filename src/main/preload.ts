@@ -16,6 +16,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   setConfig: (params: ConfigParams) => ipcRenderer.invoke('set-config', params.key, params.value, params.type), // 设置用户配置
   getConfig: (key?: string) => ipcRenderer.invoke('get-config', key),  // 获取用户配置
   resizeWindow: (windowName: 'mainWindow' | 'settingsWindow', size: { width: number, height: number }) => ipcRenderer.send('resize-window', windowName, size), // 变更窗口大小
+  setBackgroundColor: (color: string) => ipcRenderer.send('set-background-color', color), // 设置窗口背景颜色
   checkForUpdates: () => ipcRenderer.invoke('check-for-updates'), // 检查更新
   downloadUpdate: () => ipcRenderer.invoke('download-update'),  // 下载新版本
   onDownloadProgress: (callback) => ipcRenderer.on('download-progress', (_event, data) => callback(data)),  //监听下载进度,
@@ -49,9 +50,22 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('chat-stream-error', listener);
     return () => ipcRenderer.removeListener('chat-stream-error', listener);
   }, // 监听流式错误
+  onConfigChange: (callback: (config: ConfigParams) => void) => {
+    const listener = (_event: any, config: ConfigParams) => callback(config);
+    ipcRenderer.on('config-changed', listener);
+    return () => ipcRenderer.removeListener('config-changed', listener);
+  }, // 监听配置变更
+
+  onLanguageChanged: (callback) => {
+    ipcRenderer.on('language-changed', (event, language) => callback(language));
+    return () => ipcRenderer.removeListener('language-changed', callback);
+  },// 語言更改監聽
 
   // 复制相关
   readClipboardText: () => ipcRenderer.invoke('read-clipboard-text'), // 读取系统剪贴板文本
+
+  // 导出
+  saveMarkdown: (content: string, name?: string) => ipcRenderer.invoke('save-markdown', content, name),
 
 });
 

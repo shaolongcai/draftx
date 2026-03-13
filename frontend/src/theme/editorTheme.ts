@@ -1,8 +1,10 @@
 
+import { useTheme } from '@mui/material';
 import { type EditorThemeClasses } from 'lexical';
 
+
 export const theme: EditorThemeClasses = {
-    paragraph: 'editor-paragraph',
+    paragraph:  'editor-paragraph',
     heading: {
         h1: 'editor-h1',
         h2: 'editor-h2',

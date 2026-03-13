@@ -140,7 +140,7 @@ const updateTrayTitle = () => {
       {
         label: 'Settings',
         click: () => {
-          mainWindow?.hide();
+          // mainWindow?.hide();
           settingsWindow?.focus();
           const isVisible = settingsWindow?.isVisible();
           isVisible ? settingsWindow?.hide() : settingsWindow?.show();

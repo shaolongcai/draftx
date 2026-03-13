@@ -1,0 +1,23 @@
+{
+    "navDraftBack": {
+        "mac": "이전 초안으로 ( ⌘ + [ )",
+        "win": "이전 초안으로 ( Alt + [ )"
+    },
+    "navDraftForward": {
+        "mac": "다음 초안으로 ( ⌘ + ] )",
+        "win": "다음 초안으로 ( Alt + ] )"
+    },
+    "addDraft": {
+        "mac": "새 초안 추가 ( ⌘ + N )",
+        "win": "새 초안 추가 ( Alt + N )"
+    },
+    "showAllDrafts": "모든 초안 보기",
+    "backDraft": "초안으로 돌아가기",
+    "chatAI": {
+        "mac": "AI와 채팅 ( ⌥ + C )",
+        "win": "AI와 채팅 ( Alt + C )"
+    },
+    "exportMarkdown": "Markdown으로 내보내기",
+    "downloading": "다운로드 중...",
+    "updateAvailable": "업데이트 가능"
+}

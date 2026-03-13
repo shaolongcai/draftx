@@ -1,0 +1,13 @@
+{
+    "placeholder": "Appuyez sur Entrée pour envoyer",
+    "chip": {
+        "withDraft": "Générer avec brouillon",
+        "freedom": "Liberté"
+    },
+    "close": {
+        "mac": "Fermer le chat ( ⌘ + C )",
+        "win": "Fermer le chat ( Alt + C )"
+    },
+    "configureTips": "Veuillez d'abord configurer le fournisseur IA dans les paramètres.",
+    "Generating": "IA génère..."
+}

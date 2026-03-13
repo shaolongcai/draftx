@@ -1,6 +1,6 @@
 import { useEvent } from "@/contexts/EvenContext"
 import { historyStack } from "@/utils/histroyStack";
-import { Card, Stack, Typography } from "@mui/material"
+import { Card, Stack, Typography, useTheme } from "@mui/material"
 
 
 // 截断行数的映射
@@ -38,6 +38,7 @@ const DraftItem: React.FC<Props> = ({
 }) => {
 
     const { loadStickys$ } = useEvent()
+    const theme = useTheme()
 
     const clampClass = (lineClampMap as Record<number, string>)[lineClamp] ?? 'line-clamp-6'
 
@@ -50,28 +51,31 @@ const DraftItem: React.FC<Props> = ({
         // historyStack.push(uuid);
     }
 
-    return <Card className="cursor-pointer  border border-[#9F7207]/25 "
+    return <Card className="cursor-pointer  border  "
         onClick={handleClick}
         sx={{
-            height
+            height,
+            borderColor: `${theme.palette.primary.main}40`, // 25% 透明度
         }}
     >
         <Stack spacing={1} >
             <Typography fontWeight={700} variant='bodyMedium'>
                 {title}
             </Typography>
-            <Typography variant='bodyMedium'
+            <Typography variant='bodyMedium' color={theme.palette.text.primary!}
                 className={`${clampClass} overflow-hidden`}
             >
                 {snippet ? (
-                    // 这里要注意，显示的是snippet片段，而不是content，内容数量要在搜索器中调整
+                    // 这里要注意，显示的是snippet片段，而不是content，内容数量要在搜索器中调整 snippet现在已经没有用
                     <span
                         dangerouslySetInnerHTML={{
-                            __html: snippet.replace(/<mark>/g, '<mark class="bg-yellow-200 text-gray-800 font-medium px-1">')
+                            __html: snippet.replace(/<mark>/g,
+                                `<mark class="bg-yellow-200 font-medium px-1" 
+                                style="color: ${theme.palette.text.primary} opacity: 0.65">`)
                         }}
                     />
                 ) : (
-                    <span className="block text-gray-800">{content}</span>
+                    <span className="block" color={theme.palette.text.primary} style={{ opacity: 0.85 }}>{content}</span>
                 )}
             </Typography>
         </Stack>

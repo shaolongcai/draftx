@@ -1,0 +1,21 @@
+{
+    "title": "設定",
+    "userExperience": "使用者體驗改善計畫",
+    "Shortcut": "快捷鍵",
+    "autoLaunch": "自動啟動",
+    "language": "語言",
+    "logFolder": "日誌資料夾",
+    "open": "開啟",
+    "theme": "主題",
+    "system": "系統",
+    "checkUpdate": "檢查更新",
+    "check": "檢查",
+    "checking": "檢查中...",
+    "contact": "聯絡我們",
+    "checkUpdateStatusLatest": "目前已是最新版本",
+    "checkUpdateStatusNewVersion": "發現新版本：{{version}}",
+    "generalSettings": "一般設定",
+    "aiSettings": "AI 伺服器",
+    "aiProvider": "AI 提供商 (Pro)",
+    "update": "更新"
+}

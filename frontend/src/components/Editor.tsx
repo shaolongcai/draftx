@@ -1,4 +1,4 @@
-import { Box } from "@mui/material"
+import { Box, useTheme } from "@mui/material"
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { CodeHighlightPlugin } from '@/plugin/CodeHighlightPlugin';
 import { CodeActionPlugin } from '@/plugin/CodeActionPlugin';
@@ -24,7 +24,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useNotifications } from "@toolpad/core/useNotifications";
 import { useEvent } from "@/contexts/EvenContext";
-import { $convertFromMarkdownString, TRANSFORMERS } from "@lexical/markdown";
+import { $convertFromMarkdownString, $convertToMarkdownString, TRANSFORMERS } from "@lexical/markdown";
+import { CUSTOM_TRANSFORMERS } from "@/utils/transformers";
 import TabFocusPlugin from '@/plugin/TabFocusPlugin';
 import PickerPlugin from "@/plugin/PickerPlugin";
 import { MathPlugin } from "@/plugin/MathPlugin";
@@ -39,21 +40,9 @@ import { CurrencyConversionPlugin } from "@/plugin/CurrencyConversionPlugin";
 import { StatisticsPlugin } from "@/plugin/StatisticsPlugin";
 import { $isHeadingNode } from "@lexical/rich-text";
 import { RequestPlugin } from "@/plugin/RequestPlugin";
-// import { useSettings } from '@/contexts/SettingContext';
+import { useTranslation } from "@/contexts/I18nContext";
 
 
-function Placeholder() {
-    return <Box sx={{
-        color: '#ccc',
-        // overflow: 'hidden',
-        position: 'absolute',
-        top: '24px',
-        fontSize: '16px',
-        userSelect: 'none',
-        display: 'inline-block',
-        pointerEvents: 'none',
-    }}>Press / for quick input</Box>;
-}
 
 
 /**
@@ -64,10 +53,25 @@ const EditorContext: React.FC = () => {
     const [currentUuid, setCurrentUuid] = useState<string>('');
     const lastSavedRef = useRef<{ title?: string; contentJson: string; contentText: string }>({ contentJson: '', contentText: '' }); // 上次已保存
 
+    const theme = useTheme()
+    const notification = useNotifications();
     const [editor] = useLexicalComposerContext()
     const { loadStickys$, handleOnclickTool$ } = useEvent();
-    const notification = useNotifications();
+    const { t, isLoading } = useTranslation()
     const isMac = window.electronUtils?.platform === 'darwin' || /macintosh|mac os x/i.test(navigator.userAgent); //考虑放到context中
+
+    function Placeholder() {
+    return <Box sx={{
+        color: '#ccc',
+        // overflow: 'hidden',
+        position: 'absolute',
+        top: '24px',
+        fontSize: '16px',
+        userSelect: 'none',
+        display: 'inline-block',
+        pointerEvents: 'none',
+    }}>{t('app.edit.placeholder')}</Box>;
+}
 
     // 初始化
     useEffect(() => {
@@ -102,8 +106,28 @@ const EditorContext: React.FC = () => {
     handleOnclickTool$.useSubscription((tool) => {
         if (tool === 'addDraft') {
             addNewDraft();
+        } else if (tool === 'exportMarkdown') {
+            exportMarkdown();
         }
     })
+
+    // 导出 Markdown
+    const exportMarkdown = () => {
+        editor.read(() => {
+            const markdown = $convertToMarkdownString(CUSTOM_TRANSFORMERS);
+            window.electronAPI.saveMarkdown(markdown, lastSavedRef.current?.title).then(res => {
+                if (res.success) {
+                    notification.show('Export successful', {
+                        severity: 'success',
+                    });
+                } else if (res.message !== 'Canceled') {
+                    notification.show(res.message || 'Export failed', {
+                        severity: 'error',
+                    });
+                }
+            });
+        });
+    }
 
     // 监听加载新的便利贴
     loadStickys$.useSubscription((sticky) => {
@@ -252,7 +276,10 @@ const EditorContext: React.FC = () => {
     })
 
 
-    return <div className="scrollbar-thin!  rounded-xl h-full font-mono  leading-relaxed text-gray-700 ">
+    return <div className="scrollbar-thin!  rounded-xl h-full font-mono  leading-relaxed " 
+    style={{
+        color:theme.palette.text.primary,
+    }}>
         <RichTextPlugin
             contentEditable={
                 <ContentEditable

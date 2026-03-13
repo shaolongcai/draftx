@@ -1,0 +1,21 @@
+{
+    "title": "設定",
+    "userExperience": "ユーザーエクスペリエンス向上計画",
+    "Shortcut": "ショートカット",
+    "autoLaunch": "自動起動",
+    "language": "言語",
+    "logFolder": "ログフォルダ",
+    "open": "開く",
+    "theme": "テーマ",
+    "system": "システム",
+    "checkUpdate": "更新を確認",
+    "check": "確認",
+    "checking": "確認中...",
+    "contact": "お問い合わせ",
+    "checkUpdateStatusLatest": "最新バージョンです",
+    "checkUpdateStatusNewVersion": "新しいバージョンが見つかりました: {{version}}",
+    "generalSettings": "一般設定",
+    "aiSettings": "AIサーバー",
+    "aiProvider": "AIプロバイダー (Pro)",
+    "update": "更新"
+}

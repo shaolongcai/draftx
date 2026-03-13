@@ -1,0 +1,21 @@
+{
+    "title": "설정",
+    "userExperience": "사용자 경험 개선 프로그램",
+    "Shortcut": "단축키",
+    "autoLaunch": "자동 실행",
+    "language": "언어",
+    "logFolder": "로그 폴더",
+    "open": "열기",
+    "theme": "테마",
+    "system": "시스템",
+    "checkUpdate": "업데이트 확인",
+    "check": "확인",
+    "checking": "확인 중...",
+    "contact": "문의",
+    "checkUpdateStatusLatest": "최신 버전입니다",
+    "checkUpdateStatusNewVersion": "새 버전 발견: {{version}}",
+    "generalSettings": "일반 설정",
+    "aiSettings": "AI 서버",
+    "aiProvider": "AI 공급자 (Pro)",
+    "update": "업데이트"
+}

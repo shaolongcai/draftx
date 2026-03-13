@@ -1,0 +1,23 @@
+{
+    "navDraftBack": {
+        "mac": "Back to the previous draft  ( ⌘ + [ )",
+        "win": "Back to the previous draft  ( Alt + [ )"
+    },
+    "navDraftForward": {
+        "mac": "Forward to the next draft  ( ⌘ + ] )",
+        "win": "Forward to the next draft  ( Alt + ] )"
+    },
+    "addDraft": {
+        "mac": "Add a new draft ( ⌘ + N )",
+        "win": "Add a new draft ( Alt + N )"
+    },
+    "showAllDrafts": "Show all drafts",
+    "backDraft": "Back the draft",
+    "chatAI": {
+        "mac": "Chat with AI ( ⌥ + C )",
+        "win": "Chat with AI ( Alt + C )"
+    },
+    "exportMarkdown": "Export as Markdown",
+    "downloading": "Downloading...",
+    "updateAvailable": "Update available"
+}

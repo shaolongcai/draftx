@@ -1,0 +1,13 @@
+{
+    "placeholder": "Enter를 눌러 전송",
+    "chip": {
+        "withDraft": "초안으로 생성",
+        "freedom": "자유 입력"
+    },
+    "close": {
+        "mac": "채팅 닫기 ( ⌘ + C )",
+        "win": "채팅 닫기 ( Alt + C )"
+    },
+    "configureTips": "설정에서 AI 공급자를 먼저 구성하세요.",
+    "Generating": "AI 생성 중..."
+}

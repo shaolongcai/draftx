@@ -13,6 +13,9 @@ import { $convertToMarkdownString } from "@lexical/markdown";
 import { CUSTOM_TRANSFORMERS } from "@/utils/transformers";
 import { $createParagraphNode, $createTextNode, $getNodeByKey, $getRoot, $isTextNode, ParagraphNode } from "lexical";
 import { $createLoadingNode, $isLoadingNode } from "@/nodes/LoadingNode";
+import { useTranslation } from "@/contexts/I18nContext";
+
+
 
 interface Props {
     onClose: () => void
@@ -27,6 +30,7 @@ const ChatInput: React.FC<Props> = ({ onClose }) => {
     const theme = useTheme()
     const { aiAnswer, isLoading, error, messages, sendMessage, clearMessages } = useChat();
     const [editor] = useLexicalComposerContext();
+    const { t } = useTranslation()
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -55,7 +59,7 @@ const ChatInput: React.FC<Props> = ({ onClose }) => {
             editor.update(() => {
                 const root = $getRoot();
                 const pNode = $createParagraphNode();
-                const tNode = $createTextNode('Please configure the AI provider in settings first');
+                const tNode = $createTextNode(t('app.chatWithAI.configureTips'));
                 pNode.append(tNode);
                 root.append(pNode);
                 pNode.selectEnd();
@@ -85,7 +89,7 @@ const ChatInput: React.FC<Props> = ({ onClose }) => {
             editor.update(() => {
                 // 创建loading
                 const pNode = $createParagraphNode();
-                const loadingNode = $createLoadingNode('AI Generating...');
+                const loadingNode = $createLoadingNode(t('app.chatWithAI.Generating'));
                 pNode.append(loadingNode);
                 // pNode 插入到 root的最后面
                 $getRoot().append(pNode);
@@ -157,7 +161,7 @@ const ChatInput: React.FC<Props> = ({ onClose }) => {
                 bottom: '24px',
             }}
         >
-            <Tooltip title={`Close Chat (${window.electronUtils.platform === 'win32' ? 'Alt' : 'Cmd'} + C)`}>
+            <Tooltip title={t(`app.chatWithAI.close.${ window.electronUtils.platform === 'win32' ? 'win' : 'mac' }`)}>
                 <IconButton
                     onClick={onClose}
                     size="small"
@@ -173,7 +177,7 @@ const ChatInput: React.FC<Props> = ({ onClose }) => {
             </Tooltip>
             <Chip
                 icon={<AiIcon />}
-                label={inputMode === 'whitDraft' ? 'Generate with draft' : 'freedom'}
+                label={inputMode === 'whitDraft' ? t('app.chatWithAI.chip.withDraft') : t('app.chatWithAI.chip.freedom')}
                 size="small"
                 className="px-2 py-1 absolute top-[-32px] left-0"
                 color='primary'
@@ -196,7 +200,7 @@ const ChatInput: React.FC<Props> = ({ onClose }) => {
             />
             <InputBase
                 inputRef={inputRef}
-                placeholder="Press Enter to send"
+                placeholder={t('app.chatWithAI.placeholder')}
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 fullWidth
@@ -205,7 +209,7 @@ const ChatInput: React.FC<Props> = ({ onClose }) => {
                     flex: 1,
                     color: theme.palette.text.primary,
                     '& input::placeholder': {
-                        color: 'rgba(0, 0, 0, 0.65)', // 45% 透明度
+                        color: theme.palette.text.primary,
                     }
                 }}
             />

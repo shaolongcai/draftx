@@ -1,9 +1,10 @@
-import { ipcMain, app, shell, clipboard } from 'electron';
+import { ipcMain, app, shell, clipboard, dialog, BrowserWindow } from 'electron';
 import { getConfig, setConfig } from '../database/sqlite.js';
 import pathConfig from '../core/pathConfigs.js';
 import { logger } from '../core/logger.js';
 import pkg from 'node-machine-id';
 import { verifyLicense } from '../core/license.js';
+import fs from 'fs';
 const { machineId } = pkg;
 
 export function initializeSystemApi() {
@@ -11,6 +12,12 @@ export function initializeSystemApi() {
     ipcMain.on('resize-window', async (_event, windowName: 'mainWindow' | 'settingsWindow', size: { width: number, height: number }) => {
         const { windowManager } = await import('../core/windowManager.js');
         windowManager.resizeWindow(windowName, size);
+    })
+
+    // 设置窗口背景颜色
+    ipcMain.on('set-background-color', async (_event, color: string) => {
+        const { windowManager } = await import('../core/windowManager.js');
+        windowManager.setBackgroundColor(color);
     })
 
     // 获取配置
@@ -29,6 +36,12 @@ export function initializeSystemApi() {
             const { registerGlobalShortcut } = await import('../main/main.js');
             registerGlobalShortcut();
         }
+
+        // 广播配置变更到所有窗口
+        BrowserWindow.getAllWindows().forEach(win => {
+            win.webContents.send('config-changed', { key, value });
+        });
+
         return config;
     })
 
@@ -105,5 +118,30 @@ export function initializeSystemApi() {
     // 获取应用版本
     ipcMain.handle('get-app-version', () => {
         return app.getVersion();
+    });
+
+    // 导出 Markdown
+    ipcMain.handle('save-markdown', async (_event,content: string,name?:string ) => {
+        try {
+            const { canceled, filePath } = await dialog.showSaveDialog({
+                title: 'Export Markdown',
+                defaultPath: name || 'draft.md',
+                filters: [
+                    { name: 'Markdown', extensions: ['md'] },
+                    { name: 'All Files', extensions: ['*'] }
+                ]
+            });
+
+            if (canceled || !filePath) {
+                return { success: false, message: 'Canceled' };
+            }
+
+            await fs.promises.writeFile(filePath, content, 'utf-8');
+            return { success: true, filePath };
+        } catch (error) {
+            const msg = error instanceof Error ? error.message : 'Export failed';
+            logger.error(`导出 Markdown 失败: ${msg}`);
+            return { success: false, message: msg };
+        }
     });
 }

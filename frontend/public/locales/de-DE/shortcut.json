@@ -1,0 +1,6 @@
+{
+    "title": "Tastenkürzel",
+    "brief": "Drücken Sie eine Tastenkombination zum Festlegen",
+    "button": "Kürzel setzen",
+    "error": "Dies ist ein systemreserviertes Kürzel,\n bitte wählen Sie ein anderes."
+}

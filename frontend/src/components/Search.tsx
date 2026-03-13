@@ -1,7 +1,7 @@
 import { useEvent } from "@/contexts/EvenContext";
-import { Card, Paper, Stack, TextField } from "@mui/material"
-import { useEffect, useRef, useState } from "react";
-// import { useTranslation } from '@/contexts/I18nContext';
+import { Card,  TextField, useTheme } from "@mui/material"
+import {  useRef, useState } from "react";
+import { useTranslation } from '@/contexts/I18nContext';
 
 interface Props {
     onSearch: (keyword: string) => void;
@@ -12,7 +12,9 @@ const Search: React.FC<Props> = ({
 }) => {
 
     const [searchValue, setSearchValue] = useState(''); //搜索的关键词
-    // const { t } = useTranslation();
+    const { t } = useTranslation();
+    
+    const theme = useTheme()
     const inputRef = useRef<HTMLInputElement | null>(null);
     const { loadStickys$ } = useEvent();
 
@@ -30,7 +32,10 @@ const Search: React.FC<Props> = ({
     return <Card
         id='search-panel'
         elevation={0}
-        className="px-0 py-0  border border-[#9F7207]/25 "
+        className="px-0 py-0  border "
+        style={{
+            borderColor: `${theme.palette.primary.main}40`
+        }}
     >
             <TextField
                 inputRef={inputRef}
@@ -41,7 +46,7 @@ const Search: React.FC<Props> = ({
                     }
                 }}
                 fullWidth
-                placeholder='Input any keyword'
+                placeholder={t('app.list.placeholder')}
                 variant="outlined"
                 value={searchValue}
                 onChange={(event) => handleSearch(event.target.value)}
@@ -60,7 +65,7 @@ const Search: React.FC<Props> = ({
                             borderWidth: '0px',
                         },
                         '& .MuiOutlinedInput-input': {
-                            color: '#666F8D'
+                            color: theme.palette.text.primary,
                         }
                     },
                 }}

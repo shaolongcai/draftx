@@ -22,37 +22,37 @@ const ImproveTips: React.FC = () => {
     return (
         <div className="w-full h-full  flex flex-col items-center select-none">
             {/* Title */}
-            <Typography variant="h5" fontWeight={700} className="mb-6 text-[#1A1A1A] w-full text-left">
+            <Typography variant="h5" fontWeight={700} className="mb-6  w-full text-left" color='textPrimary'>
                 Help Improve DraftX
             </Typography>
 
             {/* Description */}
-            <Typography variant="body1" className="mb-4 text-[#5A5A5A] leading-7 w-full text-left">
+            <Typography variant="body1" className="mb-4  leading-7 w-full text-left" color='textSecondary'>
                 To keep improving, we anonymously send crash and performance stats—no personal data ever.
             </Typography>
 
-            <Typography variant="body1" className="mb-4 text-[#5A5A5A] w-full text-left">
+            <Typography variant="body1" className="mb-4  w-full text-left" color='textPrimary'>
                 These include:
             </Typography>
 
             {/* List Items */}
             <Stack spacing={2} className="w-full mb-8">
                 <Stack direction="row" spacing={1.5} alignItems="start">
-                    <Typography variant="body1">📌</Typography>
-                    <Typography variant="body1" className="text-[#5A5A5A] leading-relaxed">
+                    <Typography variant="body1" color='textPrimary'>📌</Typography>
+                    <Typography variant="body1" className="leading-relaxed" color='textPrimary'>
                         Program exceptions: such as crashes, error codes.
                     </Typography>
                 </Stack>
                 <Stack direction="row" spacing={1.5} alignItems="start">
-                    <Typography variant="body1">📌</Typography>
-                    <Typography variant="body1" className="text-[#5A5A5A] leading-relaxed">
+                    <Typography variant="body1" color='textPrimary'>📌</Typography>
+                    <Typography variant="body1" className="leading-relaxed" color='textPrimary'>
                         Performance data: such as download speed, operation response time, and feature usage frequency (anonymous).
                     </Typography>
                 </Stack>
             </Stack>
 
             {/* Footer Text */}
-            <Typography variant="body2" className="mb-8 text-[#888888] w-full text-left">
+            <Typography variant="body2" className="mb-8 w-full text-left" color='textSecondary'>
                 You can disable this setting at any time in Settings.
             </Typography>
 
@@ -61,8 +61,6 @@ const ImproveTips: React.FC = () => {
                 variant="contained"
                 onClick={handleConfirm}
                 sx={{
-                    backgroundColor: '#9F7207',
-                    '&:hover': { backgroundColor: '#825D06' },
                     borderRadius: '8px',
                     padding: '8px 32px',
                     textTransform: 'uppercase',

@@ -1,4 +1,4 @@
-import { Divider, IconButton, Stack, Tooltip, Typography } from "@mui/material";
+import { Divider, IconButton, Stack, Tooltip, Typography, useColorScheme, useTheme } from "@mui/material";
 import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import {
     AddCircleOutline as AddIcon,
@@ -8,11 +8,13 @@ import {
     KeyboardArrowLeft as BackIcon,
     KeyboardArrowRight as ForwardIcon,
     ArrowCircleUp as UpdateIcon,
+    FileDownload as ExportIcon,
 } from "@mui/icons-material";
 import { useEvent } from "@/contexts/EvenContext";
 import ChatInput from "./ChatInput";
 import { useKeyPress, useRequest } from "ahooks";
 import { historyStack } from "@/utils/histroyStack";
+import { useTranslation } from "@/contexts/I18nContext";
 
 
 interface ToolButtonProps {
@@ -63,6 +65,11 @@ const ToolBar: React.FC<Props> = ({
     const { handleOnclickTool$, loadStickys$ } = useEvent();
     const isMac = window.electronUtils?.platform === 'darwin' || /macintosh|mac os x/i.test(navigator.userAgent);
 
+    // 引入 MUI 主题
+    const theme = useTheme();
+    // const { setMode, mode } = useColorScheme() //调用 setMode('主题色的键，例如red') 即可调用对应主题颜色
+    const { t } = useTranslation();
+
     // 检查更新
     const { data: updateInfo } = useRequest(async () => {
         return await window.electronAPI.checkForUpdates();
@@ -88,18 +95,16 @@ const ToolBar: React.FC<Props> = ({
             // 回退到上一个草稿
             buttons.push({
                 icon: <BackIcon className={!historyStack.canBack() ? 'text-white/40!' : ''} />,
-                className: 'hover:bg-[#9F7207]/70',
                 disabled: !historyStack.canBack(),
-                tip: isMac ? 'Back to the previous draft  ( ⌘ + [ )' : 'Back to the previous draft  ( Alt + [ )',
+                tip: t('app.toolBar.navDraftBack.' + (isMac ? 'mac' : 'win')),
                 onClick: () => handleForwardOrBack('back'),
             });
 
             // 前进到下一个草稿
             buttons.push({
                 icon: <ForwardIcon className={!historyStack.canForward() ? 'text-white/40!' : ''} />,
-                className: 'hover:bg-[#9F7207]/70',
                 disabled: !historyStack.canForward(),
-                tip: isMac ? 'Forward to the next draft  ( ⌘ + ] )' : 'Forward to the next draft  ( Alt + ] )',
+                tip: t('app.toolBar.navDraftForward.' + (isMac ? 'mac' : 'win')),
                 onClick: () => handleForwardOrBack('forward'),
             });
 
@@ -111,8 +116,7 @@ const ToolBar: React.FC<Props> = ({
         // 添加草稿
         buttons.push({
             icon: <AddIcon />,
-            className: 'hover:bg-[#9F7207]/70',
-            tip: isMac ? 'Add a new draft  ( ⌘ + N )' : 'Add a new draft  ( Alt + N )',
+            tip: t('app.toolBar.addDraft.' + (isMac ? 'mac' : 'win')),
             onClick: () => {
                 setCurrentPage('draft');
                 handleOnclickTool$.emit('addDraft');
@@ -123,8 +127,7 @@ const ToolBar: React.FC<Props> = ({
         if (currentPage === 'draft') {
             buttons.push({
                 icon: <AllIcon />,
-                className: 'hover:bg-[#9F7207]/70',
-                tip: 'Show all drafts',
+                tip: t('app.toolBar.showAllDrafts'),
                 onClick: () => setCurrentPage('list'),
             });
         }
@@ -133,8 +136,7 @@ const ToolBar: React.FC<Props> = ({
         if (currentPage === 'list') {
             buttons.push({
                 icon: <DraftIcon />,
-                className: 'hover:bg-[#9F7207]/70',
-                tip: 'Back the draft',
+                tip: t('app.toolBar.backDraft'),
                 onClick: () => setCurrentPage('draft'),
             });
         }
@@ -143,9 +145,19 @@ const ToolBar: React.FC<Props> = ({
         if (currentPage === 'draft') {
             buttons.push({
                 icon: <AIChatIcon />,
-                className: 'hover:bg-[#9F7207]/70',
-                tip: isMac ? 'Chat with AI (⌥ + C)' : 'Chat with AI (Alt + C)',
+                tip: t('app.toolBar.chatAI.' + (isMac ? 'mac' : 'win')),
                 onClick: () => setIsChatMode(true),
+            });
+
+            buttons.push({
+                isDivider: true,
+            });
+
+            // 导出 Markdown
+            buttons.push({
+                icon: <ExportIcon />,
+                tip: t('app.toolBar.exportMarkdown'),
+                onClick: () => handleOnclickTool$.emit('exportMarkdown'),
             });
         }
 
@@ -166,7 +178,7 @@ const ToolBar: React.FC<Props> = ({
                 // 显示更新按钮
                 buttons.push({
                     icon: <UpdateIcon />,
-                    tip: 'Update available',
+                    tip: t('app.toolBar.updateAvailable'),
                     className: 'animate-pulse text-green-400 hover:text-green-300',
                     onClick: handleUpdate,
                 });
@@ -174,7 +186,7 @@ const ToolBar: React.FC<Props> = ({
         }
 
         return buttons;
-    }, [currentPage, setCurrentPage, historyVersion, isMac, updateInfo, isDownloading, downloadProgress]);
+    }, [currentPage, setCurrentPage, historyVersion, isMac, updateInfo, isDownloading, downloadProgress, t]);
 
 
 
@@ -190,7 +202,7 @@ const ToolBar: React.FC<Props> = ({
 
 
     // 快速开启chat
-    useKeyPress(isMac ? '⌥+c' : 'alt.c', () => {
+    useKeyPress('alt.c', () => {
         inputRef.current?.focus();
         setIsChatMode(!isChatMode);
     })
@@ -250,14 +262,19 @@ const ToolBar: React.FC<Props> = ({
     return (
         <div className="mx-auto w-fit">
             <div
-                className={`mx-auto rounded-xl overflow-hidden origin-center 
-                        transition-all duration-300 ease-out
-                        ${active
-                        // 展开：固定高度 + 中心缩放到 1
-                        ? 'w-full h-9 px-2 bg-linear-to-r from-[#9F7207]/70 via-[#9F7207]/85 to-[#9F7207] scale-y-100'
-                        // 收起：保持高度为展开值，使用 scaleY 压到近似 1px（对称收缩）
-                        : 'w-20 h-9 bg-[#9F7207]/25 scale-y-[0.12]'
-                    }`}
+                className={`mx-auto rounded-xl overflow-hidden origin-center  transition-all duration-300 ease-out`}
+                style={{
+                    width: active ? '100%' : '5rem',
+                    height: '2.25rem',
+                    paddingLeft: active ? '0.5rem' : 0,
+                    paddingRight: active ? '0.5rem' : 0,
+                    background: active   // 展开：固定高度 + 中心缩放到 1 (B3、D9是AI换算的)
+                        ? `linear-gradient(to right, ${theme.palette.primary.main}B3, ${theme.palette.primary.main}D9, ${theme.palette.primary.main})`
+                        : `${theme.palette.primary.main}`,
+                    transform: `scaleY(${active ? 1 : 0.12})`,  // 收起：保持高度为展开值，使用 scaleY 压到近似 1px（对称收缩）
+                    transition: 'all 300ms ease-out',
+                    transformOrigin: 'center',
+                }}
                 onMouseEnter={() => setActive(true)}
                 onMouseLeave={() => setActive(false)}
             >

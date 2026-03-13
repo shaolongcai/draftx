@@ -1,0 +1,21 @@
+{
+    "title": "Einstellungen",
+    "userExperience": "Plan zur Verbesserung der Benutzererfahrung",
+    "Shortcut": "Tastenkürzel",
+    "autoLaunch": "Autostart",
+    "language": "Sprache",
+    "logFolder": "Log-Ordner",
+    "open": "Öffnen",
+    "theme": "Thema",
+    "system": "System",
+    "checkUpdate": "Nach Updates suchen",
+    "check": "Prüfen",
+    "checking": "Prüfung...",
+    "contact": "Kontakt",
+    "checkUpdateStatusLatest": "Sie haben die neueste Version",
+    "checkUpdateStatusNewVersion": "Neue Version gefunden: {{version}}",
+    "generalSettings": "Allgemeine Einstellungen",
+    "aiSettings": "KI-Server",
+    "aiProvider": "KI-Anbieter (Pro)",
+    "update": "Aktualisieren"
+}

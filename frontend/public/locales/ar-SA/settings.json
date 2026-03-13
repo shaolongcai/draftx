@@ -1,0 +1,21 @@
+{
+    "title": "الإعدادات",
+    "userExperience": "برنامج تحسين تجربة المستخدم",
+    "Shortcut": "اختصار",
+    "autoLaunch": "تشغيل تلقائي",
+    "language": "اللغة",
+    "logFolder": "مجلد السجلات",
+    "open": "فتح",
+    "theme": "المظهر",
+    "system": "النظام",
+    "checkUpdate": "تحقق من التحديثات",
+    "check": "تحقق",
+    "checking": "جاري التحقق...",
+    "contact": "اتصل بنا",
+    "checkUpdateStatusLatest": "أنت على أحدث إصدار",
+    "checkUpdateStatusNewVersion": "إصدار جديد: {{version}}",
+    "generalSettings": "إعدادات عامة",
+    "aiSettings": "خادم AI",
+    "aiProvider": "مزود AI (Pro)",
+    "update": "تحديث"
+}

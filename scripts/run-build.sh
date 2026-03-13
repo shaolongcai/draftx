@@ -139,9 +139,57 @@ log_success "Frontend build completed"
 
 # --- 打包应用 ---
 log_info "Packaging application with electron-builder..."
-npx electron-builder
-# --- 不签名的打包 ---
+
+# 检测是否在 macOS 上运行
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    log_info "Detected macOS, checking for signing credentials..."
+
+    # 检查必要的环境变量
+    MISSING_ENV=0
+    if [ -z "$APPLE_ID" ]; then
+        log_warning "APPLE_ID is not set (Required for Notarization)"
+        MISSING_ENV=1
+    fi
+    if [ -z "$APPLE_APP_SPECIFIC_PASSWORD" ]; then
+        log_warning "APPLE_APP_SPECIFIC_PASSWORD is not set (Required for Notarization)"
+        MISSING_ENV=1
+    fi
+    if [ -z "$APPLE_TEAM_ID" ]; then
+        log_warning "APPLE_TEAM_ID is not set (Required for Notarization)"
+        MISSING_ENV=1
+    fi
+
+    if [ $MISSING_ENV -eq 0 ]; then
+        log_info "All signing credentials found. Building, Signing and Notarizing for macOS..."
+        
+        # 打印代理信息用于调试
+        if [ -n "$https_proxy" ] || [ -n "$http_proxy" ]; then
+            log_info "Proxy settings detected:"
+            log_info "  http_proxy: $http_proxy"
+            log_info "  https_proxy: $https_proxy"
+        else
+            log_warning "No proxy settings detected. Notarization might timeout in some regions."
+        fi
+
+        # 使用 --mac 参数明确指定构建 Mac 版本
+        npx electron-builder --mac
+    else
+        log_warning "Missing one or more signing credentials."
+        log_warning "Building for macOS without notarization (App may not run on other Macs)..."
+        log_warning "To enable Notarization, please export APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD, and APPLE_TEAM_ID."
+        
+        # 仍然尝试构建，但 electron-builder 可能会因为缺少配置跳过公证
+        npx electron-builder --mac
+    fi
+else
+    # 非 macOS 平台 (如 Linux/Windows)
+    log_info "Building for current platform..."
+    npx electron-builder
+fi
+
+# --- 不签名的打包 (备用) ---
 # npx electron-builder -c.mac.identity=null
+
 if [ $? -ne 0 ]; then
     log_error "Electron build failed"
     exit 1

@@ -126,92 +126,19 @@ export const GuidJson = {"root":{"children":[{"children":[{"detail":0,"format":0
 
 // 更新内容
 export const UpdateContent = `
-Release Notes 1.3.0
+Release Notes 1.4.0
 
-Modify calculation module: You can now directly use 2+2= , without inserting a module.
+New features: Added theme switching — now you can change themes in Settings
 
+New features: Added multi-language support — switch languages in Settings
 
+Bug fixes
 
-New features: Statistical module: In the lower part of the number ending, you can enter sum or avg to automatically calculate the total and average.
+1、增加了主题更换，现在你可以在设置中更换主题
 
+2、增加了多语言，你可以在设置中切换语言
 
-
-New currency conversion module: You can enter currency and automatically convert.
-
-
-
-New unit conversion module: You can enter international standard units, perform conversions, such as [t].
-
-
-
-New request module: You can post in the draft and get requests directly in the document.
-
-Calculation example
-
-2+2=
-
-30*3/2 =
-
-2*(30+5)=
-
-Statistical example
-
-a:20
-
-b:20
-
-sum: 40 avg: 20
-
-Conversion example
-
-100 CNY =14.41 USD
-
-100kg =
-
-修改计算模块：现在你可以直接使用2+2= ，而不需要插入模块
-
-
-
-新增统计模块：在数字结尾的下方输入sum或者avg 可以自动统计出总和以及平均值。
-
-
-
-新增货币换算模块，你可以输入货币自动换算
-
-
-
-新增单位换算模块，你可以输入国际标准单位，进行换算，例如t
-
-
-
-新增请求模块，你可直接在草稿本中进行简单的post以及get请求
-
-
-
-More Example:
-
-POST 
-
-{
-
-"libType":"public",
-
-"page":1,
-
-"pageSize":10
-
-}
-
-token:b17e5b1d-8f3a-4038-a692-e0443c9775c5
-
-post:{{url}} and input enter
-
-
-
-GET 
-
-get:{{url}} and input enter
-
+3、修复了一些BUG
 `
 
-export const UpdateJson = {"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Release Notes 1.3.0","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"heading","version":1,"tag":"h1"},{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Modify calculation module: You can now directly use 2+2= , without inserting a module.","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"listitem","version":1,"value":1},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"New features: Statistical module: In the lower part of the number ending, you can enter sum or avg to automatically calculate the total and average.","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"listitem","version":1,"value":2},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"New currency conversion module: You can enter currency and automatically convert.","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"listitem","version":1,"value":3},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"New unit conversion module: You can enter international standard units, perform conversions, such as [t].","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"listitem","version":1,"value":4},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"New request module: You can post in the draft and get requests directly in the document.","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"listitem","version":1,"value":5}],"direction":null,"format":"","indent":0,"type":"list","version":1,"listType":"bullet","start":1,"tag":"ul"},{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Calculation example","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"heading","version":1,"tag":"h3"},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"2+2=","type":"text","version":1},{"type":"calu-result-node","version":1,"result":"4"}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"30*3/2 =","type":"text","version":1},{"type":"calu-result-node","version":1,"result":"45"}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"2*(30+5)=","type":"text","version":1},{"type":"calu-result-node","version":1,"result":"70"}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Statistical example","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"heading","version":1,"tag":"h3"},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"a:20","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"b:20","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"sum: 40 avg: 20","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Conversion example","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"heading","version":1,"tag":"h3"},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"100 CNY =","type":"text","version":1},{"type":"currency-conversion-node","version":1,"originalValue":100,"originalUnit":"CNY","targetUnit":"USD","rate":0.14413}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"100kg =","type":"text","version":1},{"type":"unit-conversion-node","version":1,"originalValue":100,"originalUnit":"kg","targetUnit":"g"}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"修改计算模块：现在你可以直接使用2+2=","type":"text","version":1},{"type":"calu-result-node","version":1,"result":"4"},{"detail":0,"format":0,"mode":"normal","style":"","text":" ，而不需要插入模块","type":"text","version":1}],"direction":null,"format":"start","indent":0,"type":"listitem","version":1,"value":1},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"新增统计模块：在数字结尾的下方输入sum或者avg 可以自动统计出总和以及平均值。","type":"text","version":1}],"direction":null,"format":"start","indent":0,"type":"listitem","version":1,"value":2},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"新增货币换算模块，你可以输入货币自动换算","type":"text","version":1}],"direction":null,"format":"start","indent":0,"type":"listitem","version":1,"value":3},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"新增单位换算模块，你可以输入国际标准单位，进行换算，例如t","type":"text","version":1}],"direction":null,"format":"start","indent":0,"type":"listitem","version":1,"value":4},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"新增请求模块，你可直接在草稿本中进行简单的post以及get请求","type":"text","version":1}],"direction":null,"format":"start","indent":0,"type":"listitem","version":1,"value":5}],"direction":null,"format":"","indent":0,"type":"list","version":1,"listType":"bullet","start":1,"tag":"ul"},{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"More Example:","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"heading","version":1,"tag":"h2"},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"POST ","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"heading","version":1,"tag":"h3"},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"{","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"\"libType\":\"public\",","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"\"page\":1,","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"\"pageSize\":10","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"}","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"token:b17e5b1d-8f3a-4038-a692-e0443c9775c5","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"post:{{url}} and input enter","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"GET ","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"heading","version":1,"tag":"h3"},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"get:{{url}} and input enter","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":null,"format":"","indent":0,"type":"root","version":1}}
+export const UpdateJson = {"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Release Notes 1.4.0","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"heading","version":1,"tag":"h2"},{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"New features: Added theme switching — now you can change themes in Settings","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"listitem","version":1,"value":1},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"New features: Added multi-language support — switch languages in Settings","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"listitem","version":1,"value":2},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Bug fixes","type":"text","version":1},{"type":"linebreak","version":1}],"direction":null,"format":"","indent":0,"type":"listitem","version":1,"value":3}],"direction":null,"format":"","indent":0,"type":"list","version":1,"listType":"number","start":1,"tag":"ol"},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"1.增加了主题更换，现在你可以在设置中更换主题","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"2.增加了多语言，你可以在设置中切换语言","type":"text","version":1},{"type":"linebreak","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":"3.修复了一些BUG","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":null,"format":"","indent":0,"type":"root","version":1}}

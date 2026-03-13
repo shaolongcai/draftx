@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
 import { EditorContext } from '@/components'
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '@mui/material';
 
 
 const Editor: React.FC = () => {
 
 
     const [showTips, setShowTips] = useState(true);
-
+    const theme = useTheme();
     const navigate = useNavigate();
 
 
@@ -15,6 +16,13 @@ const Editor: React.FC = () => {
         const t = setTimeout(() => setShowTips(false), 5000)
         return () => clearTimeout(t)
     }, [])
+
+    // 监听主题变化，设置窗口背景颜色
+    useEffect(() => {
+        if (theme.palette.background.default) {
+            window.electronAPI.setBackgroundColor(theme.palette.background.default);
+        }
+    }, [window.electronAPI.getConfig('theme')])
 
 
     // 初始化路由

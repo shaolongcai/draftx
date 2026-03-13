@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useSize } from 'ahooks'
 import './App.css'
 import { Stack, ThemeProvider } from '@mui/material'
-import { theme } from './theme'
+
 import { theme as editorTheme } from './theme/editorTheme'
 import { NotificationsProvider } from '@toolpad/core/useNotifications';
 import { EventProvider } from './contexts/EvenContext'
@@ -31,20 +31,14 @@ import { CaluResultNode } from './nodes/CaluResultNode'
 import { UnitConversionNode } from './nodes/UnitConversionNode'
 import { CurrencyConversionNode } from './nodes/CurrencyConversionNode'
 import { ResponseNode } from './nodes/ResponseNode'
+import RootProviders from './RootProviders'
+
+
 
 function App() {
 
   const [currentPage, setCurrentPage] = useState<'draft' | 'list'>('draft') //当前的页面
-
   const rootRef = useRef(null)
-  const size = useSize(rootRef)
-
-  // 触发变更窗口大小
-  // useRequest(() => window.electronAPI.resizeWindow('mainWindow', size), {
-  //   ready: Boolean(size),
-  //   refreshDeps: [size],
-  // })
-
 
   const initialConfig = {
     namespace: 'MyEditor',
@@ -80,26 +74,19 @@ function App() {
   };
 
   return (
-    <NotificationsProvider slotProps={{
-      snackbar: {
-        anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
-        autoHideDuration: 2000,
-      },
-    }} >
-      <ThemeProvider theme={theme}>
-        <EventProvider >
-          <LexicalComposer initialConfig={initialConfig}>
-            <HashRouter>
-              {/* {
+    <RootProviders>
+      <LexicalComposer initialConfig={initialConfig}>
+        <HashRouter>
+          {/* {
                 import.meta.env.DEV &&
                 <div className='absolute top-0 left-0 right-0 h-8 z-10 bg-primary text-primary-contrastText text-center'>开发环境</div>
               } */}
-              <div ref={rootRef} >
-                {/* 顶部拖拽条 */}
-                <div
-                  className="drag absolute top-0 left-0 right-0 h-8 z-10 "
-                />
-                <style>{`
+          <div ref={rootRef} >
+            {/* 顶部拖拽条 */}
+            <div
+              className="drag absolute top-0 left-0 right-0 h-8 z-10 "
+            />
+            <style>{`
                 /* root隐藏滚动条但保持可滚动 */
                 ::-webkit-scrollbar {
                     display: none;
@@ -111,37 +98,35 @@ function App() {
                     -ms-overflow-style: none;
                 }
             `}</style>
-                <Routes>
-                  {/* 首页 */}
-                  <Route path='/'
-                    element={<>
-                      <div className={`${currentPage === 'draft' ? '' : 'hidden'}`}>
-                        <Home />
-                      </div>
-                      <div className={`${currentPage === 'list' ? '' : 'hidden'}`}>
-                        <DraftList setCurrentPage={setCurrentPage} currentPage={currentPage} />
-                      </div>
-                      <Stack className='absolute bottom-6 left-0 right-0 px-4 h-4'>
-                        <ToolBar
-                          currentPage={currentPage}
-                          setCurrentPage={setCurrentPage}
-                        />
-                      </Stack>
-                    </>}
-                  />
-                  {/* 更新提示 */}
-                  {/* <Route path='/' element={<Update />} /> */}
-                  {/* 配置热键 */}
-                  <Route path='/hotkeys' element={<HotkeysConfig />} />
-                  {/* 提升体验提示 */}
-                  <Route path='/improveTips' element={<ImproveTips />} />
-                </Routes>
-              </div>
-            </HashRouter>
-          </LexicalComposer>
-        </EventProvider>
-      </ThemeProvider>
-    </NotificationsProvider>
+            <Routes>
+              {/* 首页 */}
+              <Route path='/'
+                element={<>
+                  <div className={`${currentPage === 'draft' ? '' : 'hidden'}`}>
+                    <Home />
+                  </div>
+                  <div className={`${currentPage === 'list' ? '' : 'hidden'}`}>
+                    <DraftList setCurrentPage={setCurrentPage} currentPage={currentPage} />
+                  </div>
+                  <Stack className='absolute bottom-6 left-0 right-0 px-4 h-4'>
+                    <ToolBar
+                      currentPage={currentPage}
+                      setCurrentPage={setCurrentPage}
+                    />
+                  </Stack>
+                </>}
+              />
+              {/* 更新提示 */}
+              {/* <Route path='/' element={<Update />} /> */}
+              {/* 配置热键 */}
+              <Route path='/hotkeys' element={<HotkeysConfig />} />
+              {/* 提升体验提示 */}
+              <Route path='/improveTips' element={<ImproveTips />} />
+            </Routes>
+          </div>
+        </HashRouter>
+      </LexicalComposer>
+    </RootProviders>
   )
 }
 

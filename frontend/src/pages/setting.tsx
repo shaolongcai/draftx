@@ -1,14 +1,13 @@
-import { Stack, Typography, IconButton } from "@mui/material"
+import { Stack, Typography, IconButton, useTheme } from "@mui/material"
 import { useEffect, useState } from "react";
 import {
     Close as CloseIcon
 } from '@mui/icons-material';
 // import { useGlobalContext } from "@/contexts/globalContext";
-import { Contact, SettingItem } from "@/components";
-// import { useTranslation } from '@/contexts/I18nContext';
+import { Contact, SettingItem, LanguageSwitcher } from "@/components";
+import { useTranslation } from '@/contexts/I18nContext';
 import { useNavigate } from 'react-router-dom';
 import { ConfigParams } from "@/type/electron";
-// import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 
 /**
@@ -26,10 +25,12 @@ const Setting = () => {
     const [updateStatusText, setUpdateStatusText] = useState('')
     const [autoLaunch, setAutoLaunch] = useState(false) //是否開機自啟動
     const [isPro, setIsPro] = useState(false) //是否已激活Pro版 
+    const [currentTheme, setCurrentTheme] = useState('default') //当前主题
 
     // const context = useGlobalContext();
-    // const { t, isLoading } = useTranslation()
+    const { t, isLoading } = useTranslation()
     const navigate = useNavigate();
+    const theme = useTheme()
 
     // 检查是否拥有许可
     useEffect(() => {
@@ -47,7 +48,10 @@ const Setting = () => {
             setAiProvider(JSON.parse(res.ai_provider || '{}'))
             setShortcut(res.launchShortcut || '')
             setReportAgreement(res.report_agreement || false)
+            setCurrentTheme(res.theme || 'default') //设置主题
         })
+        // 设置背景颜色
+        window.electronAPI.setBackgroundColor(theme.palette.background.default);
         // // 手动检查一次更新
         // manualCheckUpdate()
     }, [])
@@ -130,11 +134,11 @@ const Setting = () => {
     }
 
 
-    return <div className="w-full max-h-[680px]!  overflow-y-auto scrollbar-thin" >
+    return <div className="w-full max-h-[680px]! pb-6  overflow-y-auto scrollbar-thin" >
         <Stack direction='row' justifyContent='space-between' alignItems='center' >
             <Stack direction='row' spacing={1}>
-                <Typography variant='headlineSmall' >
-                    Setting
+                <Typography variant='headlineSmall' color='textPrimary' >
+                    {t('app.settings.title')}
                 </Typography>
                 {
                     isPro && (
@@ -145,18 +149,18 @@ const Setting = () => {
                 }
             </Stack>
             <IconButton onClick={() => window.electronAPI.closeSettingsWindow()}>
-                <CloseIcon />
+                <CloseIcon sx={{ color: theme.palette.text.primary }} />
             </IconButton>
         </Stack>
         <Stack spacing={2} sx={{ marginTop: '16px' }}>
             <Stack spacing={1}>
-                <Typography variant='titleSmall' className='color-rgba(0, 0, 0, 0.85)' >
-                    AI Sever
+                <Typography variant='titleSmall' color='textPrimary' >
+                    {t('app.settings.aiSettings')}
                 </Typography>
                 <SettingItem
-                    title='AI Provider (Pro)'
+                    title={t('app.settings.aiProvider')}
                     type='button'
-                    value={aiProvider?.model || 'Set'}
+                    value={aiProvider?.model || t('app.settings.set')}
                     onAction={() => {
                         isPro ? navigate('/AIProvider') : navigate('/ProTips')
                     }}
@@ -171,26 +175,33 @@ const Setting = () => {
                 /> */}
             </Stack>
             <Stack spacing={1}>
-                <Typography variant='titleSmall' className='color-rgba(0, 0, 0, 0.85)' >
-                    System
+                <Typography variant='titleSmall' color='textPrimary' >
+                    {t('app.settings.system')}
                 </Typography>
+                {/* 更改主题 */}
+                <SettingItem
+                    title={t('app.settings.theme')}
+                    value={currentTheme}
+                    onAction={() => navigate('/ThemeSelect')}
+                    type='button'
+                />
                 {/* 打开日志 */}
                 <SettingItem
-                    title='Log Folder'
-                    value='Open'
+                    title={t('app.settings.logFolder')}
+                    value={t('app.settings.open')}
                     onAction={() => window.electronAPI.openDir('runLog')}
                     type='button'
                 />
                 {/* 快捷键设置 */}
                 <SettingItem
-                    title='Shortcut'
+                    title={t('app.settings.Shortcut')}
                     type='button'
                     value={shortcut}
                     onAction={() => navigate('/hotkeys?from=setting')}
                 />
                 {/* 用户体验计划 */}
                 <SettingItem
-                    title='User experience improvement plan'
+                    title={t('app.settings.userExperience')}
                     type='switch'
                     value={reportAgreement}
                     onAction={toggleReportAgreement}
@@ -217,26 +228,26 @@ const Setting = () => {
                             /> */}
                 {/* 自动启动开关 */}
                 <SettingItem
-                    title='Auto Launch'
+                    title={t('app.settings.autoLaunch')}
                     type='switch'
                     value={autoLaunch}
                     onAction={toggleAutoLaunch}
                 />
             </Stack>
-            {/* <Stack spacing={1} >
-                            <Typography variant='titleSmall' >
-                                Language
-                            </Typography>
-                            <SettingItem
-                                title={t('app.settings.language')}
-                                type='custom'
-                                onAction={() => { }}
-                                action={<LanguageSwitcher variant='select' size='small' showLabel={false} />}
-                            />
-                        </Stack> */}
             <Stack spacing={1} >
                 <Typography variant='titleSmall' >
-                    Contact
+                    {t('app.settings.language')}
+                </Typography>
+                <SettingItem
+                    title={t('app.settings.language')}
+                    type='custom'
+                    onAction={() => { }}
+                    action={<LanguageSwitcher variant='select' size='small' showLabel={false} />}
+                />
+            </Stack>
+            <Stack spacing={1} >
+                <Typography variant='titleSmall' color='textPrimary' >
+                    {t('app.settings.contact')}
                 </Typography>
                 <Contact />
             </Stack>

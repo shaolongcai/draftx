@@ -1,0 +1,6 @@
+{
+    "title": "Shortcut",
+    "brief": "Press any key combination to set the launch shortcut",
+    "button": "Set Shortcut",
+    "error":"This is a system-reserved shortcut,\n please choose another one."
+}

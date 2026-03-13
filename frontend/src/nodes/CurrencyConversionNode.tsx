@@ -1,7 +1,7 @@
 
-import { DecoratorNode, LexicalNode, NodeKey, EditorConfig, LexicalEditor, $getNodeByKey } from 'lexical';
+import { DecoratorNode, LexicalNode, NodeKey, EditorConfig, LexicalEditor, $getNodeByKey, $createNodeSelection, $setSelection } from 'lexical';
 import { ReactElement, useState, MouseEvent, useEffect, useMemo } from 'react';
-import { Menu, MenuItem, Stack, Typography, TextField, InputAdornment, IconButton, CircularProgress } from '@mui/material';
+import { Menu, MenuItem, Stack, Typography, TextField, InputAdornment, IconButton, CircularProgress, useTheme } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SearchIcon from '@mui/icons-material/Search';
 import { CURRENCY_MAP, fetchExchangeRate, isValidCurrency } from '../utils/currencyUtils';
@@ -25,6 +25,8 @@ function CurrencyConversionComponent({
     const [searchQuery, setSearchQuery] = useState('');
     const open = Boolean(anchorEl);
 
+    const theme = useTheme()
+
     useEffect(() => {
         let active = true;
         setLoading(true);
@@ -46,8 +48,19 @@ function CurrencyConversionComponent({
     }, [originalUnit, targetUnit, editor, nodeKey]);
 
     const handleClick = (event: MouseEvent<HTMLElement>) => {
+        event.preventDefault();
+        event.stopPropagation();
         setAnchorEl(event.currentTarget);
         setSearchQuery(''); // Reset search on open
+
+        editor.update(() => {
+            const node = $getNodeByKey(nodeKey);
+            if ($isCurrencyConversionNode(node)) {
+                const nodeSelection = $createNodeSelection();
+                nodeSelection.add(nodeKey);
+                $setSelection(nodeSelection);
+            }
+        });
     };
 
     const handleClose = () => {
@@ -97,17 +110,21 @@ function CurrencyConversionComponent({
                 {loading ? (
                     <CircularProgress size={16} sx={{ mr: 0.5, color: '#d97706' }} />
                 ) : (
-                    <Typography component="span" sx={{ fontWeight: 'bold' }}>
+                    <Typography component="span" sx={{ fontWeight: 'bold' }} color={theme.palette.primary.main}>
                         {resultValue !== null ? resultValue : '?'} {targetUnit}
                     </Typography>
                 )}
-                <KeyboardArrowDownIcon fontSize="small" />
+                <KeyboardArrowDownIcon fontSize="small" sx={{ color: theme.palette.primary.main }} />
             </Stack>
             
             <Menu
                 anchorEl={anchorEl}
                 open={open}
                 onClose={handleClose}
+                disableScrollLock={true}
+                autoFocus={false}
+                disableEnforceFocus={true}
+                disableRestoreFocus={true}
                 PaperProps={{
                     style: {
                         maxHeight: 300,
@@ -115,7 +132,7 @@ function CurrencyConversionComponent({
                     },
                 }}
             >
-                <div style={{ padding: '8px 16px', position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
+                <div style={{ padding: '8px 16px', position: 'sticky', top: 0, zIndex: 1 }}>
                     <TextField
                         size="small"
                         placeholder="Search currency..."
@@ -125,7 +142,9 @@ function CurrencyConversionComponent({
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
-                                    <SearchIcon fontSize="small" />
+                                    <SearchIcon fontSize="small" sx={{
+                                        color: theme.palette.primary.main,
+                                    }}  />
                                 </InputAdornment>
                             ),
                         }}
@@ -218,7 +237,7 @@ export class CurrencyConversionNode extends DecoratorNode<ReactElement> {
     }
 
     updateDOM(): boolean {
-        return false;
+        return true;
     }
 
     setTargetUnit(unit: string): void {
