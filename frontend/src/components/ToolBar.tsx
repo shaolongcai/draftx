@@ -202,7 +202,7 @@ const ToolBar: React.FC<Props> = ({
 
 
     // 快速开启chat
-    useKeyPress(isMac ? '⌥+c' : 'alt.c', () => {
+    useKeyPress('alt.c', () => {
         inputRef.current?.focus();
         setIsChatMode(!isChatMode);
     })

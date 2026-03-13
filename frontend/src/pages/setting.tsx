@@ -149,7 +149,7 @@ const Setting = () => {
                 }
             </Stack>
             <IconButton onClick={() => window.electronAPI.closeSettingsWindow()}>
-                <CloseIcon />
+                <CloseIcon sx={{ color: theme.palette.text.primary }} />
             </IconButton>
         </Stack>
         <Stack spacing={2} sx={{ marginTop: '16px' }}>

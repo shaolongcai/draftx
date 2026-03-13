@@ -15,6 +15,7 @@
     "start": "electron-forge start",
     "package": "electron-forge package",
     "build:main": "npm run compile && npm run obfuscate",
+    "build:mac": "npm run build:main && electron-builder --mac",
     "build:win": "electron-builder --win --x64"
   },
   "devDependencies": {
@@ -90,15 +91,13 @@
         {
           "target": "dmg",
           "arch": [
-            "arm64",
-            "x64"
+            "arm64"
           ]
         },
-        {
+         {
           "target": "zip",
           "arch": [
-            "arm64",
-            "x64"
+            "arm64"
           ]
         }
       ],
@@ -107,7 +106,9 @@
       "entitlements": "build/entitlements.mac.plist",
       "entitlementsInherit": "build/entitlements.mac.plist",
       "hardenedRuntime": true,
-      "gatekeeperAssess": false
+      "gatekeeperAssess": false,
+      "identity": "Zhongshan Wugui Kuaipao Technology Co., Ltd (BVCT4B89P3)",
+      "provisioningProfile": null
     },
     "nsis": {
       "oneClick": false,
