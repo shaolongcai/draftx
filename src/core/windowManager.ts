@@ -38,7 +38,7 @@ class WindowManager {
     private initMainWindow() {
         this.mainWindow = new BrowserWindow({
             width: 460,
-            height: 460,
+            height: 500,
             minWidth: 360,
             minHeight: 360,
             x: 0,               // 后面会计算居中

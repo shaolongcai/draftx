@@ -145,17 +145,23 @@ export function initializeSystemApi() {
 
     // 开启试用
     ipcMain.handle('start-trial', async () => {
-        const id = await machineId(true);
-        // 获取当前日期
-        const currentDate = new Date();
-        // 储存1：db数据库
-        setConfig('trialStartDate', currentDate.getTime(), 'number');
-        //  储存2 : 用户文件
-        const encryptedBuffer = encryptTimestamp(currentDate.getTime(), id)
-        const userPath = app.getPath('userData');
-        const trialFilePath = path.join(userPath, 'x2.dat');
-        await fs.promises.writeFile(trialFilePath, encryptedBuffer);
-        return { success: true, message: 'Trial started successfully' };
+        try {
+            const id = await machineId(true);
+            // 获取当前日期
+            const currentDate = new Date();
+            // 储存1：db数据库
+            setConfig('trialStartDate', currentDate.getTime(), 'number');
+            //  储存2 : 用户文件
+            const encryptedBuffer = encryptTimestamp(currentDate.getTime(), id)
+            const userPath = app.getPath('userData');
+            const trialFilePath = path.join(userPath, 'x2.dat');
+            await fs.promises.writeFile(trialFilePath, encryptedBuffer);
+            return { success: true, message: 'Trial started successfully' };
+        } catch (error) {
+            const msg = error instanceof Error ? error.message : 'Trial start failed';
+            logger.error(`Trial start failed: ${msg}`);
+            return { success: false, message: msg };
+        }
     })
 
     // 验证试用
@@ -188,7 +194,7 @@ export function initializeSystemApi() {
             const trialEndDate = dayjs(trialStartDateFormDB).add(14, 'day').valueOf(); //时间戳
             console.log('trialEndDate', trialEndDate);
             if (currentDate <= trialEndDate) {
-                return { success: true, message: 'Trial is valid', trialType: 'VALID' };
+                return { success: true, message: 'Trial is valid', trialType: 'VALID', trialEndDate: trialEndDate || 0, };
             } else {
                 logger.info('试用已过期');
                 return { success: false, message: 'Trial expired', trialType: 'EXPIRED' };

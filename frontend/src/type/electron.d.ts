@@ -22,6 +22,10 @@ type ChatData = {
     type: 'stream' | 'done'
 }
 
+// 试用期验证的枚举
+export type TrialType  = 'NOT_INITIALIZED' | 'MISMATCH' | 'VALID' | 'EXPIRED'
+
+
 
 interface ElectronAPI {
 
@@ -88,23 +92,20 @@ interface ElectronAPI {
     checkOllamaServer: (host: string, modelID: string) => Promise<{ code: number, errMsg?: string }>
 
     /**
-     * 保存AI工具,带ID表示更新，不带ID表示新增
-     */
-    saveAITool: (toolData: AITool) => Promise<void>;
-
-    /**
-     * 获取AI工具
-     */
-    getAITools: (id?: number) => Promise<AIToolItem[] | AIToolItem | null>;
-
-    /**
-     * 删除AI工具
-     */
-    deleteAITool: (id: number) => Promise<void>;
-    /**
      * 更新托盘菜单语言
      */
     updateTrayLanguage(language: string): void;
+
+    /**
+     * 开始试用
+     */
+    startTrial: () => Promise<{ success: boolean, message?: string }>;
+
+    /**
+     * 验证试用
+     */
+    verifyTrial: () => Promise<{ success: boolean, message?: string, trialType: TrialType }>;
+
 
 
     /**

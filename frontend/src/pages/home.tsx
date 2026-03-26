@@ -6,11 +6,9 @@ import { useTheme } from '@mui/material';
 
 const Editor: React.FC = () => {
 
-
     const [showTips, setShowTips] = useState(true);
     const theme = useTheme();
     const navigate = useNavigate();
-
 
     useEffect(() => {
         const t = setTimeout(() => setShowTips(false), 5000)
@@ -30,8 +28,15 @@ const Editor: React.FC = () => {
         const init = async () => {
             // 检查是否有激活，进入激活码环节
             const isPro = await window.electronAPI.verifyLicense()
-            console.log('isPro', isPro)
             if (!isPro) {
+                // 检查是否在试用中
+                const trialRes = await window.electronAPI.verifyTrial()
+                if (trialRes.trialType === 'VALID') {
+                    console.log('正在试用期中')
+                    // 试用有效，跳转到首页
+                    navigate('/')
+                    return
+                }
                 navigate('/activationCode')
                 return
             }

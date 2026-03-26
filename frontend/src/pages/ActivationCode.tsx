@@ -22,17 +22,28 @@ const ActivationCode: React.FC = () => {
     const theme = useTheme()
     const { t } = useTranslation()
 
+
     useEffect(() => {
         window.electronAPI.getMachineId().then(setMachineId)
     }, [])
 
     // 开始试用
     const handleStartTrial = () => {
-        if (window.history.length > 1) {
-            navigate(-1)
-            return
-        }
-        navigate('/')
+        window.electronAPI.startTrial().then(res => {
+            if (res.success) {
+                navigate('/')
+                return
+            }
+            throw res.message
+        })
+            .catch(err => {
+                console.error(err)
+                const msg = err instanceof Error ? err.message : 'Trial start failed';
+                notifications.show(msg, {
+                    severity: 'error',
+                    autoHideDuration: 1800,
+                })
+            })
     }
 
     const handleJoinDiscord = () => {
