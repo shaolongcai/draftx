@@ -18,13 +18,6 @@ import ThemeSelect from './pages/ThemeSelect';
 const APP = () => {
 
     const rootRef = useRef(null);
-    const size = useSize(rootRef)
-
-    // 触发变更窗口大小
-    // useRequest(() => window.electronAPI.resizeWindow('settingsWindow', size), {
-    //     ready: Boolean(size),
-    //     refreshDeps: [size],
-    // })
 
     return (
         <RootProviders>

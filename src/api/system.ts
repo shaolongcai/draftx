@@ -5,14 +5,12 @@ import { logger } from '../core/logger.js';
 import pkg from 'node-machine-id';
 import { verifyLicense } from '../core/license.js';
 import fs from 'fs';
+import path from 'path';
+import { decryptTimestamp, encryptTimestamp } from '../units/cyber.js';
+import dayjs from 'dayjs';
 const { machineId } = pkg;
 
 export function initializeSystemApi() {
-    // 变更视窗大小
-    ipcMain.on('resize-window', async (_event, windowName: 'mainWindow' | 'settingsWindow', size: { width: number, height: number }) => {
-        const { windowManager } = await import('../core/windowManager.js');
-        windowManager.resizeWindow(windowName, size);
-    })
 
     // 设置窗口背景颜色
     ipcMain.on('set-background-color', async (_event, color: string) => {
@@ -121,7 +119,7 @@ export function initializeSystemApi() {
     });
 
     // 导出 Markdown
-    ipcMain.handle('save-markdown', async (_event,content: string,name?:string ) => {
+    ipcMain.handle('save-markdown', async (_event, content: string, name?: string) => {
         try {
             const { canceled, filePath } = await dialog.showSaveDialog({
                 title: 'Export Markdown',
@@ -144,4 +142,61 @@ export function initializeSystemApi() {
             return { success: false, message: msg };
         }
     });
+
+    // 开启试用
+    ipcMain.handle('start-trial', async () => {
+        const id = await machineId(true);
+        // 获取当前日期
+        const currentDate = new Date();
+        // 储存1：db数据库
+        setConfig('trialStartDate', currentDate.getTime(), 'number');
+        //  储存2 : 用户文件
+        const encryptedBuffer = encryptTimestamp(currentDate.getTime(), id)
+        const userPath = app.getPath('userData');
+        const trialFilePath = path.join(userPath, 'x2.dat');
+        await fs.promises.writeFile(trialFilePath, encryptedBuffer);
+        return { success: true, message: 'Trial started successfully' };
+    })
+
+    // 验证试用
+    ipcMain.handle('verify-trial', async () => {
+        const id = await machineId(true);
+        // 检查db
+        const trialStartDateFormDB = getConfig('trialStartDate') as number | null;
+        // 检查文件
+        const trialFilePath = path.join(app.getPath('userData'), 'x2.dat');
+        // 如果两个都没有，简单认为没有试用过
+        if (!trialStartDateFormDB && !fs.existsSync(trialFilePath)) {
+            logger.info('未曾试用');
+            return { success: false, message: '未曾试用', trialType: 'NOT_INITIALIZED' };
+        }
+        // 如果只有其中一个存在，则认为数据损坏，结束试用
+        if (!trialStartDateFormDB || !fs.existsSync(trialFilePath)) {
+            logger.info('试用文件丢失，试用数据损坏');
+            return { success: false, message: '试用数据损坏', trialType: 'MISMATCH' }; // 试用数据损坏
+        }
+
+        try {
+            const encryptedBuffer = await fs.promises.readFile(trialFilePath);
+            const trialStartDateFormFile = decryptTimestamp(encryptedBuffer, id);
+            // 验证文件数据是否与db上的数据一致
+            if (trialStartDateFormFile !== trialStartDateFormDB) {
+                logger.info('数据不一致，试用数据损坏');
+                return { success: false, message: '试用数据损坏', trialType: 'MISMATCH' }; // 试用数据损坏
+            }
+            const currentDate = new Date().getTime();
+            const trialEndDate = dayjs(trialStartDateFormDB).add(14, 'day').valueOf(); //时间戳
+            console.log('trialEndDate', trialEndDate);
+            if (currentDate <= trialEndDate) {
+                return { success: true, message: 'Trial is valid', trialType: 'VALID' };
+            } else {
+                logger.info('试用已过期');
+                return { success: false, message: 'Trial expired', trialType: 'EXPIRED' };
+            }
+        } catch (error) {
+            const msg = error instanceof Error ? error.message : 'Trial verification failed';
+            logger.error(`Trial verification failed: ${msg}`);
+            return { success: false, message: msg, trialType: 'EXPIRED' };
+        }
+    })
 }

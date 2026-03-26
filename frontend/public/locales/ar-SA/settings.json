@@ -17,5 +17,18 @@
     "generalSettings": "إعدادات عامة",
     "aiSettings": "خادم AI",
     "aiProvider": "مزود AI (Pro)",
-    "update": "تحديث"
+    "update": "تحديث",
+    "activationPageTitle": "التفعيل",
+    "activationJoinDiscord": "انضم إلى Discord لشراء رمز التفعيل",
+    "activationPrice": "9 دولارات، دفعة واحدة، ترخيص مدى الحياة.",
+    "activationCodeLabel": "رمز التفعيل",
+    "activationCodePlaceholder": "يرجى إدخال رمز التفعيل",
+    "activationCodeHelper": "📌 يمكن استخدام كل رمز تفعيل 3 مرات. بعد التفعيل لا يمكن الإلغاء أو استرداد المبلغ. يرجى البقاء متصلاً بالإنترنت أثناء التفعيل.",
+    "activationButton": "تفعيل",
+    "activationLoading": "جارٍ التفعيل...",
+    "activationTrialButton": "ابدأ تجربة 14 يومًا",
+    "activationSuccessTitle": "تم التفعيل بنجاح",
+    "activationSuccessDesc": "تم ترخيص هذا الجهاز الآن. يمكنك العودة إلى الإعدادات ومتابعة استخدام جميع الميزات.",
+    "activationBackButton": "العودة إلى الإعدادات",
+    "activationSuccessToast": "تم التفعيل بنجاح"
 }

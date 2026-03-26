@@ -15,7 +15,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // 系统相关
   setConfig: (params: ConfigParams) => ipcRenderer.invoke('set-config', params.key, params.value, params.type), // 设置用户配置
   getConfig: (key?: string) => ipcRenderer.invoke('get-config', key),  // 获取用户配置
-  resizeWindow: (windowName: 'mainWindow' | 'settingsWindow', size: { width: number, height: number }) => ipcRenderer.send('resize-window', windowName, size), // 变更窗口大小
   setBackgroundColor: (color: string) => ipcRenderer.send('set-background-color', color), // 设置窗口背景颜色
   checkForUpdates: () => ipcRenderer.invoke('check-for-updates'), // 检查更新
   downloadUpdate: () => ipcRenderer.invoke('download-update'),  // 下载新版本
@@ -26,6 +25,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   closeSettingsWindow: () => ipcRenderer.send('close-settings-window'), // 关闭设置窗口
   getMachineId: () => ipcRenderer.invoke('get-machine-id'), // 获取唯一机器码
   verifyLicense: () => ipcRenderer.invoke('verify-license'), // 验证许可证
+  startTrial: () => ipcRenderer.invoke('start-trial'), // 开始试用
+  verifyTrial: () => ipcRenderer.invoke('verify-trial'), // 验证试用
+
+
 
   // AI相关
   checkOllamaServer: (host: string, modelID: string) => ipcRenderer.invoke('check-ollama-server', host, modelID), // 检查ollama服务是否可用

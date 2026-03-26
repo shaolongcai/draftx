@@ -43,11 +43,6 @@ interface ElectronAPI {
     refreshDeleteDay: (id: number) => void;
 
     /**
-     * 变更窗口大小
-     */
-    resizeWindow: (windowName: 'mainWindow' | 'settingsWindow', size: { width: number, height: number }) => Promise<void>;
-
-    /**
      * 设置窗口背景颜色
      */
     setBackgroundColor: (color: string) => void;

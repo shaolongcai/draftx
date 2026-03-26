@@ -18,5 +18,18 @@
     "aiSettings": "AI Sever",
     "aiProvider": "AI Provider (Pro)",
     "update": "Update",
-    "set": "Set"
+    "set": "Set",
+    "activationPageTitle": "Activation",
+    "activationJoinDiscord": "Join Discord to buy an activation code",
+    "activationPrice": "$9, one-time, lifetime license.",
+    "activationCodeLabel": "Activation Code",
+    "activationCodePlaceholder": "Please enter your activation code",
+    "activationCodeHelper": "📌 Each activation code can be used 3 times. Once activated, it cannot be cancelled and is non-refundable. Please stay connected to the internet during activation.",
+    "activationButton": "Activate",
+    "activationLoading": "Activating...",
+    "activationTrialButton": "Start 14-Day Trial",
+    "activationSuccessTitle": "Activation Successful",
+    "activationSuccessDesc": "This device is now licensed. You can go back to settings and continue using all features.",
+    "activationBackButton": "Back to Settings",
+    "activationSuccessToast": "Activation successful"
 }

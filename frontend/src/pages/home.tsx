@@ -28,8 +28,15 @@ const Editor: React.FC = () => {
     // 初始化路由
     useEffect(() => {
         const init = async () => {
+            // 检查是否有激活，进入激活码环节
+            const isPro = await window.electronAPI.verifyLicense()
+            console.log('isPro', isPro)
+            if (!isPro) {
+                navigate('/activationCode')
+                return
+            }
+            // 检查是否有提交改进协议
             const hasShowedImproveTips = await window.electronAPI.getConfig('report_agreement');
-            console.log('hasShowedImproveTips', hasShowedImproveTips)
             if (hasShowedImproveTips === null) {
                 navigate('/improveTips')
                 return
@@ -40,7 +47,10 @@ const Editor: React.FC = () => {
                 navigate('/hotkeys')
             }
         }
-        init()
+        // 稍等200ms
+        setTimeout(() => {
+            init()
+        }, 200)
     }, [])
 
     return <div className="overflow-hidden" >

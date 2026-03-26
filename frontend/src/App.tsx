@@ -32,6 +32,7 @@ import { UnitConversionNode } from './nodes/UnitConversionNode'
 import { CurrencyConversionNode } from './nodes/CurrencyConversionNode'
 import { ResponseNode } from './nodes/ResponseNode'
 import RootProviders from './RootProviders'
+import ActivationCode from './pages/ActivationCode'
 
 
 
@@ -99,7 +100,7 @@ function App() {
                 }
             `}</style>
             <Routes>
-              {/* 首页 */}
+              {/* 首页 （所有页面均先进入这个） */}
               <Route path='/'
                 element={<>
                   <div className={`${currentPage === 'draft' ? '' : 'hidden'}`}>
@@ -117,7 +118,7 @@ function App() {
                 </>}
               />
               {/* 更新提示 */}
-              {/* <Route path='/' element={<Update />} /> */}
+              <Route path='/activationCode' element={<ActivationCode />} />
               {/* 配置热键 */}
               <Route path='/hotkeys' element={<HotkeysConfig />} />
               {/* 提升体验提示 */}

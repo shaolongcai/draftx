@@ -224,20 +224,6 @@ class WindowManager {
         }
     }
 
-    // 变更窗口大小
-    public resizeWindow(windowName: 'mainWindow' | 'settingsWindow', size: { width: number, height: number }) {
-        if (!size || !size.height || !size.width) return;
-        let window = this.mainWindow;
-        if (windowName === 'settingsWindow') {
-            window = this.settingsWindow;
-            // console.log('设置窗口变化')
-        }
-        window.setBounds({
-            width: size.width + 8,
-            height: size.height + 8 || this.mainWindow.getBounds().height + 8
-        });
-    }
-
     destroy() {
         this.mainWindow.destroy();
         this.settingsWindow.destroy();

@@ -17,5 +17,18 @@
     "generalSettings": "Allgemeine Einstellungen",
     "aiSettings": "KI-Server",
     "aiProvider": "KI-Anbieter (Pro)",
-    "update": "Aktualisieren"
+    "update": "Aktualisieren",
+    "activationPageTitle": "Aktivierung",
+    "activationJoinDiscord": "Tritt Discord bei, um einen Aktivierungscode zu kaufen",
+    "activationPrice": "9 $, einmalig, lebenslange Lizenz.",
+    "activationCodeLabel": "Aktivierungscode",
+    "activationCodePlaceholder": "Bitte gib deinen Aktivierungscode ein",
+    "activationCodeHelper": "📌 Jeder Aktivierungscode kann 3 Mal verwendet werden. Nach der Aktivierung kann sie nicht rückgängig gemacht oder erstattet werden. Bitte bleibe während der Aktivierung mit dem Internet verbunden.",
+    "activationButton": "Aktivieren",
+    "activationLoading": "Wird aktiviert...",
+    "activationTrialButton": "14-Tage-Test starten",
+    "activationSuccessTitle": "Aktivierung erfolgreich",
+    "activationSuccessDesc": "Dieses Gerät ist jetzt lizenziert. Du kannst zu den Einstellungen zurückkehren und alle Funktionen weiter nutzen.",
+    "activationBackButton": "Zurück zu den Einstellungen",
+    "activationSuccessToast": "Aktivierung erfolgreich"
 }

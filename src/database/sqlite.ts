@@ -89,7 +89,7 @@ const convertValue = (value: string, type: string): any => {
  * @param key 配置键名
  * @returns 配置值，根据类型会自动转换为对应类型
  */
-export function getConfig(key?: ConfigName): UserConfig | string | boolean | null {
+export function getConfig(key?: ConfigName): UserConfig | string | boolean | number |  null {
     try {
         const db = getDatabase()
         let result: any | undefined

@@ -17,5 +17,18 @@
     "generalSettings": "一般設定",
     "aiSettings": "AI 伺服器",
     "aiProvider": "AI 提供商 (Pro)",
-    "update": "更新"
+    "update": "更新",
+    "activationPageTitle": "啟用",
+    "activationJoinDiscord": "加入 Discord，購買啟用碼",
+    "activationPrice": "$9，一次購買，終身授權。",
+    "activationCodeLabel": "啟用碼",
+    "activationCodePlaceholder": "請輸入啟用碼",
+    "activationCodeHelper": "📌 啟用碼可使用 3 次，一旦啟用將無法取消，啟用後無法退款。啟用時請保持網路連線。",
+    "activationButton": "啟用",
+    "activationLoading": "啟用中...",
+    "activationTrialButton": "開始 14 天試用",
+    "activationSuccessTitle": "啟用成功",
+    "activationSuccessDesc": "目前裝置已完成授權，現在可以返回設定繼續使用完整功能。",
+    "activationBackButton": "返回設定",
+    "activationSuccessToast": "啟用成功"
 }
