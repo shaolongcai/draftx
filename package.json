@@ -14,9 +14,10 @@
     "make": "electron-forge make",
     "start": "electron-forge start",
     "package": "electron-forge package",
+    "build:mcp": "npm --prefix mcp-server run build",
     "build:main": "npm run compile && npm run obfuscate",
-    "build:mac": "npm run build:main && electron-builder --mac",
-    "build:win": "electron-builder --win --x64"
+    "build:mac": "npm run build:mcp && npm run build:main && electron-builder --mac",
+    "build:win": "npm run build:mcp && electron-builder --win --x64"
   },
   "devDependencies": {
     "@types/node": "^24.3.1",
@@ -72,6 +73,10 @@
       {
         "from": "resources/app-update.yml",
         "to": "app-update.yml"
+      },
+      {
+        "from": "mcp-server/dist",
+        "to": "mcp-server/dist"
       }
     ],
     "directories": {

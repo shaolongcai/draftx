@@ -118,6 +118,25 @@ export function initializeSystemApi() {
         return app.getVersion();
     });
 
+    ipcMain.handle('get-mcp-entry-path', () => {
+        const candidates: string[] = [];
+        if (app.isPackaged) {
+            candidates.push(path.join(process.resourcesPath, 'mcp-server', 'dist', 'index.js'));
+            candidates.push(path.join(process.resourcesPath, 'app.asar.unpacked', 'mcp-server', 'dist', 'index.js'));
+        }
+        candidates.push(path.resolve(app.getAppPath(), '..', 'mcp-server', 'dist', 'index.js'));
+        candidates.push(path.resolve(process.cwd(), 'mcp-server', 'dist', 'index.js'));
+
+        const matched = candidates.find((item) => fs.existsSync(item));
+        if (matched) {
+            return matched;
+        }
+        if (app.isPackaged) {
+            return path.join(process.resourcesPath, 'mcp-server', 'dist', 'index.js');
+        }
+        return path.resolve(process.cwd(), 'mcp-server', 'dist', 'index.js');
+    });
+
     // 导出 Markdown
     ipcMain.handle('save-markdown', async (_event, content: string, name?: string) => {
         try {

@@ -62,6 +62,7 @@ interface ElectronAPI {
      * 获取应用版本
      */
     getAppVersion: () => Promise<string>;
+    getMcpEntryPath: () => Promise<string>;
 
     /**
      * 获取配置

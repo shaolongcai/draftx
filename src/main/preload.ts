@@ -27,6 +27,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   verifyLicense: () => ipcRenderer.invoke('verify-license'), // 验证许可证
   startTrial: () => ipcRenderer.invoke('start-trial'), // 开始试用
   verifyTrial: () => ipcRenderer.invoke('verify-trial'), // 验证试用
+  getMcpEntryPath: () => ipcRenderer.invoke('get-mcp-entry-path'),
 
 
 

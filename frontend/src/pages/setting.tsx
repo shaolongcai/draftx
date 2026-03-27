@@ -18,7 +18,6 @@ import { alpha } from "@mui/material/styles";
 const Setting = () => {
 
     const [reportAgreement, setReportAgreement] = useState(false) //是否同意上报问题
-    const [aiProvider, setAiProvider] = useState<{ host: string, model: string }>() //是否已设置AI服务
     const [shortcut, setShortcut] = useState('') //快捷键
     // 更新檢查相關狀態
     const [isUpdateAvailable, setIsUpdateAvailable] = useState(false)
@@ -51,7 +50,6 @@ const Setting = () => {
         window.electronAPI.getConfig().then((res: UserConfig) => {
             console.log('config', res)
             setAutoLaunch(res.autoLaunch)
-            setAiProvider(JSON.parse(res.ai_provider || '{}'))
             setShortcut(res.launchShortcut || '')
             setReportAgreement(res.report_agreement || false)
             setCurrentTheme(res.theme || 'default') //设置主题
@@ -176,6 +174,7 @@ const Setting = () => {
             </IconButton>
         </Stack>
         <Stack spacing={2} sx={{ marginTop: '16px' }}>
+            {/* MCP服务 */}
             <Stack spacing={1}>
                 <Typography variant='titleSmall' color='textPrimary' >
                     {t('app.settings.aiSettings')}
@@ -183,9 +182,9 @@ const Setting = () => {
                 <SettingItem
                     title={t('app.settings.mcpProvider')}
                     type='button'
-                    value={aiProvider?.model || t('app.settings.set')}
+                    value={t('app.settings.open')}
                     onAction={() => {
-                        // isPro ? navigate('/AIProvider') : navigate('/ProTips')
+                        navigate('/AIToolConfig')
                     }}
                 />
             </Stack>

@@ -68,7 +68,7 @@ export const theme = createTheme({
                     color: theme.palette.primary.contrastText,
                     border: 'none',
                     '&:hover': {
-                        backgroundColor: theme.palette.background.paper, // 85% 透明度
+                        backgroundColor: alpha(theme.palette.primary.main, 0.85), // 85% 透明度
                     },
                         
                     '&.Mui-disabled': {

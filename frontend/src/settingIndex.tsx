@@ -3,11 +3,9 @@ import Setting from '@/pages/setting';
 import RootProviders from './RootProviders';
 import './index.css'
 import { useRef } from 'react';
-import { useSize } from 'ahooks';
 import { Routes, Route, HashRouter } from 'react-router-dom';
 import { AIProvider } from './components';
-import AITools from '@/pages/AITools';
-import AIToolConfig from '@/pages/AIToolConfig';
+import McpConfig from '@/pages/McpConfig';
 import ProTips from '@/pages/ProTips';
 import ActivationCode from '@/pages/ActivationCode';
 import HotkeysConfig from './pages/HotkeysConfig';
@@ -42,8 +40,7 @@ const APP = () => {
                     <Routes>
                         <Route path="/" element={<Setting />} />
                         <Route path="/AIProvider" element={<AIProvider />} />
-                        <Route path="/AITools" element={<AITools />} />
-                        <Route path="/AIToolConfig" element={<AIToolConfig />} />
+                        <Route path="/AIToolConfig" element={<McpConfig />} />
                         <Route path="/ActivationCode" element={<ActivationCode />} />
                         <Route path="/ProTips" element={<ProTips />} />
                         <Route path="/hotkeys" element={<HotkeysConfig />} />
