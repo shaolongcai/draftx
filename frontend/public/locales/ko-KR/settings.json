@@ -30,5 +30,6 @@
     "activationSuccessTitle": "활성화 완료",
     "activationSuccessDesc": "이 기기의 라이선스 인증이 완료되었습니다. 설정으로 돌아가 모든 기능을 계속 사용할 수 있습니다.",
     "activationBackButton": "설정으로 돌아가기",
-    "activationSuccessToast": "활성화 완료"
+    "activationSuccessToast": "활성화 완료",
+    "trialDaysLeft": "평가판 {{days}}일 남음"
 }

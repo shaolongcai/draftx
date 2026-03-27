@@ -1,6 +1,4 @@
-import { SettingTitle } from "@/components"
 import { useTranslation } from "@/contexts/I18nContext"
-import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded'
 import { alpha } from "@mui/material/styles"
 import { Button, Paper, Stack, TextField, Typography, useTheme } from "@mui/material"
 import { useEffect, useState } from "react"
@@ -8,6 +6,7 @@ import axios from 'axios'
 import { useNotifications } from "@toolpad/core/useNotifications"
 import DiscordIcon from '@/assets/icons/discord.svg'
 import { useNavigate } from "react-router-dom"
+import { TrialType } from "@/type/electron"
 
 const DISCORD_URL = 'https://discord.gg/TyArpAVf6A'
 
@@ -15,13 +14,20 @@ const ActivationCode: React.FC = () => {
     const [machineId, setMachineId] = useState('')
     const [code, setCode] = useState('')
     const [loading, setLoading] = useState(false)
-    const [isSuccess, setIsSuccess] = useState(false)
+    const [trialType, setTrialType] = useState<TrialType | null>(null)
 
     const notifications = useNotifications()
     const navigate = useNavigate()
     const theme = useTheme()
     const { t } = useTranslation()
 
+
+    // 获取试用状态
+    useEffect(() => {
+        window.electronAPI.verifyTrial().then(trialRes => {
+            setTrialType(trialRes.trialType)
+        })
+    }, [])
 
     useEffect(() => {
         window.electronAPI.getMachineId().then(setMachineId)
@@ -70,7 +76,7 @@ const ActivationCode: React.FC = () => {
                     value: JSON.stringify(licenseData),
                     type: 'string'
                 })
-                setIsSuccess(true)
+                navigate('/')
                 return
             }
             throw res.data.errMsg
@@ -189,9 +195,12 @@ const ActivationCode: React.FC = () => {
                             onClick={handleStartTrial}
                             fullWidth
                             size="large"
+                            disabled={trialType === 'EXPIRED' || trialType === 'MISMATCH'}
                             sx={{ borderRadius: '12px', py: 1.05, fontWeight: 700 }}
                         >
-                            {t('app.settings.activationTrialButton')}
+                            {(trialType === 'EXPIRED' || trialType === 'MISMATCH') ?
+                                t('app.settings.activationTrialExpired') :
+                                t('app.settings.activationTrialButton')}
                         </Button>
                     </Stack>
                 </Stack>

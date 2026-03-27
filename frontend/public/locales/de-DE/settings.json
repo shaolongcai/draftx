@@ -30,5 +30,6 @@
     "activationSuccessTitle": "Aktivierung erfolgreich",
     "activationSuccessDesc": "Dieses Gerät ist jetzt lizenziert. Du kannst zu den Einstellungen zurückkehren und alle Funktionen weiter nutzen.",
     "activationBackButton": "Zurück zu den Einstellungen",
-    "activationSuccessToast": "Aktivierung erfolgreich"
+    "activationSuccessToast": "Aktivierung erfolgreich",
+    "trialDaysLeft": "Noch {{days}} Tage in der Testversion"
 }

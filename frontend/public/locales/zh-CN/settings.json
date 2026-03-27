@@ -33,5 +33,6 @@
     "activationSuccessTitle": "激活成功",
     "activationSuccessDesc": "当前设备已完成授权，现在可以返回设置继续使用完整功能。",
     "activationBackButton": "返回设置",
-    "activationSuccessToast": "激活成功"
+    "activationSuccessToast": "激活成功",
+    "trialDaysLeft": "试用期剩余 {{days}} 天结束"
 }

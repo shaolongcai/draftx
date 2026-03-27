@@ -1,14 +1,15 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { EditorContext } from '@/components'
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material';
-
+import { useGlobal } from '@/contexts/GlobalContext';
 
 const Editor: React.FC = () => {
 
     const [showTips, setShowTips] = useState(true);
     const theme = useTheme();
     const navigate = useNavigate();
+    const { setTrialEndDate } = useGlobal()
 
     useEffect(() => {
         const t = setTimeout(() => setShowTips(false), 5000)
@@ -32,7 +33,7 @@ const Editor: React.FC = () => {
                 // 检查是否在试用中
                 const trialRes = await window.electronAPI.verifyTrial()
                 if (trialRes.trialType === 'VALID') {
-                    console.log('正在试用期中')
+                    setTrialEndDate(trialRes.trialEndDate) // 试用期中，才会设置试用期的endDate
                     // 试用有效，跳转到首页
                     navigate('/')
                     return

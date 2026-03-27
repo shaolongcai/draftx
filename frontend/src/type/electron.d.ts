@@ -23,7 +23,7 @@ type ChatData = {
 }
 
 // 试用期验证的枚举
-export type TrialType  = 'NOT_INITIALIZED' | 'MISMATCH' | 'VALID' | 'EXPIRED'
+export type TrialType = 'NOT_INITIALIZED' | 'MISMATCH' | 'VALID' | 'EXPIRED'
 
 
 
@@ -103,8 +103,9 @@ interface ElectronAPI {
 
     /**
      * 验证试用
+     * @returns Promise<{ success: boolean, message?: string, trialType: TrialType, trialEndDate?: number,试用结束时间 }>
      */
-    verifyTrial: () => Promise<{ success: boolean, message?: string, trialType: TrialType }>;
+    verifyTrial: () => Promise<{ success: boolean, message?: string, trialType: TrialType, trialEndDate?: number }>;
 
 
 

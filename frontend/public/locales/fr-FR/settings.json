@@ -30,5 +30,6 @@
     "activationSuccessTitle": "Activation réussie",
     "activationSuccessDesc": "Cet appareil est maintenant autorisé. Vous pouvez revenir aux paramètres et utiliser toutes les fonctionnalités.",
     "activationBackButton": "Retour aux paramètres",
-    "activationSuccessToast": "Activation réussie"
+    "activationSuccessToast": "Activation réussie",
+    "trialDaysLeft": "Il reste {{days}} jours d'essai"
 }

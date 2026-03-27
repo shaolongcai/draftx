@@ -30,5 +30,6 @@
     "activationSuccessTitle": "啟用成功",
     "activationSuccessDesc": "目前裝置已完成授權，現在可以返回設定繼續使用完整功能。",
     "activationBackButton": "返回設定",
-    "activationSuccessToast": "啟用成功"
+    "activationSuccessToast": "啟用成功",
+    "trialDaysLeft": "試用期剩餘 {{days}} 天結束"
 }

@@ -30,5 +30,6 @@
     "activationSuccessTitle": "アクティベート成功",
     "activationSuccessDesc": "このデバイスのライセンス認証が完了しました。設定に戻ってすべての機能を利用できます。",
     "activationBackButton": "設定に戻る",
-    "activationSuccessToast": "アクティベート成功"
+    "activationSuccessToast": "アクティベート成功",
+    "trialDaysLeft": "試用期間の残り {{days}} 日"
 }

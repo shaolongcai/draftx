@@ -31,5 +31,9 @@
     "activationSuccessTitle": "Activation Successful",
     "activationSuccessDesc": "This device is now licensed. You can go back to settings and continue using all features.",
     "activationBackButton": "Back to Settings",
-    "activationSuccessToast": "Activation successful"
+    "activationSuccessToast": "Activation successful",
+    "trialDaysLeft": "{{days}} days left in trial",
+
+    "mcpProvider": "MCP Provider",
+    "activationTrialExpired": "Trial expired"
 }

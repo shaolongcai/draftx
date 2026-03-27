@@ -76,6 +76,8 @@ function RootProviders({ children }) {
             <ThemeProvider theme={currentTheme}>
                 <GlobalContext.Provider value={{
                     setTheme,
+                    trialEndDate: null,
+                    setTrialEndDate: () => { },
                 }}>
                     <NotificationsProvider
                         slotProps={{

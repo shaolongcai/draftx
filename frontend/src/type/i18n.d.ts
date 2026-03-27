@@ -74,6 +74,7 @@ export interface TranslationKeys {
       update?: string;
       about?: string;
       website?: string;
+      trialDaysLeft?: string;
     };
     common: {
       confirm: string;
@@ -171,6 +172,7 @@ export type TranslationKeyPath =
   | 'app.settings.aiSettings'
   | 'app.settings.update'
   | 'app.settings.about'
+  | 'app.settings.trialDaysLeft'
   | 'app.common.confirm'
   | 'app.common.cancel'
   | 'app.common.save'

@@ -30,5 +30,6 @@
     "activationSuccessTitle": "تم التفعيل بنجاح",
     "activationSuccessDesc": "تم ترخيص هذا الجهاز الآن. يمكنك العودة إلى الإعدادات ومتابعة استخدام جميع الميزات.",
     "activationBackButton": "العودة إلى الإعدادات",
-    "activationSuccessToast": "تم التفعيل بنجاح"
+    "activationSuccessToast": "تم التفعيل بنجاح",
+    "trialDaysLeft": "بقي {{days}} أيام في الفترة التجريبية"
 }
