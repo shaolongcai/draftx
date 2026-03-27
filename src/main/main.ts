@@ -10,6 +10,7 @@ import { GuidJson, GuidContent, UpdateContent, UpdateJson } from '../data/data.j
 import { initializeAIApi } from '../api/ai.js';
 import { initializeUpdateApi } from '../api/update.js';
 import { reportErrorToWechat } from '../units/report.js';
+import { startLocalServer } from '../server/mcpLocalServer.js';
 import pkg from 'node-machine-id';
 const { machineId } = pkg;
 
@@ -284,6 +285,10 @@ app.whenReady().then(async () => {
   initializeSystemApi();
   initializeAIApi();
   logger.info('所有API初始化完成');
+  
+  // 启动 MCP 本地桥接服务
+  startLocalServer();
+  
   // 创建托盘
   createTray();
 

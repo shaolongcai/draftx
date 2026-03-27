@@ -22,6 +22,13 @@ type ChatData = {
     type: 'stream' | 'done'
 }
 
+type DraftTimeFilter = {
+    createdAfter?: string;
+    createdBefore?: string;
+    modifiedAfter?: string;
+    modifiedBefore?: string;
+}
+
 // 试用期验证的枚举
 export type TrialType = 'NOT_INITIALIZED' | 'MISMATCH' | 'VALID' | 'EXPIRED'
 
@@ -34,7 +41,7 @@ interface ElectronAPI {
      * @param query 搜索词
      * @returns 直接返回草稿列表
      */
-    getDraft: (query: string) => Promise<DraftResult[]>;
+    getDraft: (query: string, limit?: number, timeFilter?: DraftTimeFilter) => Promise<DraftResult[]>;
 
     /**
      * 保存便利贴

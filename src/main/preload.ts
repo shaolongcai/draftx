@@ -6,7 +6,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // 便利贴相关
   saveSticky: (stickyNote: StickyParmas) => ipcRenderer.send('save-sticky', stickyNote), // 保存 stickyNote API
-  getDraft: (query: string, limit: number) => ipcRenderer.invoke('get-draft', query, limit),   // 搜索 stickyNote API
+  getDraft: (query: string, limit: number, timeFilter?: { createdAfter?: string; createdBefore?: string; modifiedAfter?: string; modifiedBefore?: string }) => ipcRenderer.invoke('get-draft', query, limit, timeFilter),   // 搜索 stickyNote API
   getDraftByUuid: (uuid: string) => ipcRenderer.invoke('get-draft-by-uuid', uuid), // 根据ID获取草稿
   refreshDeleteDay: (id: number) => ipcRenderer.send('refresh-delete-day', id), // 点击刷新删除时间
   /** @deprecated 使用 getDraftByUuid 替代 */

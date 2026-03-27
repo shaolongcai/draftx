@@ -36,7 +36,7 @@ const Setting = () => {
 
     // 查询试用期天数
     useEffect(() => {
-        console.log('trialEndDate',trialEndDate)
+        console.log('trialEndDate', trialEndDate)
         if (!trialEndDate) return
         const now = dayjs()
         const end = dayjs(trialEndDate)
@@ -56,9 +56,9 @@ const Setting = () => {
             setReportAgreement(res.report_agreement || false)
             setCurrentTheme(res.theme || 'default') //设置主题
             // 计算结束日以及还剩多少日结束
+            if (!res.trialStartDate) return
             const trialEndDate = dayjs(res.trialStartDate).add(14, 'day')
             const now = dayjs()
-            const end = dayjs(trialEndDate)
             const diffDays = trialEndDate.diff(now, 'day')
             setTrialDiffDays(diffDays)
         })
@@ -154,7 +154,7 @@ const Setting = () => {
                 </Typography>
                 {
                     trialDiffDays !== null &&
-                    <span 
+                    <span
                         className="inline-flex items-center justify-center px-3 py-1 text-xs font-bold text-white uppercase tracking-wider rounded-full"
                         style={{
                             background: `linear-gradient(to right, ${theme.palette.primary.main}, ${alpha(theme.palette.primary.main, 0.2)})`

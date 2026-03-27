@@ -1,5 +1,5 @@
 import { ipcMain } from "electron";
-import { getGuideMemo, saveStickyNote, getDraft, refreshDeleteDay, getDraftByUuid } from "../database/repositories.js";
+import { getGuideMemo, saveStickyNote, getDraft, refreshDeleteDay, getDraftByUuid, type DraftTimeFilter } from "../database/repositories.js";
 
 
 
@@ -11,8 +11,8 @@ export function initializeDraftApi() {
     });
 
     // 搜索 stickyNote 从数据库
-    ipcMain.handle('get-draft', (event, query: string, limit: number) => {
-        return getDraft(query, limit);
+    ipcMain.handle('get-draft', (event, query: string, limit: number, timeFilter?: DraftTimeFilter) => {
+        return getDraft(query, limit, timeFilter);
     });
 
     // 点击刷新删除时间
