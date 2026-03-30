@@ -31,6 +31,7 @@ import { CaluResultNode } from './nodes/CaluResultNode'
 import { UnitConversionNode } from './nodes/UnitConversionNode'
 import { CurrencyConversionNode } from './nodes/CurrencyConversionNode'
 import { ResponseNode } from './nodes/ResponseNode'
+import { ImageNode } from './nodes/imageNode/EditorImageNode'
 import RootProviders from './RootProviders'
 import ActivationCode from './pages/ActivationCode'
 
@@ -71,6 +72,7 @@ function App() {
       UnitConversionNode,
       CurrencyConversionNode,
       ResponseNode,
+      ImageNode,
     ],
   };
 

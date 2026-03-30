@@ -41,6 +41,7 @@ import { StatisticsPlugin } from "@/plugin/StatisticsPlugin";
 import { $isHeadingNode } from "@lexical/rich-text";
 import { RequestPlugin } from "@/plugin/RequestPlugin";
 import { useTranslation } from "@/contexts/I18nContext";
+import ImagesPlugin from "@/plugin/ImagesPlugin";
 
 
 
@@ -311,6 +312,7 @@ const EditorContext: React.FC = () => {
         <CodeHighlightPlugin />
         <CodeActionPlugin />
         <MermaidPlugin />
+        <ImagesPlugin />
         <PickerPlugin />
         {/* <AiPickerPlugin /> */}
         <CalculatePlugin />

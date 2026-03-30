@@ -22,24 +22,23 @@ import {
     $createParagraphNode,
 } from 'lexical';
 import { $setBlocksType } from '@lexical/selection';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Menu, MenuItem } from '@mui/material';
 import { $createHeadingNode } from '@lexical/rich-text';
 import { INSERT_CHECK_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDERED_LIST_COMMAND } from '@lexical/list';
 import { OPEN_PASTE_COMMAND } from './AutoPastePlugin';
-import { OPEN_CALCULATOR_COMMAND } from './MathPlugin';
+import { OPEN_IMAGE_PICKER_COMMAND } from './imageCommands';
 // icon
 import {
     h1 as H1Icon,
     h2 as H2Icon,
     h3 as H3Icon,
+    image as ImageIcon,
     ul as UnorderedListIcon,
     ol as OrderedListIcon,
     checklist as ChecklistIcon,
     autoPaste as AutoPasteIcon,
-    calculator as CalculatorIcon,
     paragraph as ParagraphIcon,
-    random as RandomIcon,
 } from '@/assets/icons/editIcon'
 
 
@@ -136,6 +135,13 @@ function getBaseOptions(editor: LexicalEditor) {
             onSelect: () => {
                 // 触发命令
                 editor.dispatchCommand(OPEN_PASTE_COMMAND, undefined);
+            }
+        }),
+        new ComponentPickerOption('Image', {
+            icon: ImageIcon,
+            keywords: ['image', 'img', '图片', 'jpg', 'png'],
+            onSelect: () => {
+                editor.dispatchCommand(OPEN_IMAGE_PICKER_COMMAND, undefined);
             }
         }),
         new ComponentPickerOption('Heading 1', {

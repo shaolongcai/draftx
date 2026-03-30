@@ -14,7 +14,16 @@ importers:
       '@emotion/styled':
         specifier: ^11.14.1
         version: 11.14.1(@emotion/react@11.14.0(@types/react@19.2.7)(react@19.2.3))(@types/react@19.2.7)(react@19.2.3)
+      '@lexical/clipboard':
+        specifier: ^0.39.0
+        version: 0.39.0
       '@lexical/code':
+        specifier: ^0.39.0
+        version: 0.39.0
+      '@lexical/hashtag':
+        specifier: ^0.39.0
+        version: 0.39.0
+      '@lexical/html':
         specifier: ^0.39.0
         version: 0.39.0
       '@lexical/link':

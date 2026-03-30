@@ -12,7 +12,10 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@lexical/clipboard": "^0.39.0",
     "@lexical/code": "^0.39.0",
+    "@lexical/hashtag": "^0.39.0",
+    "@lexical/html": "^0.39.0",
     "@lexical/link": "^0.39.0",
     "@lexical/list": "^0.39.0",
     "@lexical/markdown": "^0.39.0",
