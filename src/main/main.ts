@@ -25,6 +25,16 @@ let settingsWindow: BrowserWindow | null;
 let appWindowManager: any = null; // 临时增加，用于正式退出
 const isDev = process.env.NODE_ENV === 'development';
 
+process.on('uncaughtException', (error) => {
+  const msg = error instanceof Error ? `${error.message}\n${error.stack || ''}` : String(error);
+  logger.error(`主进程未捕获异常: ${msg}`);
+});
+
+process.on('unhandledRejection', (reason) => {
+  const msg = reason instanceof Error ? `${reason.message}\n${reason.stack || ''}` : String(reason);
+  logger.error(`主进程未处理拒绝: ${msg}`);
+});
+
 // 防止多开：必须在应用启动的最早阶段执行
 // const gotTheLock = app.requestSingleInstanceLock();
 // if (!gotTheLock && !isDev) {
@@ -268,46 +278,38 @@ const initializeUserConfig = () => {
 
 
 app.whenReady().then(async () => {
-  // 准备窗口
-  const { windowManager } = await import('../core/windowManager.js');
-  appWindowManager = windowManager;
-  mainWindow = windowManager.mainWindow;
-  settingsWindow = windowManager.settingsWindow;
-  // 初始化数据库
-  initializeDatabase();
-  logger.info('数据库初始化完成');
-  // 注册全局快捷键
-  registerGlobalShortcut();
-  logger.info('全局快捷键注册完成');
-  // 初始化 API
-  initializeUpdateApi()
-  initializeDraftApi();
-  initializeSystemApi();
-  initializeAIApi();
-  logger.info('所有API初始化完成');
-  
-  // 启动 MCP 本地桥接服务
-  startLocalServer();
-  
-  // 创建托盘
-  createTray();
-
-  // macOS 上隐藏 Dock 图标（实现 skipTaskbar 效果）
-  if (process.platform === 'darwin') {
-    app.dock.hide();
+  try {
+    logger.info('应用 ready，开始初始化窗口');
+    const { windowManager } = await import('../core/windowManager.js');
+    logger.info('窗口管理器加载完成');
+    appWindowManager = windowManager;
+    mainWindow = windowManager.mainWindow;
+    settingsWindow = windowManager.settingsWindow;
+    initializeDatabase();
+    logger.info('数据库初始化完成');
+    registerGlobalShortcut();
+    logger.info('全局快捷键注册完成');
+    initializeUpdateApi()
+    initializeDraftApi();
+    initializeSystemApi();
+    initializeAIApi();
+    logger.info('所有API初始化完成');
+    startLocalServer();
+    createTray();
+    if (process.platform === 'darwin') {
+      app.dock.hide();
+    }
+    initializeGuideMemo()
+    initializeUpdateDraft()
+    initializeAITool()
+    initializeUserConfig();
+    logger.info('用户配置初始化完成');
+    deleteExpiredStickys();
+    logger.info('所有过期的便利贴已删除');
+  } catch (error) {
+    const msg = error instanceof Error ? `${error.message}\n${error.stack || ''}` : String(error);
+    logger.error(`应用启动失败: ${msg}`);
   }
-  // 初始化引导memo
-  initializeGuideMemo()
-  // 初始化更新说明草稿
-  initializeUpdateDraft()
-  // 初始化AI工具
-  initializeAITool()
-  // 初始化用户配置
-  initializeUserConfig();
-  logger.info('用户配置初始化完成');
-  // 删除所有过期的便利贴
-  deleteExpiredStickys();
-  logger.info('所有过期的便利贴已删除');
 });
 
 // 为了解决macOS上的cltr+w 的关闭问题导致没有主体的问题
