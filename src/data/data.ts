@@ -126,19 +126,11 @@ export const GuidJson = {"root":{"children":[{"children":[{"detail":0,"format":0
 
 // 更新内容
 export const UpdateContent = `
-Release Notes 1.4.0
+Release Notes 1.5.0
 
-New features: Added theme switching — now you can change themes in Settings
+New features:Added MCP service support; you can now directly interact with your drafts using Openclaw or other agents—e.g., querying content or requesting summaries.
 
-New features: Added multi-language support — switch languages in Settings
-
-Bug fixes
-
-1、增加了主题更换，现在你可以在设置中更换主题
-
-2、增加了多语言，你可以在设置中切换语言
-
-3、修复了一些BUG
+New features: Added image support; you can now insert images into your drafts.
 `
 
-export const UpdateJson = {"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Release Notes 1.4.0","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"heading","version":1,"tag":"h2"},{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"New features: Added theme switching — now you can change themes in Settings","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"listitem","version":1,"value":1},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"New features: Added multi-language support — switch languages in Settings","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"listitem","version":1,"value":2},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Bug fixes","type":"text","version":1},{"type":"linebreak","version":1}],"direction":null,"format":"","indent":0,"type":"listitem","version":1,"value":3}],"direction":null,"format":"","indent":0,"type":"list","version":1,"listType":"number","start":1,"tag":"ol"},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"1.增加了主题更换，现在你可以在设置中更换主题","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"2.增加了多语言，你可以在设置中切换语言","type":"text","version":1},{"type":"linebreak","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":"3.修复了一些BUG","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":null,"format":"","indent":0,"type":"root","version":1}}
+export const UpdateJson = {"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Release Notes 1.5.0","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"heading","version":1,"tag":"h2"},{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"New features:Added MCP service support; you can now directly interact with your drafts using Openclaw or other agents—e.g., querying content or requesting summaries.","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"listitem","version":1,"value":1},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"New features: Added image support; you can now insert images into your drafts.","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"listitem","version":1,"value":2}],"direction":null,"format":"","indent":0,"type":"list","version":1,"listType":"number","start":1,"tag":"ol"}],"direction":null,"format":"","indent":0,"type":"root","version":1}}
