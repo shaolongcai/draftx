@@ -189,7 +189,9 @@ export function initializeSystemApi() {
         // 检查db
         const trialStartDateFormDB = getConfig('trialStartDate') as number | null;
         // 检查文件
-        const trialFilePath = path.join(app.getPath('userData'), 'x2.dat');
+        const trialFilePath = path.join(app.getPath('userData'), 'x2.dat'); // 注意： mac上的路径，生产与测试userData都是同一路经
+        logger.info(`trialFilePath: ${trialFilePath}`);
+        logger.info(`trialStartDateFormDB: ${trialStartDateFormDB}`);
         // 如果两个都没有，简单认为没有试用过
         if (!trialStartDateFormDB && !fs.existsSync(trialFilePath)) {
             logger.info('未曾试用');
