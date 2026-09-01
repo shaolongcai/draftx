@@ -1,37 +1,14 @@
-import { useState, useRef, useEffect } from 'react'
-import { useSize } from 'ahooks'
+import { useState, useRef } from 'react'
 import './App.css'
-import { Stack, ThemeProvider } from '@mui/material'
+import { Stack } from '@mui/material'
 
-import { theme as editorTheme } from './theme/editorTheme'
-import { NotificationsProvider } from '@toolpad/core/useNotifications';
-import { EventProvider } from './contexts/EvenContext'
 import Home from './pages/home'
 import { ToolBar } from './components'
 import DraftList from './pages/draftList'
 import { Routes, Route, HashRouter } from 'react-router-dom';
-import Update from './pages/update'
-import { LexicalComposer } from '@lexical/react/LexicalComposer';
-import { mermaidNode } from "@/nodes/MermaidNode";
-import { ListItemNode, ListNode } from '@lexical/list';
-import { AutoLinkNode, LinkNode } from '@lexical/link';
-import { HeadingNode, QuoteNode } from '@lexical/rich-text';
-import { CodeHighlightNode, CodeNode } from '@lexical/code';
-import { HorizontalRuleNode } from '@/nodes/HorizontalRuleNode';
-import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
-import { MathNode } from "@/nodes/MathNode";
-import { MathItemNode } from "@/nodes/MathItemNode";
-import { BlockTitleNode } from "@/nodes/BlockTitleNode";
-import { BlockTipNode } from "@/nodes/BlockTipNode";
-import { PasteNode } from "@/nodes/PasteNode";
-import { LoadingNode } from "@/nodes/LoadingNode";
+import { EditorProvider } from './contexts/EditorContext'
 import HotkeysConfig from './pages/HotkeysConfig'
 import ImproveTips from './pages/ImproveTips'
-import { CaluResultNode } from './nodes/CaluResultNode'
-import { UnitConversionNode } from './nodes/UnitConversionNode'
-import { CurrencyConversionNode } from './nodes/CurrencyConversionNode'
-import { ResponseNode } from './nodes/ResponseNode'
-import { ImageNode } from './nodes/imageNode/EditorImageNode'
 import RootProviders from './RootProviders'
 import ActivationCode from './pages/ActivationCode'
 
@@ -42,43 +19,9 @@ function App() {
   const [currentPage, setCurrentPage] = useState<'draft' | 'list'>('draft') //当前的页面
   const rootRef = useRef(null)
 
-  const initialConfig = {
-    namespace: 'MyEditor',
-    theme: editorTheme,
-    onError: (error: Error) => {
-      console.error(error.message);
-    },
-    nodes: [
-      HeadingNode,
-      QuoteNode,
-      ListNode,
-      ListItemNode,
-      CodeNode,
-      CodeHighlightNode,
-      LinkNode,
-      AutoLinkNode,
-      TableNode,
-      TableCellNode,
-      HorizontalRuleNode,
-      TableRowNode,
-      BlockTitleNode,
-      BlockTipNode,
-      mermaidNode,
-      MathNode,
-      MathItemNode,
-      PasteNode,
-      LoadingNode,
-      CaluResultNode,
-      UnitConversionNode,
-      CurrencyConversionNode,
-      ResponseNode,
-      ImageNode,
-    ],
-  };
-
   return (
     <RootProviders>
-      <LexicalComposer initialConfig={initialConfig}>
+      <EditorProvider>
         <HashRouter>
           {/* {
                 import.meta.env.DEV &&
@@ -128,7 +71,7 @@ function App() {
             </Routes>
           </div>
         </HashRouter>
-      </LexicalComposer>
+      </EditorProvider>
     </RootProviders>
   )
 }

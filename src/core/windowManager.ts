@@ -143,8 +143,8 @@ class WindowManager {
     // 为窗口加载内容
     private loadWindows() {
         if (isDev) {
-            this.mainWindow.loadURL('http://localhost:5173');   // 加载搜索条HTML
-            this.settingsWindow.loadURL('http://localhost:5173/setting.html');   // 加载设置条HTML
+            this.mainWindow.loadURL('http://localhost:5174');   // 加载搜索条HTML
+            this.settingsWindow.loadURL('http://localhost:5174/setting.html');   // 加载设置条HTML
             this.mainWindow.webContents.openDevTools(); //打开开发者工具        
             this.settingsWindow.webContents.openDevTools(); //打开开发者工具
         } else {

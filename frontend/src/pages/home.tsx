@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { EditorContext } from '@/components'
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material';
@@ -6,15 +6,9 @@ import { useGlobal } from '@/contexts/GlobalContext';
 
 const Editor: React.FC = () => {
 
-    const [showTips, setShowTips] = useState(true);
     const theme = useTheme();
     const navigate = useNavigate();
     const { setTrialEndDate } = useGlobal()
-
-    useEffect(() => {
-        const t = setTimeout(() => setShowTips(false), 5000)
-        return () => clearTimeout(t)
-    }, [])
 
     // 监听主题变化，设置窗口背景颜色
     useEffect(() => {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Language, TranslationKeys, TranslationKeyPath, I18nContextType, TranslationResources } from '@/type/i18n';
 import { SUPPORTED_LANGUAGES } from '@/config/languages';
@@ -106,7 +107,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({
                         };
                         deepMerge(combined, legacy);
                     }
-                } catch { }
+                } catch { /* 舊版單檔 JSON 不存在時忽略 */ }
 
                 setTranslations(prev => ({
                     ...prev,

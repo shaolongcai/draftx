@@ -6,13 +6,22 @@ type ChannelType = 'download-progress';
 
 
 /**
- * 保存便利贴参数
+ * 保存笔记参数（内容即 markdown 原文，写入 .md 文件）
  */
+type NoteParmas = {
+    uuid: string;
+    title?: string;
+    /** markdown 原文；空字符串表示删除该笔记 */
+    content: string;
+    /** 已有笔记的文件路径（可选，通常由后端根据 uuid 解析） */
+    path?: string;
+}
+
+/** @deprecated 旧版 Lexical 存储参数，保留仅为兼容残留引用 */
 type StickyParmas = {
     uuid: string;
     title?: string;
     content: string;
-    contentJson: string;
 }
 
 

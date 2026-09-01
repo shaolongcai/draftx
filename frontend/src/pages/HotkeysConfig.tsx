@@ -1,4 +1,4 @@
-import { Button, Stack, Typography, useTheme } from "@mui/material";
+import { Button, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNotifications } from "@toolpad/core/useNotifications";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -13,7 +13,6 @@ const HotkeysConfig = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const { t } = useTranslation();
-    const theme = useTheme()
 
     // 检查是否已完成初始配置，检查热键配置
     useEffect(() => {

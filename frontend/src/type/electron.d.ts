@@ -1,11 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-
-// 保存便利贴参数
-type StickyParmas = {
+// 保存笔记参数（content 为 markdown 原文；空字符串表示删除）
+type NoteParmas = {
     uuid: string;
     title?: string;
     content: string;
-    contentJson: string;
+    path?: string;
 }
 
 // 配置类型
@@ -37,21 +37,26 @@ export type TrialType = 'NOT_INITIALIZED' | 'MISMATCH' | 'VALID' | 'EXPIRED'
 interface ElectronAPI {
 
     /**
-     * 获取所有草稿
-     * @param query 搜索词
-     * @returns 直接返回草稿列表
+     * 获取笔记列表（仅元数据，不含正文）
+     * @param query 搜索词（支持中文全文搜索）
+     * @returns 直接返回笔记列表
      */
     getDraft: (query: string, limit?: number, timeFilter?: DraftTimeFilter) => Promise<DraftResult[]>;
 
     /**
-     * 保存便利贴
+     * 保存笔记（写入 .md 文件；空内容 = 删除）
      */
-    saveSticky: (params: StickyParmas) => void;
+    saveSticky: (params: NoteParmas) => void;
 
     /**
-     * 刷新删除时间（默认30天）
+     * 保存图片到 notes/.asset/，返回相对路径（如 ".asset/xxx.png"）
      */
-    refreshDeleteDay: (id: number) => void;
+    saveImageAsset: (data: ArrayBuffer, ext?: string) => Promise<string>;
+
+    /**
+     * 获取笔记根目录绝对路径
+     */
+    getNotesDir: () => Promise<string>;
 
     /**
      * 设置窗口背景颜色
@@ -82,13 +87,7 @@ interface ElectronAPI {
     onConfigChange: (callback: (config: ConfigParams) => void) => () => void;
 
     /**
-     * 获取引导memo
-     * @deprecated 已废弃，使用 getDraftByUuid 替代
-     */
-    getGuideMemo: () => Promise<StickyResult>
-
-    /**
-     * 根据UUID获取草稿
+     * 根据UUID获取笔记（元数据 + md 正文）
      */
     getDraftByUuid: (uuid: string) => Promise<DraftResult | null>;
 

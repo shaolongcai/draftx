@@ -17,6 +17,10 @@ interface PathsConfig {
     logs: string;
     database: string;
     resources: string;
+    /** 笔记 .md 文件根目录（事实来源） */
+    notes: string;
+    /** 笔记图片等资源目录（notes/.asset） */
+    notesAsset: string;
 }
 
 /**
@@ -60,6 +64,10 @@ class PathConfig {
             logs: path.join(this.appDataPath, 'logs'),
             // 数据库
             database: path.join(this.appDataPath, 'data'),
+            // 笔记 .md 文件目录（笔记以 md 文件为事实来源）
+            notes: path.join(this.appDataPath, 'notes'),
+            // 笔记图片等资源
+            notesAsset: path.join(this.appDataPath, 'notes', '.asset'),
         };
 
         //确保所有目录都存在

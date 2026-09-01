@@ -1,257 +1,335 @@
 import { getConfig, getDatabase } from './sqlite.js'
 import { logger } from '../core/logger.js';
-import dayjs from 'dayjs';
+import crypto from 'crypto';
+import {
+    deleteNote,
+    extractTitleFromMarkdown,
+    hashContent,
+    listMarkdownFiles,
+    pathForNewNote,
+    readNote,
+    writeNote,
+} from '../core/noteFileService.js';
 
 const db = getDatabase()
 
 
-/**
- * 保存 stickyNote 到数据库
- * @param stickyNote 
- */
-export const saveStickyNote = (stickyNote: StickyParmas) => {
-    try {
-        // 若content为空，则删除该草稿
-        if (!stickyNote.content.trim()) {
-            const deleteStmt = db.prepare(`
-                DELETE FROM stickys
-                WHERE uuid = ?
-            `);
-            deleteStmt.run(stickyNote.uuid);
-            return;
-        }
+// ==================== 笔记（md 文件 + 元数据） ====================
 
-        const now = new Date().toISOString();
-        // const deletedAt = dayjs().add(30, 'day').toISOString();
-        const deletedAt = dayjs().add(30, 'day').toISOString(); //测试用，只增加一天
-        // 存在即更新，不存在则插入
-        const upsertStmt = db.prepare(`
-                INSERT INTO stickys ( uuid, content, content_json, title, created_at, modified_at, deleted_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT( uuid ) DO UPDATE SET
-                    content = excluded.content,
-                    content_json = excluded.content_json,
-                    title = excluded.title,
-                    modified_at = excluded.modified_at
-            `);
-        upsertStmt.run(stickyNote.uuid, stickyNote.content, stickyNote.contentJson, stickyNote.title, now, now, deletedAt);
-    } catch (error) {
-        logger.error(error)
-    }
-};
-
-
-/**
- * 从数据库获取操作
- * @param query 搜索关键词 如果没有则返回所有
- * @param limit 限制返回数量
- * @returns 直接返回草稿列表
- */
-export type DraftTimeFilter = {
+export type NoteTimeFilter = {
     createdAfter?: string;
     createdBefore?: string;
     modifiedAfter?: string;
     modifiedBefore?: string;
 }
 
-export const getDraft = (query?: string, limit: number = 50, timeFilter: DraftTimeFilter = {}) => {
+type NoteRow = {
+    id: number;
+    uuid: string;
+    path: string;
+    title: string | null;
+    mtime: number;
+    hash: string;
+    created_at: string;
+}
+
+/** 同步/更新单条笔记的 FTS 索引 */
+const upsertFts = (id: number, title: string, content: string) => {
+    db.prepare(`DELETE FROM fts_index WHERE rowid = ?`).run(id);
+    db.prepare(`INSERT INTO fts_index (rowid, title, content) VALUES (?, ?, ?)`).run(id, title, content);
+}
+
+/** 删除单条笔记的 FTS 索引 */
+const deleteFts = (id: number) => {
+    db.prepare(`DELETE FROM fts_index WHERE rowid = ?`).run(id);
+}
+
+const getNoteMetaByUuid = (uuid: string): NoteRow | undefined => {
+    const stmt = db.prepare(`SELECT id, uuid, path, title, mtime, hash, created_at FROM notes WHERE uuid = ? LIMIT 1`);
+    return stmt.get(uuid) as NoteRow | undefined;
+}
+
+const getNoteMetaByPath = (relPath: string): NoteRow | undefined => {
+    const stmt = db.prepare(`SELECT id, uuid, path, title, mtime, hash, created_at FROM notes WHERE path = ? LIMIT 1`);
+    return stmt.get(relPath) as NoteRow | undefined;
+}
+
+/**
+ * 保存笔记：写入 md 文件（事实来源），再同步元数据与 FTS 索引
+ * - content 为空 = 删除该笔记（文件 + 元数据 + 索引）
+ * @returns 保存结果；删除时返回 { deleted: true }
+ */
+export const saveNote = (note: NoteParmas): { uuid: string; path: string; mtime: number } | { deleted: true } | null => {
+    try {
+        const uuid = note.uuid || crypto.randomUUID();
+        const existing = getNoteMetaByUuid(uuid);
+
+        // 空内容 = 删除笔记
+        if (!note.content.trim()) {
+            if (existing) {
+                deleteNote(existing.path);
+                deleteFts(existing.id);
+                db.prepare(`DELETE FROM notes WHERE id = ?`).run(existing.id);
+                logger.info(`笔记内容为空，已删除: ${existing.path}`);
+            }
+            return { deleted: true };
+        }
+
+        // 确定文件路径：已有笔记沿用原路径，否则按标题生成不冲突的文件名
+        const relPath = existing?.path
+            ?? note.path
+            ?? pathForNewNote(note.title || extractTitleFromMarkdown(note.content));
+
+        // 1. 写 md 文件（事实来源）
+        const mtime = writeNote(relPath, note.content);
+        const hash = hashContent(note.content);
+        const title = note.title || extractTitleFromMarkdown(note.content) || relPath.replace(/\.md$/i, '');
+
+        // 2. 同步元数据
+        const upsertStmt = db.prepare(`
+            INSERT INTO notes (uuid, path, title, mtime, hash)
+            VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT(uuid) DO UPDATE SET
+                path = excluded.path,
+                title = excluded.title,
+                mtime = excluded.mtime,
+                hash = excluded.hash
+        `);
+        upsertStmt.run(uuid, relPath, title, mtime, hash);
+
+        // 3. 同步 FTS 索引
+        const row = getNoteMetaByUuid(uuid);
+        if (row) {
+            upsertFts(row.id, title, note.content);
+        }
+
+        return { uuid, path: relPath, mtime };
+    } catch (error) {
+        logger.error(error);
+        return null;
+    }
+};
+
+
+/** 构造时间过滤条件（created_at 为 datetime，mtime 为毫秒时间戳） */
+const buildTimeFilter = (timeFilter: NoteTimeFilter, conditions: string[], params: any[]) => {
+    if (timeFilter.createdAfter) {
+        conditions.push(`datetime(n.created_at) >= datetime(?)`);
+        params.push(timeFilter.createdAfter);
+    }
+    if (timeFilter.createdBefore) {
+        conditions.push(`datetime(n.created_at) <= datetime(?)`);
+        params.push(timeFilter.createdBefore);
+    }
+    if (timeFilter.modifiedAfter) {
+        conditions.push(`n.mtime >= ?`);
+        params.push(Date.parse(timeFilter.modifiedAfter));
+    }
+    if (timeFilter.modifiedBefore) {
+        conditions.push(`n.mtime <= ?`);
+        params.push(Date.parse(timeFilter.modifiedBefore));
+    }
+}
+
+/** 转义 FTS5 查询字符串（作为短语处理） */
+const escapeFtsQuery = (query: string) => `"${query.replace(/"/g, '""')}"`;
+
+/**
+ * 短查询（< 3 字符）回退：trigram 索引不支持，直接扫描文件匹配
+ */
+const searchNotesByScan = (query: string, limit: number, timeFilter: NoteTimeFilter) => {
+    const conditions: string[] = [];
+    const params: any[] = [];
+    buildTimeFilter(timeFilter, conditions, params);
+    const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+    const stmt = db.prepare(`
+        SELECT n.id, n.uuid, n.path, n.title, n.mtime, n.hash, n.created_at
+        FROM notes n ${whereClause}
+        ORDER BY n.mtime DESC
+    `);
+    const rows = stmt.all(...params) as NoteRow[];
+
+    const lowerQuery = query.toLowerCase();
+    const results: any[] = [];
+    for (const row of rows) {
+        const title = row.title || '';
+        let score = 0;
+        let snippet: string | undefined;
+
+        if (title.toLowerCase().includes(lowerQuery)) {
+            score = 1; // 标题命中优先
+        } else {
+            const content = readNote(row.path);
+            if (content && content.toLowerCase().includes(lowerQuery)) {
+                score = 0.5;
+                const idx = content.toLowerCase().indexOf(lowerQuery);
+                const start = Math.max(0, idx - 30);
+                const raw = content.slice(start, idx + query.length + 30).replace(/\s+/g, ' ');
+                snippet = raw.replace(
+                    new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'ig'),
+                    (m) => `<mark>${m}</mark>`
+                );
+            }
+        }
+
+        if (score > 0) {
+            results.push({ ...row, score, snippet });
+            if (results.length >= limit) break;
+        }
+    }
+    return results;
+}
+
+/**
+ * 获取笔记列表 / 全文搜索
+ * @param query 搜索关键词，为空返回全部（仅元数据，不含正文）
+ * @param limit 限制返回数量
+ * @param timeFilter 时间过滤（ISO 字符串）
+ */
+export const getNotes = (query?: string, limit: number = 50, timeFilter: NoteTimeFilter = {}) => {
     try {
         const normalizedQuery = query?.trim();
-        const createdAfter = timeFilter.createdAfter;
-        const createdBefore = timeFilter.createdBefore;
-        const modifiedAfter = timeFilter.modifiedAfter;
-        const modifiedBefore = timeFilter.modifiedBefore;
 
-        // 空查询：直接返回全部，按修改时间排序
+        // 空查询：返回全部元数据，按修改时间排序
         if (!normalizedQuery) {
             const conditions: string[] = [];
             const params: any[] = [];
-
-            if (createdAfter) {
-                conditions.push(`datetime(s.created_at) >= datetime(?)`);
-                params.push(createdAfter);
-            }
-            if (createdBefore) {
-                conditions.push(`datetime(s.created_at) <= datetime(?)`);
-                params.push(createdBefore);
-            }
-            if (modifiedAfter) {
-                conditions.push(`datetime(s.modified_at) >= datetime(?)`);
-                params.push(modifiedAfter);
-            }
-            if (modifiedBefore) {
-                conditions.push(`datetime(s.modified_at) <= datetime(?)`);
-                params.push(modifiedBefore);
-            }
-
+            buildTimeFilter(timeFilter, conditions, params);
             const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
             const stmt = db.prepare(`
-                SELECT id, uuid, title, content, content_json, created_at, modified_at, deleted_at
-                FROM stickys s
+                SELECT n.id, n.uuid, n.path, n.title, n.mtime, n.created_at
+                FROM notes n
                 ${whereClause}
-                ORDER BY s.modified_at DESC
+                ORDER BY n.mtime DESC
                 LIMIT ?
             `);
-            const rows = stmt.all(...params, limit);
-            return rows;
+            return stmt.all(...params, limit);
         }
 
-        const conditions: string[] = [
-            `(
-                lower(s.title) LIKE '%' || q.query || '%'
-                OR lower(s.content) LIKE '%' || q.query || '%'
-            )`
-        ];
-        const params: any[] = [normalizedQuery];
+        // trigram 索引要求查询长度 >= 3 个字符，短查询回退到文件扫描
+        if ([...normalizedQuery].length < 3) {
+            return searchNotesByScan(normalizedQuery, limit, timeFilter);
+        }
 
-        if (createdAfter) {
-            conditions.push(`datetime(s.created_at) >= datetime(?)`);
-            params.push(createdAfter);
-        }
-        if (createdBefore) {
-            conditions.push(`datetime(s.created_at) <= datetime(?)`);
-            params.push(createdBefore);
-        }
-        if (modifiedAfter) {
-            conditions.push(`datetime(s.modified_at) >= datetime(?)`);
-            params.push(modifiedAfter);
-        }
-        if (modifiedBefore) {
-            conditions.push(`datetime(s.modified_at) <= datetime(?)`);
-            params.push(modifiedBefore);
-        }
+        const conditions: string[] = [];
+        const params: any[] = [escapeFtsQuery(normalizedQuery)];
+        buildTimeFilter(timeFilter, conditions, params);
+        const whereClause = conditions.length ? `AND ${conditions.join(' AND ')}` : '';
 
         const stmt = db.prepare(`
-            WITH q(query) AS (SELECT lower(?))
-            SELECT 
-                s.id, s.uuid, s.title, s.content, s.content_json, s.created_at, s.modified_at, s.deleted_at,
-                (
-                    0.40 * CASE WHEN lower(s.title) LIKE q.query || '%' THEN CAST(length(q.query) AS REAL) / NULLIF(length(s.title), 0) ELSE 0 END
-                    + 0.30 * CASE WHEN instr(lower(s.title), q.query) > 0 THEN 1 - (instr(lower(s.title), q.query) - 1) / CAST(length(s.title) AS REAL) ELSE 0 END
-                    + 0.15 * CASE WHEN instr(lower(s.content), q.query) > 0 THEN 1.0 ELSE 0 END
-                    + 0.10 * (1.0 - 1.0 / (COALESCE(s.click_count, 0) + 1))
-                    + 0.05 * (1.0 - MIN(length(s.title), 255) / 255.0)
-                ) AS score
-            FROM stickys s
-            CROSS JOIN q
-            WHERE ${conditions.join(' AND ')}
-            ORDER BY score DESC, s.title
+            SELECT
+                n.id, n.uuid, n.path, n.title, n.mtime, n.created_at,
+                bm25(fts_index, 10.0, 1.0) AS score,
+                snippet(fts_index, 1, '<mark>', '</mark>', '…', 32) AS snippet
+            FROM fts_index f
+            JOIN notes n ON n.id = f.rowid
+            WHERE fts_index MATCH ?
+            ${whereClause}
+            ORDER BY score
             LIMIT ?
         `);
-        const rows = stmt.all(...params, limit);
-        return rows;
+        return stmt.all(...params, limit);
     } catch (error) {
-        logger.error(error)
-        return []
+        logger.error(error);
+        return [];
     }
 }
 
 
 /**
- * 增加天数：刷新删除天数
+ * 通过 UUID 获取笔记（元数据 + md 正文）
  */
-export const refreshDeleteDay = (id: number) => {
+export const getNoteByUuid = (uuid: string) => {
     try {
-        logger.info(`刷新删除的时间，草稿ID：${id}`);
-        // 增加3天，并更新数据库
-        const newDeletedAt = dayjs().add(30, 'day').toISOString(); // 转换为 ISO 字符串
-        const updateStmt = db.prepare(`
-            UPDATE stickys SET deleted_at = ? WHERE id = ?
-        `);
-        updateStmt.run(newDeletedAt, id);
+        const row = getNoteMetaByUuid(uuid);
+        if (!row) return null;
+        const content = readNote(row.path);
+        return { ...row, content };
     } catch (error) {
-        logger.error(error)
+        logger.error(error);
+        return null;
+    }
+}
+
+/**
+ * 通过路径获取笔记（元数据 + md 正文）
+ */
+export const getNoteByPath = (relPath: string) => {
+    try {
+        const row = getNoteMetaByPath(relPath);
+        if (!row) return null;
+        const content = readNote(row.path);
+        return { ...row, content };
+    } catch (error) {
+        logger.error(error);
+        return null;
     }
 }
 
 
 /**
- * 删除过期的便利贴
+ * 启动对账：扫描 notes 目录，使元数据/索引与 md 文件（事实来源）保持一致
+ * - 磁盘新文件 → 补充元数据并建立索引
+ * - 文件被外部修改（mtime/hash 变化）→ 更新元数据并重建索引
+ * - 文件消失 → 删除元数据与索引
  */
-export const deleteExpiredStickys = () => {
+export const syncNotesWithFiles = () => {
     try {
-        // 取出所有过期的便利贴
-        const stmt = db.prepare(`
-            SELECT id FROM stickys WHERE deleted_at IS NOT NULL AND deleted_at <= datetime('now')
-        `);
-        const rows = stmt.all();
-        if (rows.length === 0) {
-            logger.info('no expired sticky notes found');
-            return;
+        const files = listMarkdownFiles();
+        const fileMap = new Map(files.map(f => [f.path, f.mtime]));
+        const rows = db.prepare(`SELECT id, uuid, path, title, mtime, hash, created_at FROM notes`).all() as NoteRow[];
+        const rowMap = new Map(rows.map(r => [r.path, r]));
+
+        let added = 0, updated = 0, removed = 0;
+
+        // 新增 / 更新
+        for (const file of files) {
+            const row = rowMap.get(file.path);
+            const content = readNote(file.path);
+            if (content === null) continue;
+            const hash = hashContent(content);
+
+            if (!row) {
+                const uuid = crypto.randomUUID();
+                const title = extractTitleFromMarkdown(content) || file.path.replace(/\.md$/i, '');
+                db.prepare(`
+                    INSERT INTO notes (uuid, path, title, mtime, hash)
+                    VALUES (?, ?, ?, ?, ?)
+                `).run(uuid, file.path, title, file.mtime, hash);
+                const inserted = getNoteMetaByPath(file.path);
+                if (inserted) upsertFts(inserted.id, title, content);
+                added++;
+            } else if (row.hash !== hash) {
+                const title = extractTitleFromMarkdown(content) || row.title;
+                db.prepare(`UPDATE notes SET title = ?, mtime = ?, hash = ? WHERE id = ?`)
+                    .run(title, file.mtime, hash, row.id);
+                upsertFts(row.id, title || '', content);
+                updated++;
+            } else if (row.mtime !== file.mtime) {
+                // 内容未变，仅同步 mtime
+                db.prepare(`UPDATE notes SET mtime = ? WHERE id = ?`).run(file.mtime, row.id);
+            }
         }
 
-        // 删除过期的便利贴
-        const deleteStmt = db.prepare(`
-            DELETE FROM stickys WHERE id = ?
-        `);
-        rows.forEach(row => {
-            logger.info(`删除了过期的便利贴 ${row.id}`);
-            deleteStmt.run(row.id);
-        });
-    } catch (error) {
-        logger.error(error)
-    }
-}
+        // 删除磁盘上已不存在的笔记
+        for (const row of rows) {
+            if (!fileMap.has(row.path)) {
+                deleteFts(row.id);
+                db.prepare(`DELETE FROM notes WHERE id = ?`).run(row.id);
+                removed++;
+            }
+        }
 
-
-
-/**
- * 获取UUID为guid 的便利贴
- * @deprecated 使用 getDraftByUuid 替代
- */
-export const getGuideMemo = () => {
-    try {
-        const stmt = db.prepare(`
-            SELECT id, uuid, title, content, content_json, created_at, modified_at, deleted_at
-            FROM stickys
-            WHERE uuid = ?
-            LIMIT 1
-        `);
-        return stmt.get('guide');
+        logger.info(`笔记对账完成: 新增 ${added}, 更新 ${updated}, 移除 ${removed}`);
+        return { added, updated, removed };
     } catch (error) {
         logger.error(error);
-        return null;
-    }
-}
-
-/**
- * 通过UUID获取草稿
- */
-export const getDraftByUuid = (uuid: string) => {
-    try {
-        const stmt = db.prepare(`
-            SELECT id, uuid, title, content, content_json, created_at, modified_at, deleted_at
-            FROM stickys
-            WHERE uuid = ?
-            LIMIT 1
-        `);
-        return stmt.get(uuid);
-    } catch (error) {
-        logger.error(error);
-        return null;
-    }
-}
-
-/**
- * 通过id获取便利贴
- * @deprecated 使用 getStickyByUuid 替代
- */
-export const getStickyById = (id: number) => {
-    try {
-        const stmt = db.prepare(`
-            SELECT id, uuid, title, content, content_json, created_at, modified_at, deleted_at
-            FROM stickys
-            WHERE id = ?
-            LIMIT 1
-        `);
-        return stmt.get(id);
-    } catch (error) {
-        logger.error(error);
-        return null;
+        return { added: 0, updated: 0, removed: 0 };
     }
 }
 
 
+// ==================== AI 工具 ====================
 
 /**
  * 添加AI工具

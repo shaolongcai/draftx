@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // 翻譯系統類型定義
 
 // 從統一配置文件導入語言類型
@@ -14,6 +15,7 @@ export interface TranslationKeys {
     edit: {
       test: string;
       placeholder: string;
+      titlePlaceholder: string;
     };
     // 新增模塊：工具欄
     toolBar: {
@@ -132,6 +134,7 @@ export type TranslationKeyPath =
   | 'app.title'
   | 'app.edit.test'
   | 'app.edit.placeholder'
+  | 'app.edit.titlePlaceholder'
 
   // 新增模塊：工具欄
   | 'app.toolBar.addDraft.mac'

@@ -42,7 +42,7 @@ const DraftList: React.FC<Props> = ({
                                 <DraftItem
                                     id={item.id}
                                     title={item.title}
-                                    content={item.content}
+                                    mtime={item.mtime}
                                     snippet={item.snippet}
                                     uuid={item.uuid}
                                     lineClamp={5}

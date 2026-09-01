@@ -1,4 +1,4 @@
-import { Divider, IconButton, Stack, Tooltip, Typography, useColorScheme, useTheme } from "@mui/material";
+import { Divider, IconButton, Stack, Tooltip, Typography, useTheme } from "@mui/material";
 import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import {
     AddCircleOutline as AddIcon,
@@ -230,7 +230,7 @@ const ToolBar: React.FC<Props> = ({
             // 获取草稿详情
             window.electronAPI.getDraftByUuid(uuid).then(draft => {
                 if (draft) {
-                    loadStickys$.emit({ ...draft, content: draft.content_json } as DraftResult)
+                    loadStickys$.emit(draft)
                 }
                 // 如果已删掉，则跳过一个,并且把这个uuid从历史堆栈中删除
                 else {
@@ -285,7 +285,7 @@ const ToolBar: React.FC<Props> = ({
                     className={`items-center gap-1 px-2 transition-opacity duration-300 ${active ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
                 >
                     {toolButtons.map((button, index) => {
-                        if ((button as any).isDivider) {
+                        if ('isDivider' in button) {
                             return (
                                 <Divider
                                     key={index}

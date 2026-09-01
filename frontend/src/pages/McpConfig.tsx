@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button, Paper, Stack, Typography } from "@mui/material"
 import { useNotifications } from "@toolpad/core/useNotifications";
-import { useNavigate } from "react-router-dom";
 import { SettingTitle } from "@/components";
 import { useTranslation } from "@/contexts/I18nContext";
 import { useEffect, useMemo, useState } from "react";
@@ -8,7 +8,6 @@ import { useEffect, useMemo, useState } from "react";
 const AIToolConfig: React.FC = () => {
     const { t } = useTranslation();
     const notifications = useNotifications();
-    const navigate = useNavigate();
     const [mcpEntryPath, setMcpEntryPath] = useState('');
 
     useEffect(() => {

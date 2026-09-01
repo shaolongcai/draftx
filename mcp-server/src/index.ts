@@ -40,7 +40,7 @@ async function callBridge(action: string, payload: any) {
 // 1. 按照关键词获取草稿（如果不传关键词，获取全部）
 server.tool(
     "get_drafts",
-    "获取 DraftX 草稿列表。支持关键词搜索，如果不传入关键词则返回所有草稿。",
+    "获取 DraftX 笔记列表（仅元数据：标题/路径/修改时间，正文请按 path 读取对应 .md 文件）。支持关键词全文搜索（含中文），如果不传入关键词则返回所有笔记。",
     {
         query: z.string().optional().describe("搜索关键词，留空获取全部"),
         limit: z.number().optional().describe("最大返回数量，默认 50"),
@@ -74,10 +74,10 @@ server.tool(
 // 2. 添加草稿
 server.tool(
     "add_draft",
-    "向 DraftX 中添加一条新草稿",
+    "向 DraftX 中添加一条新笔记（content 为 markdown 原文，会保存为 .md 文件）",
     {
-        title: z.string().describe("草稿的标题"),
-        content: z.string().describe("草稿的文本内容"),
+        title: z.string().describe("笔记的标题"),
+        content: z.string().describe("笔记的 markdown 内容"),
     },
     async ({ title, content }) => {
         try {
@@ -86,7 +86,7 @@ server.tool(
                 content: [
                     {
                         type: "text",
-                        text: `添加成功！草稿 UUID: ${result.uuid}`,
+                        text: `添加成功！笔记 UUID: ${result.uuid}，文件: ${result.path || "(空内容未创建)"}`,
                     },
                 ],
             };

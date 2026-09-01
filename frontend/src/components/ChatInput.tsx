@@ -1,18 +1,13 @@
 import { Chip, IconButton, InputBase, Stack, Tooltip } from "@mui/material"
 import {
-    Send as SendIcon,
     SwapHoriz as AiIcon,
     Cancel as CloseIcon
 } from '@mui/icons-material';
 import { useTheme, alpha } from '@mui/material/styles';
 import { useEffect, useRef, useState } from "react";
-import { useKeyPress, useUpdateLayoutEffect } from "ahooks";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { useKeyPress } from "ahooks";
 import useChat from "@/hooks/useChat";
-import { $convertToMarkdownString } from "@lexical/markdown";
-import { CUSTOM_TRANSFORMERS } from "@/utils/transformers";
-import { $createParagraphNode, $createTextNode, $getNodeByKey, $getRoot, $isTextNode, ParagraphNode } from "lexical";
-import { $createLoadingNode, $isLoadingNode } from "@/nodes/LoadingNode";
+import { useEditor } from "@/contexts/EditorContext";
 import { useTranslation } from "@/contexts/I18nContext";
 
 
@@ -25,13 +20,14 @@ const ChatInput: React.FC<Props> = ({ onClose }) => {
 
     const [inputMode, setInputMode] = useState<'whitDraft' | 'freedom'>('whitDraft')
     const [inputValue, setInputValue] = useState('')
-    const [textNodeKey, setTextNodeKey] = useState('')
 
     const theme = useTheme()
-    const { aiAnswer, isLoading, error, messages, sendMessage, clearMessages } = useChat();
-    const [editor] = useLexicalComposerContext();
+    const { aiAnswer, isLoading, sendMessage, clearMessages } = useChat();
+    const { vditorRef } = useEditor();
     const { t } = useTranslation()
     const inputRef = useRef<HTMLInputElement>(null);
+    // 已写入编辑器的 AI 回答长度（aiAnswer 是累计值，每次只追加增量）
+    const writtenLengthRef = useRef(0);
 
     useEffect(() => {
         // 确保组件挂载后聚焦
@@ -51,101 +47,64 @@ const ChatInput: React.FC<Props> = ({ onClose }) => {
         target: inputRef
     })
 
-    // 统一的AI生成 ， 可以考虑放到  onSelectOption 中
+    // 统一的AI生成
     const createAIRespone = async () => {
+        const vditor = vditorRef.current;
+        if (!vditor || isLoading) return;
         // 检查是否有配置AI
         const provider = await window.electronAPI.getConfig('ai_provider');
         if (!provider) {
-            editor.update(() => {
-                const root = $getRoot();
-                const pNode = $createParagraphNode();
-                const tNode = $createTextNode(t('app.chatWithAI.configureTips'));
-                pNode.append(tNode);
-                root.append(pNode);
-                pNode.selectEnd();
-            })
+            vditor.insertValue(`\n\n${t('app.chatWithAI.configureTips')}\n`);
             return;
         }
         // 检查是否激活
         const isActivated = await window.electronAPI.verifyLicense();
         if (!isActivated) {
-            editor.update(() => {
-                const root = $getRoot();
-                const pNode = $createParagraphNode();
-                const tNode = $createTextNode('Please activate the software first');
-                pNode.append(tNode);
-                root.append(pNode);
-                pNode.selectEnd();
-            })
+            vditor.insertValue('\n\nPlease activate the software first\n');
             return;
         }
         clearMessages();
-        editor.setEditable(false); //先禁用编辑器
-        editor.read(() => {
-            // 将draft的内容以markdown格式导出
-            const markdown = $convertToMarkdownString(CUSTOM_TRANSFORMERS);
-            console.log('markdown', markdown)
-            // 增加一个段落以承载AI内容
-            editor.update(() => {
-                // 创建loading
-                const pNode = $createParagraphNode();
-                const loadingNode = $createLoadingNode(t('app.chatWithAI.Generating'));
-                pNode.append(loadingNode);
-                // pNode 插入到 root的最后面
-                $getRoot().append(pNode);
-                // 插入一个空格， 以确保后续的文本节点可以正常选中
-                const textNode = $createTextNode(' ');
-                setTextNodeKey(textNode.getKey()); // 保存文本节点的key
-                pNode.append(textNode);
-                textNode.select()
-                sendMessage(inputValue, inputMode === 'freedom' ? '' : markdown);
-            })
-        })
+        // 将当前笔记内容以 markdown 作为上下文
+        const markdown = vditor.getValue();
+        writtenLengthRef.current = 0;
+        // 换行后承载AI内容
+        vditor.insertValue('\n\n');
+        sendMessage(inputValue, inputMode === 'freedom' ? '' : markdown);
     }
 
-    // 更新editor的状态
+    // 加载中时禁用编辑器
     useEffect(() => {
-        editor.setEditable(!isLoading); // 加载中时禁用编辑器
-        // 去掉loading段落
-        if (isLoading) return;
-        editor.update(() => {
-            const textNode = $getNodeByKey(textNodeKey!);
-            const pNode = textNode.getParent();
-            const loadingNode = pNode?.getChildren().find(child => $isLoadingNode(child));
-            loadingNode?.remove();
-        })
+        const vditor = vditorRef.current;
+        if (!vditor) return;
+        if (isLoading) {
+            vditor.disabled();
+        } else {
+            vditor.enable();
+        }
     }, [isLoading])
 
-    // 更新消息内容
-    useUpdateLayoutEffect(() => {
-        if (aiAnswer) {
-            // console.log('messagesType', messages[messages.length - 1].type);
-            editor.read(() => {
-                const textNode = $getNodeByKey(textNodeKey!);
-                try {
-                    // 先删掉loading节点
-                    const pNode = textNode.getParent();
-                    const loadingNode = pNode?.getChildren().find(child => $isLoadingNode(child));
-                    editor.update(() => {
-                        loadingNode?.remove();
-                        console.log('aiAnswer', aiAnswer);
-                        if ($isTextNode(textNode)) {
-                            textNode.setTextContent(aiAnswer);
-                            textNode.getParent()?.selectEnd(); // 每更新一次都将光标移动到最后
-                        }
-                    })
-                } catch (error) {
-                    editor.update(() => {
-                        if ($isTextNode(textNode)) {
-                            textNode.setTextContent('AI generation failed');
-                            textNode.getParent()?.selectEnd(); // 每更新一次都将光标移动到最后
-                        }
-                    })
-                    console.log('更新AI内容失败', error);
-                }
-            })
+    // 流式回答增量写入编辑器
+    useEffect(() => {
+        if (!aiAnswer) return;
+        const vditor = vditorRef.current;
+        if (!vditor) return;
+        const chunk = aiAnswer.slice(writtenLengthRef.current);
+        if (!chunk) return;
+        writtenLengthRef.current = aiAnswer.length;
+        try {
+            vditor.insertValue(chunk);
+        } catch (error) {
+            console.log('更新AI内容失败', error);
         }
-    }, [aiAnswer, messages])
+    }, [aiAnswer])
+
+    // 组件卸载时确保编辑器恢复可用
+    useEffect(() => {
+        return () => {
+            vditorRef.current?.enable();
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     return (
         <Stack
@@ -161,7 +120,7 @@ const ChatInput: React.FC<Props> = ({ onClose }) => {
                 bottom: '24px',
             }}
         >
-            <Tooltip title={t(`app.chatWithAI.close.${ window.electronUtils.platform === 'win32' ? 'win' : 'mac' }`)}>
+            <Tooltip title={t(`app.chatWithAI.close.${window.electronUtils.platform === 'win32' ? 'win' : 'mac'}`)}>
                 <IconButton
                     onClick={onClose}
                     size="small"
@@ -213,17 +172,6 @@ const ChatInput: React.FC<Props> = ({ onClose }) => {
                     }
                 }}
             />
-            {/* <IconButton
-                size="small"
-                sx={{
-                    color: theme.palette.primary.contrastText,
-                    '&:hover': {
-                        bgcolor: 'rgba(159, 114, 7, 0.08)',
-                    }
-                }}
-            >
-                <SendIcon fontSize="small" />
-            </IconButton> */}
         </Stack>
     )
 }

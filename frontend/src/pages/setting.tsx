@@ -19,17 +19,12 @@ const Setting = () => {
 
     const [reportAgreement, setReportAgreement] = useState(false) //是否同意上报问题
     const [shortcut, setShortcut] = useState('') //快捷键
-    // 更新檢查相關狀態
-    const [isUpdateAvailable, setIsUpdateAvailable] = useState(false)
-    const [isCheckingUpdate, setIsCheckingUpdate] = useState(false)
-    const [latestVersion, setLatestVersion] = useState<string | null>(null)
-    const [updateStatusText, setUpdateStatusText] = useState('')
     const [autoLaunch, setAutoLaunch] = useState(false) //是否開機自啟動
     const [trialDiffDays, setTrialDiffDays] = useState<number | null>(null)
     const [currentTheme, setCurrentTheme] = useState('default') //当前主题
 
     const { trialEndDate } = useGlobal()
-    const { t, isLoading } = useTranslation()
+    const { t } = useTranslation()
     const navigate = useNavigate();
     const theme = useTheme()
 
@@ -41,7 +36,7 @@ const Setting = () => {
         const end = dayjs(trialEndDate)
         const diffDays = end.diff(now, 'day')
         console.log('试用期剩余天数：', diffDays)
-        now.isBefore(end) && setTrialDiffDays(diffDays)
+        if (now.isBefore(end)) setTrialDiffDays(diffDays)
     }, [])
 
     // 拉取用户配置
@@ -158,6 +153,7 @@ const Setting = () => {
                             background: `linear-gradient(to right, ${theme.palette.primary.main}, ${alpha(theme.palette.primary.main, 0.2)})`
                         }}
                     >
+                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                         {t('app.settings.trialDaysLeft' as any, { days: trialDiffDays })}
                     </span>
                 }
