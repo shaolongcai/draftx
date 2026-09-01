@@ -1,7 +1,7 @@
 {
   "name": "draftx",
   "type": "module",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Electron app with React frontend and Node.js backend",
   "main": "dist/main/main.js",
   "scripts": {
@@ -14,9 +14,10 @@
     "make": "electron-forge make",
     "start": "electron-forge start",
     "package": "electron-forge package",
+    "build:mcp": "npm --prefix mcp-server run build",
     "build:main": "npm run compile && npm run obfuscate",
-    "build:mac": "npm run build:main && electron-builder --mac",
-    "build:win": "electron-builder --win --x64"
+    "build:mac": "npm run build:mcp && npm run build:main && electron-builder --mac",
+    "build:win": "npm run build:mcp && electron-builder --win --x64"
   },
   "devDependencies": {
     "@types/node": "^24.3.1",
@@ -72,6 +73,18 @@
       {
         "from": "resources/app-update.yml",
         "to": "app-update.yml"
+      },
+      {
+        "from": "mcp-server/package.json",
+        "to": "mcp-server/package.json"
+      },
+      {
+        "from": "mcp-server/dist",
+        "to": "mcp-server/dist"
+      },
+      {
+        "from": "mcp-server/node_modules",
+        "to": "mcp-server/node_modules"
       }
     ],
     "directories": {
@@ -94,7 +107,7 @@
             "arm64"
           ]
         },
-         {
+        {
           "target": "zip",
           "arch": [
             "arm64"

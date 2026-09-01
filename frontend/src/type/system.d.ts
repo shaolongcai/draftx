@@ -11,4 +11,5 @@ type UserConfig = {
     ai_provider: string; //AI服务配置(JSON字符串)
     launchShortcut: string; //启动快捷键
     theme: 'default' | 'white' | 'forest' | 'dark'; //主题
+    trialStartDate: number; //试开始时间
 }

@@ -38,7 +38,7 @@ class WindowManager {
     private initMainWindow() {
         this.mainWindow = new BrowserWindow({
             width: 460,
-            height: 460,
+            height: 500,
             minWidth: 360,
             minHeight: 360,
             x: 0,               // 后面会计算居中
@@ -222,20 +222,6 @@ class WindowManager {
         if (input.control && input.shift && input.key.toLowerCase() === 'c') {
             event.preventDefault();
         }
-    }
-
-    // 变更窗口大小
-    public resizeWindow(windowName: 'mainWindow' | 'settingsWindow', size: { width: number, height: number }) {
-        if (!size || !size.height || !size.width) return;
-        let window = this.mainWindow;
-        if (windowName === 'settingsWindow') {
-            window = this.settingsWindow;
-            // console.log('设置窗口变化')
-        }
-        window.setBounds({
-            width: size.width + 8,
-            height: size.height + 8 || this.mainWindow.getBounds().height + 8
-        });
     }
 
     destroy() {

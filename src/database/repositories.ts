@@ -47,18 +47,78 @@ export const saveStickyNote = (stickyNote: StickyParmas) => {
  * @param limit 限制返回数量
  * @returns 直接返回草稿列表
  */
-export const getDraft = (query?: string, limit: number = 50) => {
+export type DraftTimeFilter = {
+    createdAfter?: string;
+    createdBefore?: string;
+    modifiedAfter?: string;
+    modifiedBefore?: string;
+}
+
+export const getDraft = (query?: string, limit: number = 50, timeFilter: DraftTimeFilter = {}) => {
     try {
+        const normalizedQuery = query?.trim();
+        const createdAfter = timeFilter.createdAfter;
+        const createdBefore = timeFilter.createdBefore;
+        const modifiedAfter = timeFilter.modifiedAfter;
+        const modifiedBefore = timeFilter.modifiedBefore;
+
         // 空查询：直接返回全部，按修改时间排序
-        if (!query || query.trim() === '') {
+        if (!normalizedQuery) {
+            const conditions: string[] = [];
+            const params: any[] = [];
+
+            if (createdAfter) {
+                conditions.push(`datetime(s.created_at) >= datetime(?)`);
+                params.push(createdAfter);
+            }
+            if (createdBefore) {
+                conditions.push(`datetime(s.created_at) <= datetime(?)`);
+                params.push(createdBefore);
+            }
+            if (modifiedAfter) {
+                conditions.push(`datetime(s.modified_at) >= datetime(?)`);
+                params.push(modifiedAfter);
+            }
+            if (modifiedBefore) {
+                conditions.push(`datetime(s.modified_at) <= datetime(?)`);
+                params.push(modifiedBefore);
+            }
+
+            const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
             const stmt = db.prepare(`
                 SELECT id, uuid, title, content, content_json, created_at, modified_at, deleted_at
-                FROM stickys
-                ORDER BY modified_at DESC
+                FROM stickys s
+                ${whereClause}
+                ORDER BY s.modified_at DESC
                 LIMIT ?
             `);
-            const rows = stmt.all(limit);
+            const rows = stmt.all(...params, limit);
             return rows;
+        }
+
+        const conditions: string[] = [
+            `(
+                lower(s.title) LIKE '%' || q.query || '%'
+                OR lower(s.content) LIKE '%' || q.query || '%'
+            )`
+        ];
+        const params: any[] = [normalizedQuery];
+
+        if (createdAfter) {
+            conditions.push(`datetime(s.created_at) >= datetime(?)`);
+            params.push(createdAfter);
+        }
+        if (createdBefore) {
+            conditions.push(`datetime(s.created_at) <= datetime(?)`);
+            params.push(createdBefore);
+        }
+        if (modifiedAfter) {
+            conditions.push(`datetime(s.modified_at) >= datetime(?)`);
+            params.push(modifiedAfter);
+        }
+        if (modifiedBefore) {
+            conditions.push(`datetime(s.modified_at) <= datetime(?)`);
+            params.push(modifiedBefore);
         }
 
         const stmt = db.prepare(`
@@ -74,14 +134,11 @@ export const getDraft = (query?: string, limit: number = 50) => {
                 ) AS score
             FROM stickys s
             CROSS JOIN q
-            WHERE (
-                lower(s.title) LIKE '%' || q.query || '%'
-                OR lower(s.content) LIKE '%' || q.query || '%'
-            )
+            WHERE ${conditions.join(' AND ')}
             ORDER BY score DESC, s.title
             LIMIT ?
         `);
-        const rows = stmt.all(query, limit);
+        const rows = stmt.all(...params, limit);
         return rows;
     } catch (error) {
         logger.error(error)

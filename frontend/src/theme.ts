@@ -2,7 +2,7 @@ import { Theme } from "@mui/material";
 import { createTheme } from '@mui/material/styles';
 // When using TypeScript 3.x and below
 // import '@mui/lab/themeAugmentation';
-
+import { alpha } from "@mui/material/styles"
 
 //主题
 export const theme = createTheme({
@@ -68,7 +68,26 @@ export const theme = createTheme({
                     color: theme.palette.primary.contrastText,
                     border: 'none',
                     '&:hover': {
+                        backgroundColor: alpha(theme.palette.primary.main, 0.85), // 85% 透明度
+                    },
+                        
+                    '&.Mui-disabled': {
+                        backgroundColor: alpha(theme.palette.primary.main, 0.25),
+                        color: alpha(theme.palette.primary.contrastText, 0.75),
+                        cursor: 'not-allowed',
+                    }
+                }),
+                containedSecondary: ({ theme }: { theme: Theme }) => ({
+                    backgroundColor: theme.palette.secondary.main,
+                    color: theme.palette.secondary.contrastText,
+                    border: 'none',
+                    '&:hover': {
                         backgroundColor: theme.palette.background.paper, // 85% 透明度
+                    },
+                    '&.Mui-disabled': {
+                        backgroundColor: alpha(theme.palette.secondary.main, 0.25),
+                        color: alpha(theme.palette.secondary.contrastText, 0.75),
+                        cursor: 'not-allowed',
                     }
                 })
             }
@@ -177,33 +196,6 @@ export const theme = createTheme({
             fontWeight: 'Regular',
         },
     },
-
-
-    //调色板
-    // palette: {
-    //     text: {
-    //         primary: 'rgba(0, 0, 0, 0.85)', //在背景上的颜色
-    //         secondary: 'rgba(0, 0, 0, 0.65)',
-    //         tertiary: 'rgba(0, 0, 0, 0.45)',
-    //         disabled: 'rgba(0, 0, 0, 0.25)',
-    //     },
-    //     background: {
-    //         default: '#F9F3E5',
-    //         paper: '#FFFFFF',
-    //     },
-    //     primary: {
-    //         main: '#9F7207',
-    //         // light: '#FFE5B4',
-    //         // dark: '#664D03',
-    //         contrastText: '#FFFFFF',
-    //     },
-    //     // secondary: {
-    //     //     main: '#D4E4F6',
-    //     // },
-    //     error: {
-    //         main: '#FF4D4F',
-    //     },
-    // }
 })
 
 // 默认主题

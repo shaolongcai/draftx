@@ -70,9 +70,23 @@ fi
 # 返回根目录
 cd ..
 
+cd mcp-server
+if [ ! -d "node_modules" ]; then
+    log_info "Installing MCP server dependencies..."
+    npm install
+    if [ $? -ne 0 ]; then
+        log_error "Failed to install MCP server dependencies"
+        cd ..
+        exit 1
+    fi
+else
+    log_info "MCP server dependencies already installed"
+fi
+cd ..
+
 # --- 清理之前编译的文件 ---
 log_info "Cleaning previous builds..."
-rm -rf dist out
+rm -rf dist out mcp-server/dist
 
 # --- 编译TypeScript文件 ---
 log_info "Compiling TypeScript files..."
@@ -82,6 +96,14 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 log_success "TypeScript compilation completed"
+
+log_info "Building MCP server..."
+npm run build:mcp
+if [ $? -ne 0 ]; then
+    log_error "Failed to build MCP server"
+    exit 1
+fi
+log_success "MCP server build completed"
 
 # --- 混淆主线程代码 (关键步骤) ---
 log_info "Obfuscating main process code..."

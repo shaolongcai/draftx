@@ -49,6 +49,19 @@ export interface TranslationKeys {
       open: string;
       community: string;
       feedback: string;
+      activationPageTitle?: string;
+      activationJoinDiscord?: string;
+      activationPrice?: string;
+      activationCodeLabel?: string;
+      activationCodePlaceholder?: string;
+      activationCodeHelper?: string;
+      activationButton?: string;
+      activationLoading?: string;
+      activationTrialButton?: string;
+      activationSuccessTitle?: string;
+      activationSuccessDesc?: string;
+      activationBackButton?: string;
+      activationSuccessToast?: string;
       install?: string;
       reInstall?: string;
       checkUpdate?: string;
@@ -61,6 +74,7 @@ export interface TranslationKeys {
       update?: string;
       about?: string;
       website?: string;
+      trialDaysLeft?: string;
     };
     common: {
       confirm: string;
@@ -137,6 +151,19 @@ export type TranslationKeyPath =
   | 'app.settings.language'
   | 'app.settings.logFolder'
   | 'app.settings.open'
+  | 'app.settings.activationPageTitle'
+  | 'app.settings.activationJoinDiscord'
+  | 'app.settings.activationPrice'
+  | 'app.settings.activationCodeLabel'
+  | 'app.settings.activationCodePlaceholder'
+  | 'app.settings.activationCodeHelper'
+  | 'app.settings.activationButton'
+  | 'app.settings.activationLoading'
+  | 'app.settings.activationTrialButton'
+  | 'app.settings.activationSuccessTitle'
+  | 'app.settings.activationSuccessDesc'
+  | 'app.settings.activationBackButton'
+  | 'app.settings.activationSuccessToast'
   | 'app.settings.checkUpdate'
   | 'app.settings.check'
   | 'app.settings.checking'
@@ -145,6 +172,7 @@ export type TranslationKeyPath =
   | 'app.settings.aiSettings'
   | 'app.settings.update'
   | 'app.settings.about'
+  | 'app.settings.trialDaysLeft'
   | 'app.common.confirm'
   | 'app.common.cancel'
   | 'app.common.save'

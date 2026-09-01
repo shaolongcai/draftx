@@ -22,6 +22,17 @@ type ChatData = {
     type: 'stream' | 'done'
 }
 
+type DraftTimeFilter = {
+    createdAfter?: string;
+    createdBefore?: string;
+    modifiedAfter?: string;
+    modifiedBefore?: string;
+}
+
+// 试用期验证的枚举
+export type TrialType = 'NOT_INITIALIZED' | 'MISMATCH' | 'VALID' | 'EXPIRED'
+
+
 
 interface ElectronAPI {
 
@@ -30,7 +41,7 @@ interface ElectronAPI {
      * @param query 搜索词
      * @returns 直接返回草稿列表
      */
-    getDraft: (query: string) => Promise<DraftResult[]>;
+    getDraft: (query: string, limit?: number, timeFilter?: DraftTimeFilter) => Promise<DraftResult[]>;
 
     /**
      * 保存便利贴
@@ -43,11 +54,6 @@ interface ElectronAPI {
     refreshDeleteDay: (id: number) => void;
 
     /**
-     * 变更窗口大小
-     */
-    resizeWindow: (windowName: 'mainWindow' | 'settingsWindow', size: { width: number, height: number }) => Promise<void>;
-
-    /**
      * 设置窗口背景颜色
      */
     setBackgroundColor: (color: string) => void;
@@ -56,6 +62,7 @@ interface ElectronAPI {
      * 获取应用版本
      */
     getAppVersion: () => Promise<string>;
+    getMcpEntryPath: () => Promise<string>;
 
     /**
      * 获取配置
@@ -93,23 +100,21 @@ interface ElectronAPI {
     checkOllamaServer: (host: string, modelID: string) => Promise<{ code: number, errMsg?: string }>
 
     /**
-     * 保存AI工具,带ID表示更新，不带ID表示新增
-     */
-    saveAITool: (toolData: AITool) => Promise<void>;
-
-    /**
-     * 获取AI工具
-     */
-    getAITools: (id?: number) => Promise<AIToolItem[] | AIToolItem | null>;
-
-    /**
-     * 删除AI工具
-     */
-    deleteAITool: (id: number) => Promise<void>;
-    /**
      * 更新托盘菜单语言
      */
     updateTrayLanguage(language: string): void;
+
+    /**
+     * 开始试用
+     */
+    startTrial: () => Promise<{ success: boolean, message?: string }>;
+
+    /**
+     * 验证试用
+     * @returns Promise<{ success: boolean, message?: string, trialType: TrialType, trialEndDate?: number,试用结束时间 }>
+     */
+    verifyTrial: () => Promise<{ success: boolean, message?: string, trialType: TrialType, trialEndDate?: number }>;
+
 
 
     /**

@@ -1,52 +1,82 @@
-import { SettingTitle } from "@/components"
-import { Button, Stack, TextField, Typography } from "@mui/material"
+import { useTranslation } from "@/contexts/I18nContext"
+import { alpha } from "@mui/material/styles"
+import { Button, Paper, Stack, TextField, Typography, useTheme } from "@mui/material"
 import { useEffect, useState } from "react"
 import axios from 'axios'
 import { useNotifications } from "@toolpad/core/useNotifications"
-import proTipsImg from '@/assets/images/pro.png'
+import DiscordIcon from '@/assets/icons/discord.svg'
 import { useNavigate } from "react-router-dom"
+import { TrialType } from "@/type/electron"
 
-/**
- * 激活码页面
- */
+const DISCORD_URL = 'https://discord.gg/TyArpAVf6A'
+
 const ActivationCode: React.FC = () => {
-
-    const [machineId, setMachineId] = useState('') // 新增状态管理机器码
+    const [machineId, setMachineId] = useState('')
     const [code, setCode] = useState('')
     const [loading, setLoading] = useState(false)
-    const [isSuccess, setIsSuccess] = useState(false) // 新增状态管理激活成功
+    const [trialType, setTrialType] = useState<TrialType | null>(null)
 
     const notifications = useNotifications()
     const navigate = useNavigate()
+    const theme = useTheme()
+    const { t } = useTranslation()
 
-    // 组件挂载时获取机器码
+
+    // 获取试用状态
     useEffect(() => {
-        window.electronAPI.getMachineId().then(setMachineId);
-    }, []);
+        window.electronAPI.verifyTrial().then(trialRes => {
+            setTrialType(trialRes.trialType)
+        })
+    }, [])
+
+    useEffect(() => {
+        window.electronAPI.getMachineId().then(setMachineId)
+    }, [])
+
+    // 开始试用
+    const handleStartTrial = () => {
+        window.electronAPI.startTrial().then(res => {
+            if (res.success) {
+                navigate('/')
+                return
+            }
+            throw res.message
+        })
+            .catch(err => {
+                console.error(err)
+                const msg = err instanceof Error ? err.message : 'Trial start failed';
+                notifications.show(msg, {
+                    severity: 'error',
+                    autoHideDuration: 1800,
+                })
+            })
+    }
+
+    const handleJoinDiscord = () => {
+        window.electronAPI.openExternalUrl(DISCORD_URL)
+    }
 
     const handleActivate = async () => {
-        if (!code.trim()) return
+        if (!code.trim() || !machineId) return
 
         setLoading(true)
         try {
-            // 向服务器发送激活码
             const res = await axios.post('https://api.draftx.cc/osai/activationCode/use', { code, deviceHash: machineId })
             if (res.data.code === 0) {
-                notifications.show('Activation Success', {
+                notifications.show(t('app.settings.activationSuccessToast'), {
                     severity: 'success',
                     autoHideDuration: 1200,
-                });
+                })
                 const licenseData = {
-                    "payload": res.data.data.payload,
-                    "signature": res.data.data.signature,
+                    payload: res.data.data.payload,
+                    signature: res.data.data.signature,
                 }
-                // 存入数据库
-                window.electronAPI.setConfig({
+                await window.electronAPI.setConfig({
                     key: 'licenseData',
                     value: JSON.stringify(licenseData),
                     type: 'string'
                 })
-                setIsSuccess(true) // 激活成功后设置状态为 true
+                navigate('/')
                 return
             }
             throw res.data.errMsg
@@ -56,58 +86,125 @@ const ActivationCode: React.FC = () => {
             notifications.show(msg, {
                 severity: 'error',
                 autoHideDuration: 1800,
-            });
+            })
         } finally {
             setLoading(false)
         }
     }
 
-    // 激活成功时样式
-    if (isSuccess) {
-        return (
-            <>
-                <SettingTitle title="Activation Success" />
-                <Stack alignItems='center' >
-                    <img src={proTipsImg} className="w-[50%]" alt="proTipsImg" />
-                    <Stack className="mt-6 w-full max-w-[400px] mx-auto" spacing={3} alignItems='center'>
-                        <Typography variant='headlineSmall' className="text-green-500">
-                            ✅ Activation Success
+    return (
+        <>
+            <div>
+                <Stack spacing={3} alignItems='center'>
+                    <Paper
+                        elevation={0}
+                        onClick={handleJoinDiscord}
+                        sx={{
+                            width: 84,
+                            height: 84,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: '18px',
+                            border: `1px solid ${alpha(theme.palette.primary.main, 1)}`,
+                            backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                            '&:hover': {
+                                backgroundColor: alpha(theme.palette.primary.main, 0.14),
+                                transform: 'translateY(-1px)',
+                            },
+                        }}
+                    >
+                        <img src={DiscordIcon} className="h-10 w-10" alt="discord" />
+                    </Paper>
+
+                    <Stack spacing={1} alignItems='center'>
+                        <Typography variant='headlineSmall' textAlign='center' color='text.primary'>
+                            {t('app.settings.activationJoinDiscord')}
                         </Typography>
-                        <Button variant='contained' onClick={() => navigate('/')} fullWidth>
-                            Back to Setting
+                        <Typography
+                            variant='titleLarge'
+                            textAlign='center'
+                            sx={{ color: theme.palette.primary.main, fontWeight: 800 }}
+                        >
+                            {t('app.settings.activationPrice')}
+                        </Typography>
+                    </Stack>
+                    <Stack spacing={1.25} className="w-full">
+                        <TextField
+                            fullWidth
+                            variant="outlined"
+                            value={code}
+                            onChange={(e) => setCode(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleActivate()
+                                }
+                            }}
+                            placeholder={t('app.settings.activationCodePlaceholder')}
+                            disabled={loading}
+                            size="small"
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: '14px',
+                                    backgroundColor: alpha(theme.palette.background.default, 0.18),
+                                    '& fieldset': {
+                                        borderColor: alpha(theme.palette.text.primary, 0.24),
+                                    },
+                                    '&:hover fieldset': {
+                                        borderColor: alpha(theme.palette.primary.main, 0.5),
+                                    },
+                                    '&.Mui-focused fieldset': {
+                                        borderColor: theme.palette.primary.main,
+                                    },
+                                },
+                                '& .MuiInputBase-input': {
+                                    py: 1.5,
+                                    color: theme.palette.text.primary,
+                                },
+                                '& .MuiInputBase-input::placeholder': {
+                                    opacity: 1,
+                                    color: alpha(theme.palette.text.primary, 0.56),
+                                },
+                            }}
+                        />
+                        <Typography
+                            variant='bodySmall'
+                            sx={{ color: alpha(theme.palette.text.primary, 0.68), lineHeight: 1.7 }}
+                        >
+                            {t('app.settings.activationCodeHelper')}
+                        </Typography>
+                    </Stack>
+
+                    <Stack spacing={1.5} className="w-full" >
+                        <Button
+                            variant='contained'
+                            color='primary'
+                            onClick={handleActivate}
+                            disabled={!code.trim() || !machineId || loading}
+                            fullWidth
+                            size="large"
+                            sx={{ borderRadius: '12px', fontWeight: 700, boxShadow: 'none' }}
+                        >
+                            {loading ? t('app.settings.activationLoading') : t('app.settings.activationButton')}
+                        </Button>
+                        <Button
+                            variant='outlined'
+                            color='primary'
+                            onClick={handleStartTrial}
+                            fullWidth
+                            size="large"
+                            disabled={trialType === 'EXPIRED' || trialType === 'MISMATCH'}
+                            sx={{ borderRadius: '12px', py: 1.05, fontWeight: 700 }}
+                        >
+                            {(trialType === 'EXPIRED' || trialType === 'MISMATCH') ?
+                                t('app.settings.activationTrialExpired') :
+                                t('app.settings.activationTrialButton')}
                         </Button>
                     </Stack>
                 </Stack>
-            </>
-        )
-    }
-
-    return (
-        <>
-            <SettingTitle title="Activation" />
-            <Stack className="mt-6 w-full max-w-[400px] mx-auto" spacing={3} alignItems='center'>
-                <TextField
-                    fullWidth
-                    label="Activation Code"
-                    variant="outlined"
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                    placeholder="Enter your code here"
-                    disabled={loading}
-                    size="small"
-                    helperText="📌 The activation code can be used 3 times. Once activated, it cannot be cancelled and no refunds will be provided. Please ensure you are connected to the internet during activation."
-                />
-
-                <Button
-                    variant='contained'
-                    onClick={handleActivate}
-                    disabled={!code.trim() || loading}
-                    fullWidth
-                    size="large"
-                >
-                    {loading ? 'Activating...' : 'Activate'}
-                </Button>
-            </Stack>
+            </div>
         </>
     )
 }

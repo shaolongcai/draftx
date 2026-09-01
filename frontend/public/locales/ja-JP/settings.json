@@ -17,5 +17,19 @@
     "generalSettings": "一般設定",
     "aiSettings": "AIサーバー",
     "aiProvider": "AIプロバイダー (Pro)",
-    "update": "更新"
+    "update": "更新",
+    "activationPageTitle": "アクティベーション",
+    "activationJoinDiscord": "Discord に参加してアクティベーションコードを購入",
+    "activationPrice": "$9、1回の購入で永久ライセンス。",
+    "activationCodeLabel": "アクティベーションコード",
+    "activationCodePlaceholder": "アクティベーションコードを入力してください",
+    "activationCodeHelper": "📌 各アクティベーションコードは 3 回まで使用できます。アクティベート後は取り消しや返金ができません。アクティベート中はインターネット接続を維持してください。",
+    "activationButton": "アクティベート",
+    "activationLoading": "アクティベート中...",
+    "activationTrialButton": "14日間トライアルを開始",
+    "activationSuccessTitle": "アクティベート成功",
+    "activationSuccessDesc": "このデバイスのライセンス認証が完了しました。設定に戻ってすべての機能を利用できます。",
+    "activationBackButton": "設定に戻る",
+    "activationSuccessToast": "アクティベート成功",
+    "trialDaysLeft": "試用期間の残り {{days}} 日"
 }

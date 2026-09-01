@@ -23,11 +23,18 @@ if not exist "frontend\node_modules" (
     call pnpm install
     cd ..
 )
+if not exist "mcp-server\node_modules" (
+    echo [INFO] Installing MCP server dependencies...
+    cd mcp-server
+    call npm install
+    cd ..
+)
 
 :: 清理旧构建
 if exist "out" rmdir /s /q "out"
 if exist "dist" rmdir /s /q "dist"
 if exist "frontend\dist" rmdir /s /q "frontend\dist"
+if exist "mcp-server\dist" rmdir /s /q "mcp-server\dist"
 
 :: 编译主进程 TypeScript
 echo [INFO] Compiling main process TypeScript...
@@ -44,6 +51,14 @@ if %errorlevel% neq 0 (
 )
 
 
+echo [INFO] Building MCP server...
+call npm run build:mcp
+if %errorlevel% neq 0 (
+    echo [ERROR] MCP server build failed
+    pause
+    exit /b 1
+)
+
 :: 构建前端
 echo [INFO] Building frontend...
 cd frontend
@@ -57,7 +72,12 @@ cd ..
 
 :: 打包 Electron
 echo [INFO] Building with electron-builder...
-call npm run build:win
+call npx electron-builder --win --x64
+if %errorlevel% neq 0 (
+    echo [ERROR] electron-builder build failed
+    pause
+    exit /b 1
+)
 
 echo [SUCCESS] Build completed! Files in out\
 dir out
