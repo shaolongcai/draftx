@@ -73,7 +73,9 @@ function RootProviders({ children }) {
 
     return (
         <I18nProvider defaultLanguage={lang} language={lang}>
-            <ThemeProvider theme={currentTheme}>
+            <ThemeProvider 
+            theme={currentTheme}
+            >
                 <GlobalContext.Provider value={{
                     setTheme,
                     trialEndDate: null,

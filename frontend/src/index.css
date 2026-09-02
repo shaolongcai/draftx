@@ -19,11 +19,11 @@
 } */
 
 body {
-  padding: 24px;
+  padding: 0px;
   background-color: transparent;
   min-width: 320px;
   min-height: 100vh;
-  font-family: 'Roboto', 'Noto Sans SC', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Digits', 'Cormorant Garamond', 'LXGW WenKai Mono TC', 'Roboto', 'Noto Sans SC', system-ui, Avenir, Helvetica, Arial, sans-serif;
   position: relative; /* 确保伪元素定位参考 */
 }
 
@@ -51,6 +51,53 @@ body::before {
 }
 
 /* 字体定义 */
+/* 数字专用：仅覆盖数字 0-9，优先于其他字体命中 */
+@font-face {
+  font-family: 'Digits';
+  src: url('./assets/front/Roboto/Roboto-VariableFont_wdth,wght.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0030-0039;
+}
+
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('./assets/front/Cormorant_Garamond/CormorantGaramond-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('./assets/front/Cormorant_Garamond/CormorantGaramond-Italic-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 300 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LXGW WenKai Mono TC';
+  src: url('./assets/front/LXGW_WenKai_Mono_TC/LXGWWenKaiMonoTC-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LXGW WenKai Mono TC';
+  src: url('./assets/front/LXGW_WenKai_Mono_TC/LXGWWenKaiMonoTC-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LXGW WenKai Mono TC';
+  src: url('./assets/front/LXGW_WenKai_Mono_TC/LXGWWenKaiMonoTC-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+}
+
 @font-face {
   font-family: 'Roboto';
   src: url('./assets/front/Roboto/Roboto-VariableFont_wdth,wght.ttf') format('truetype-variations');
@@ -84,7 +131,7 @@ body::before {
 }
 
 :root {
-  font-family: 'Roboto', 'Noto Sans SC', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Digits', 'Cormorant Garamond', 'LXGW WenKai Mono TC', 'Roboto', 'Noto Sans SC', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
   overflow: hidden;

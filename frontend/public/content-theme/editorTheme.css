@@ -13,8 +13,7 @@
 
 /* 内容主题 */
 .vditor-reset {
-    /* 谷歌字体 */
-    font-family: 'Roboto', 'Noto Sans SC', system-ui, Avenir, Helvetica, Arial, sans-serif;
+    font-family: 'Digits', 'Cormorant Garamond', 'LXGW WenKai Mono TC', 'Roboto', 'Noto Sans SC', system-ui, Avenir, Helvetica, Arial, sans-serif;
     background-color: #F9F3E5 !important;
     max-height: 600px;
     overflow-y: auto;
@@ -24,21 +23,21 @@
 .vditor-reset h1 {
     font-size: 24px;
     color: rgba(0, 0, 0, 0.85);
-    font-weight: 700;
+    font-weight: 600;
     margin-top: 0px;
 }
 
 .vditor-reset h2 {
     font-size: 20px;
     color: rgba(0, 0, 0, 0.85);
-    font-weight: 700;
+    font-weight: 600;
     margin-top: 0px;
 }
 
 .vditor-reset h3 {
     font-size: 16px;
     color: rgba(0, 0, 0, 0.85);
-    font-weight: 700;
+    font-weight: 600;
     margin-top: 0px;
 }
 

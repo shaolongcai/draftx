@@ -37,24 +37,24 @@ class WindowManager {
     // 初始化main窗口
     private initMainWindow() {
         this.mainWindow = new BrowserWindow({
-            width: 460,
-            height: 500,
-            minWidth: 360,
-            minHeight: 360,
+            width: 770,
+            height: 770,
+            minWidth: 770,
+            minHeight: 770,
             x: 0,               // 后面会计算居中
             y: 0,
             frame: true,       // 有无边框
             resizable: true, // 是否可调整大小
             movable: true,
-            alwaysOnTop: true,  // 总在最前
+            alwaysOnTop: false,  // 总在最前
             skipTaskbar: true,  // 不占用任务栏
             show: false,        // 先不显示
             // transparent: true,
             // backgroundColor: '#00000000',
             roundedCorners: true,
             hasShadow: true,
-            backgroundColor: '#F9F3E5',
-            // vibrancy: 'under-window', // macOS 模糊效果，增强边框层次
+            backgroundColor: '#F5F4EF',
+            vibrancy: 'under-window', // macOS 模糊效果，增强边框层次
             titleBarStyle: process.platform === 'darwin' ? 'customButtonsOnHover' : 'hidden', // 隐藏原生标题栏，保留边框
             // titleBarStyle: 'hiddenInset',
             webPreferences: {
@@ -105,7 +105,7 @@ class WindowManager {
             frame: true,       // 无边框
             resizable: true,
             movable: true,
-            alwaysOnTop: true,  // 总在最前
+            alwaysOnTop: false,  // 总在最前
             skipTaskbar: true,  // 不占用任务栏
             show: false,        // 先不显示
             roundedCorners: true,

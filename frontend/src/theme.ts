@@ -118,6 +118,7 @@ export const theme = createTheme({
 
     //字体
     typography: {
+        fontFamily: "'Digits', 'Cormorant Garamond', 'LXGW WenKai Mono TC', 'Roboto', 'Noto Sans SC', system-ui, Avenir, Helvetica, Arial, sans-serif",
         //页面大标题
         headlineLarge: {
             fontSize: '32px',
@@ -209,8 +210,8 @@ export const defaultTheme = createTheme(theme, {
             primary: 'rgba(0, 0, 0, 0.85)',
         },
         background: {
-            default: '#F9F3E5',
-            paper: '#F9F3E5',
+            default: '#F5F4EF',
+            paper: '#F5F4EF',
         },
     },
 })
