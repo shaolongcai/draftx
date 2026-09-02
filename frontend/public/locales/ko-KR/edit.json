@@ -1,4 +1,9 @@
 {
     "placeholder": "여기서 작성을 시작하세요",
-    "titlePlaceholder": "제목 입력"
+    "titlePlaceholder": "제목 입력",
+    "imageMenu": {
+        "copy": "이미지 복사",
+        "shrink": "이미지 축소",
+        "enlarge": "이미지 확대"
+    }
 }

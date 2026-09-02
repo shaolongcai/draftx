@@ -1,7 +1,6 @@
 import React from 'react'
-import { Paper, Stack } from "@mui/material"
 import DiscordIcon from '@/assets/icons/discord.svg'
-import EmailIcon from '@/assets/icons/email.svg'
+import { Mail as MailIcon } from 'lucide-react'
 import { useNotifications } from '@toolpad/core/useNotifications'
 
 const Contact: React.FC = () => {
@@ -18,24 +17,24 @@ const Contact: React.FC = () => {
     };
 
     return (
-        <Stack spacing={2} alignItems='center' direction='row'>
-            <Paper
-                elevation={0}
-                variant='outlined'
+        <div className="flex items-center gap-4 py-2">
+            {/* Discord */}
+            <button
+                type='button'
                 onClick={() => window.electronAPI.openExternalUrl('https://discord.gg/TyArpAVf6A')}
-                className='p-4 rounded-[8px]! box-border cursor-pointer'
+                className="cursor-pointer rounded-full transition-transform hover:scale-105"
             >
-                <img src={DiscordIcon} className='w-10 h-10' />
-            </Paper>
-            <Paper
-                variant='outlined'
-                elevation={0}
-                className=' p-4 rounded-[8px]! box-border cursor-pointer'
+                <img src={DiscordIcon} className="size-12 rounded-full" />
+            </button>
+            {/* 邮箱 */}
+            <button
+                type='button'
                 onClick={copyEmail}
+                className="flex size-12 cursor-pointer items-center justify-center rounded-full bg-[#3A332C] text-[#F5F4EF] transition-transform hover:scale-105"
             >
-                <img src={EmailIcon} className='w-10 h-10' />
-            </Paper>
-        </Stack>
+                <MailIcon className="size-5" />
+            </button>
+        </div>
     )
 }
 

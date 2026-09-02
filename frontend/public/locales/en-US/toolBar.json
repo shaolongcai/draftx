@@ -19,5 +19,22 @@
     },
     "exportMarkdown": "Export as Markdown",
     "downloading": "Downloading...",
-    "updateAvailable": "Update available"
+    "updateAvailable": "Update available",
+    "formatBold": {
+        "mac": "Bold ( ⌘ + B )",
+        "win": "Bold ( Ctrl + B )"
+    },
+    "formatItalic": {
+        "mac": "Italic ( ⌘ + I )",
+        "win": "Italic ( Ctrl + I )"
+    },
+    "formatList": {
+        "mac": "Task list ( ⌘ + T )",
+        "win": "Task list ( Ctrl + T )"
+    },
+    "insertImage": "Insert image",
+    "searchDrafts": {
+        "mac": "Search drafts ( ⌘ + F )",
+        "win": "Search drafts ( Ctrl + F )"
+    }
 }

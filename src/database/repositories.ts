@@ -8,6 +8,7 @@ import {
     listMarkdownFiles,
     pathForNewNote,
     readNote,
+    renameNote,
     writeNote,
 } from '../core/noteFileService.js';
 
@@ -75,10 +76,18 @@ export const saveNote = (note: NoteParmas): { uuid: string; path: string; mtime:
             return { deleted: true };
         }
 
-        // 确定文件路径：已有笔记沿用原路径，否则按标题生成不冲突的文件名
-        const relPath = existing?.path
+        // 确定文件路径：已有笔记优先按标题同步文件名，否则按标题生成不冲突的新文件名
+        let relPath = existing?.path
             ?? note.path
             ?? pathForNewNote(note.title || extractTitleFromMarkdown(note.content));
+
+        // 标题变化经前端 200ms 防抖后到达这里；重命名失败时回退原路径，不影响正文保存
+        if (existing && note.title?.trim()) {
+            const renamedPath = renameNote(existing.path, note.title);
+            if (renamedPath) {
+                relPath = renamedPath;
+            }
+        }
 
         // 1. 写 md 文件（事实来源）
         const mtime = writeNote(relPath, note.content);
@@ -133,6 +142,20 @@ const buildTimeFilter = (timeFilter: NoteTimeFilter, conditions: string[], param
 
 /** 转义 FTS5 查询字符串（作为短语处理） */
 const escapeFtsQuery = (query: string) => `"${query.replace(/"/g, '""')}"`;
+
+/** 生成笔记纯文本预览（去除常见 Markdown 语法、折叠空白），供列表页展示 */
+const buildPreview = (content: string, maxLen = 120): string => {
+    const text = content
+        .replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1')      // 图片 -> alt 文本
+        .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')       // 链接 -> 链接文本
+        .replace(/^\s{0,3}#{1,6}\s+/gm, '')            // 标题标记
+        .replace(/^\s*[-*+]\s+\[[ xX]\]\s+/gm, '')     // 任务列表标记
+        .replace(/^\s*(?:[-*+]|\d+\.)\s+/gm, '')       // 列表标记
+        .replace(/[*_`~]+/g, '')                       // 强调/代码标记
+        .replace(/\s+/g, ' ')
+        .trim();
+    return text.length > maxLen ? `${text.slice(0, maxLen)}…` : text;
+};
 
 /**
  * 短查询（< 3 字符）回退：trigram 索引不支持，直接扫描文件匹配
@@ -190,7 +213,7 @@ export const getNotes = (query?: string, limit: number = 50, timeFilter: NoteTim
     try {
         const normalizedQuery = query?.trim();
 
-        // 空查询：返回全部元数据，按修改时间排序
+        // 空查询：返回全部元数据（附纯文本预览），按修改时间排序
         if (!normalizedQuery) {
             const conditions: string[] = [];
             const params: any[] = [];
@@ -203,7 +226,9 @@ export const getNotes = (query?: string, limit: number = 50, timeFilter: NoteTim
                 ORDER BY n.mtime DESC
                 LIMIT ?
             `);
-            return stmt.all(...params, limit);
+            const rows = stmt.all(...params, limit) as NoteRow[];
+            // 列表页需要内容预览：读取文件生成纯文本摘要（无搜索高亮）
+            return rows.map(row => ({ ...row, snippet: buildPreview(readNote(row.path) ?? '') }));
         }
 
         // trigram 索引要求查询长度 >= 3 个字符，短查询回退到文件扫描

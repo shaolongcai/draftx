@@ -1,4 +1,9 @@
 {
     "placeholder": "ابدأ الكتابة هنا",
-    "titlePlaceholder": "أدخل العنوان"
+    "titlePlaceholder": "أدخل العنوان",
+    "imageMenu": {
+        "copy": "نسخ الصورة",
+        "shrink": "تصغير الصورة",
+        "enlarge": "تكبير الصورة"
+    }
 }

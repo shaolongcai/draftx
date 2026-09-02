@@ -19,5 +19,22 @@
     },
     "exportMarkdown": "Markdown으로 내보내기",
     "downloading": "다운로드 중...",
-    "updateAvailable": "업데이트 가능"
+    "updateAvailable": "업데이트 가능",
+    "formatBold": {
+        "mac": "굵게 ( ⌘ + B )",
+        "win": "굵게 ( Ctrl + B )"
+    },
+    "formatItalic": {
+        "mac": "기울임 ( ⌘ + I )",
+        "win": "기울임 ( Ctrl + I )"
+    },
+    "formatList": {
+        "mac": "작업 목록 ( ⌘ + T )",
+        "win": "작업 목록 ( Ctrl + T )"
+    },
+    "insertImage": "이미지 삽입",
+    "searchDrafts": {
+        "mac": "초안 검색 ( ⌘ + F )",
+        "win": "초안 검색 ( Ctrl + F )"
+    }
 }

@@ -1,6 +1,4 @@
-import { Paper, Stack, Typography, Button, Switch, useTheme } from "@mui/material"
-// import { useTranslation } from '@/contexts/I18nContext';
-
+import { Switch } from "@/components/ui/switch"
 
 type ActionType = 'button' | 'switch' | 'custom' | 'text'
 
@@ -14,13 +12,12 @@ interface Props {
 }
 
 /**
- * @description 配置项组件
+ * @description 配置项组件（设置卡片内的一行）
  * @param value 配置项的值，取代按钮或者文字的文案
  * @param type 配置项的类型，决定了渲染的组件
  * @param onAction 配置项的操作函数，参数为配置项的值,switch 为 checked，button 为点击事件,当type为custom时，此参数无效
  * @param action 自定义的操作组件
  * @param disabled 是否禁用
- * @returns 
  */
 const SettingItem: React.FC<Props> = ({
     title,
@@ -31,68 +28,33 @@ const SettingItem: React.FC<Props> = ({
     disabled = false,
 }) => {
 
-    // const { t } = useTranslation();
-    const theme = useTheme()
-
     // 渲染末位的操作
     const generateAction = (type: ActionType) => {
         switch (type) {
             case 'button':
                 return (
-                    <Button
-                        sx={{
-                            fontWeight: 'bold',
-                            border: '1px solid transparent',
-                            boxSizing: 'border-box',
-                            '&:focus': {
-                                outline: 'none',
-                                border: '1px solid #fff',
-                                boxShadow: 'none'
-                            },
-                            '&:active': {
-                                outline: 'none',
-                                border: '1px solid #fff',
-                                boxShadow: 'none'
-                            },
-                            '&:hover': {
-                                border: '1px solid #fff'
-                            }
-                        }}
-                        variant='text'
-                        className="text-white"
+                    <button
+                        type='button'
+                        disabled={disabled}
                         onClick={onAction}
+                        className="cursor-pointer text-sm tracking-widest uppercase text-[#3A332C]/60 transition-colors hover:text-[#3A332C] disabled:cursor-not-allowed disabled:opacity-40"
                     >
                         {value}
-                    </Button>
+                    </button>
                 )
             case 'switch':
                 return (
                     <Switch
-                        sx={{
-                            '& .MuiSwitch-track': {
-                                backgroundColor: '#fff !important',
-                                opacity: 0.45
-                            },
-                            '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                                backgroundColor: '#fff !important',
-                                opacity: 1
-                            },
-                            // 圆点为白色
-                            '& .MuiSwitch-thumb': {
-                                backgroundColor: '#fff !important',
-                                border: '1px solid #000'
-                            }
-                        }}
-                        checked={value as boolean}
-                        onChange={(_e, checked) => onAction(checked)}
+                        checked={!!value}
+                        onCheckedChange={(checked) => onAction?.(checked)}
                         disabled={disabled}
                     />
                 )
             case 'text':
                 return (
-                    <Typography variant='bodyMedium' color="text.primary" >
+                    <span className="text-sm text-[#3A332C]/60">
                         {value}
-                    </Typography>
+                    </span>
                 )
             case 'custom':
                 return action
@@ -102,18 +64,12 @@ const SettingItem: React.FC<Props> = ({
     }
 
     return (
-        <Paper className="px-4 py-3 rounded-2xl w-full" variant='outlined'
-            sx={{
-                backgroundColor: theme.palette.primary.main,
-            }}
-        >
-            <Stack direction='row' justifyContent='space-between' alignItems='center'>
-                <Typography variant='bodyLarge' color="text.primary" className=" text-white" >
-                    {title}
-                </Typography>
-                {generateAction(type)}
-            </Stack>
-        </Paper>
+        <div className="flex w-full items-center justify-between gap-4 py-3">
+            <span className="text-[15px] text-[#3A332C]">
+                {title}
+            </span>
+            {generateAction(type)}
+        </div>
     )
 }
 

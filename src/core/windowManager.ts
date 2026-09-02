@@ -102,15 +102,15 @@ class WindowManager {
             minHeight: 360,
             x: 0,               // 后面会计算居中
             y: 0,
-            frame: true,       // 无边框
+            frame: false,       // 无边框（不透明），Windows 下 DWM 直接为无边框窗口绘制阴影
             resizable: true,
             movable: true,
             alwaysOnTop: false,  // 总在最前
             skipTaskbar: true,  // 不占用任务栏
             show: false,        // 先不显示
             roundedCorners: true,
-            hasShadow: true,
-            backgroundColor: '#F9F3E5',
+            hasShadow: true,    // 系统原生阴影（Windows 仅对无边框窗口生效）
+            backgroundColor: '#F5F4EF',
             transparent: false,
             titleBarStyle: process.platform === 'darwin' ? 'customButtonsOnHover' : 'hidden', // 隐藏原生标题栏，保留边框
             // backgroundColor: '#E92828', //测试大小专用色

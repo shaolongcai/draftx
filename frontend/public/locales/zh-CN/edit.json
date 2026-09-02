@@ -1,5 +1,10 @@
 {
     "test": "测试",
     "placeholder": "在这里开始书写",
-    "titlePlaceholder": "输入标题"
+    "titlePlaceholder": "输入标题",
+    "imageMenu": {
+        "copy": "复制图片",
+        "shrink": "缩小图片",
+        "enlarge": "放大图片"
+    }
 }

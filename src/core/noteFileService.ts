@@ -95,6 +95,62 @@ export const deleteNote = (relPath: string): void => {
     }
 }
 
+/** Windows 文件系统不区分大小写，用于判断冲突文件是否就是当前文件 */
+const isSameFilePath = (first: string, second: string): boolean => {
+    const normalize = (value: string) => {
+        const resolved = path.resolve(value);
+        return process.platform === 'win32' ? resolved.toLowerCase() : resolved;
+    };
+    return normalize(first) === normalize(second);
+}
+
+/** 拼接 notes 目录内的 posix 相对路径 */
+const joinNotePath = (dirName: string, fileName: string): string => {
+    return dirName === '.' ? fileName : `${dirName}/${fileName}`;
+}
+
+/**
+ * 按标题重命名笔记文件，返回新的相对路径
+ * - 空标题、文件不存在或重命名失败时返回 null，由调用方回退到原路径
+ * - 目标文件名冲突时自动追加 -2、-3...，但不会把当前文件误判为冲突
+ */
+export const renameNote = (oldRelPath: string, title: string): string | null => {
+    const nextBaseName = sanitizeFileName(title);
+    if (!nextBaseName) return null;
+
+    const oldPath = toPosix(oldRelPath);
+    const oldAbsPath = resolveNotePath(oldPath);
+    if (!fs.existsSync(oldAbsPath)) return null;
+
+    const dirName = path.posix.dirname(oldPath);
+    const currentBaseName = path.posix.basename(oldPath).replace(/\.md$/i, '');
+    if (currentBaseName === nextBaseName) return oldPath;
+
+    let candidateBaseName = nextBaseName;
+    let candidatePath = joinNotePath(dirName, `${candidateBaseName}.md`);
+    let candidateAbsPath = resolveNotePath(candidatePath);
+    let counter = 2;
+
+    while (fs.existsSync(candidateAbsPath) && !isSameFilePath(oldAbsPath, candidateAbsPath)) {
+        candidateBaseName = `${nextBaseName}-${counter}`;
+        candidatePath = joinNotePath(dirName, `${candidateBaseName}.md`);
+        candidateAbsPath = resolveNotePath(candidatePath);
+        counter++;
+    }
+
+    // 冲突避让后仍指向当前文件（例如目标名被其他笔记占用），无需重命名
+    if (candidatePath === oldPath) return oldPath;
+
+    try {
+        fs.renameSync(oldAbsPath, candidateAbsPath);
+        logger.info(`笔记文件已重命名: ${oldPath} -> ${candidatePath}`);
+        return candidatePath;
+    } catch (error) {
+        logger.error(`重命名笔记文件失败: ${oldPath} -> ${candidatePath}, ${error}`);
+        return null;
+    }
+}
+
 /**
  * 计算内容 sha1 哈希
  */

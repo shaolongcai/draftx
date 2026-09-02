@@ -5,8 +5,16 @@ import { useTranslation } from '@/contexts/I18nContext';
 // 導入語言類型定義和配置
 import { Language } from '@/type/i18n';
 import { LANGUAGE_CONFIGS, getLanguageConfig } from '@/config/languages';
-// 導入 Material-UI 組件
-import { Button, ButtonGroup, Box, Select, MenuItem, FormControl, useTheme } from '@mui/material';
+// shadcn 組件
+import { Button } from '@/components/ui/button';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 // 導入國旗 React 組件
 import {
     ChinaFlag,
@@ -58,7 +66,6 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
 }) => {
     // 從國際化上下文中獲取翻譯函數、當前語言、設定語言函數和載入狀態
     const { t, currentLanguage, setLanguage, isLoading } = useTranslation();
-    const theme = useTheme()
 
     // 支援的語言列表
     // 從統一配置文件中提取所有語言代碼，用於遍歷渲染
@@ -97,30 +104,10 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
         try {
             // 調用上下文中的設定語言函數
             await setLanguage(language);
-            // 设置配置
-            // window.electronAPI.setConfig({ key: 'app_language', value: language });
         } catch (error) {
             // 如果切換失敗，在控制台輸出錯誤信息
             console.error('切换语言失败？请告知我们:', error);
         }
-    };
-
-    /**
-     * 獲取按鈕的變體樣式
-     * @param language 語言代碼
-     * @returns 按鈕變體：當前語言為實心，其他為輪廓
-     */
-    const getButtonVariant = (language: Language) => {
-        return currentLanguage === language ? 'contained' : 'outlined';
-    };
-
-    /**
-     * 獲取按鈕的顏色主題
-     * @param language 語言代碼
-     * @returns 按鈕顏色：當前語言為主色，其他為繼承
-     */
-    const getButtonColor = (language: Language) => {
-        return currentLanguage === language ? 'primary' : 'inherit';
     };
 
     /**
@@ -132,21 +119,13 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
         return languages.map((lang) => (
             <Button
                 key={lang}                                    // 使用語言代碼作為 key
-                size={size}                                   // 按鈕大小
-                variant={getButtonVariant(lang)}              // 按鈕變體樣式
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                color={getButtonColor(lang) as any}           // 按鈕顏色主題
+                size={size === 'small' ? 'sm' : 'default'}    // 按鈕大小
+                variant={currentLanguage === lang ? 'default' : 'outline'} // 當前語言為實心，其他為輪廓
                 onClick={() => handleLanguageChange(lang)}    // 點擊事件處理
-                disabled={isLoading}                        // 載入時禁用按鈕
-                sx={{
-                    color:'#fff' 
-                }}
+                disabled={isLoading}                          // 載入時禁用按鈕
             >
-                {/* 按鈕內容：國旗圖示 + 語言名稱 */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1}}>
-                    {getFlagByLanguage(lang)}
-                    <span>{getLanguageText(lang)}</span>
-                </Box>
+                {getFlagByLanguage(lang)}
+                <span>{getLanguageText(lang)}</span>
             </Button>
         ));
     };
@@ -155,87 +134,77 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
     // 當語言切換正在進行時顯示載入提示
     if (isLoading) {
         return (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <div className="flex items-center gap-1">
                 {/* 條件渲染標籤 */}
                 {showLabel && <span>{t('app.language.title')}</span>}
                 {/* 禁用的載入按鈕 */}
-                <Button disabled size={size}>
+                <Button disabled size={size === 'small' ? 'sm' : 'default'}>
                     載入中...
                 </Button>
-            </Box>
+            </div>
         );
     }
 
     // 下拉選單模式的渲染
     if (variant === 'select') {
         return (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <div className="flex items-center gap-1">
                 {/* 條件渲染標籤 */}
                 {showLabel && <span>{t('app.language.title')}</span>}
-                {/* Material-UI 表單控制器 */}
-                <FormControl size={size === 'small' ? 'small' : 'medium'} sx={{ minWidth: 160 }}>
-                    <Select
-                        value={currentLanguage}                                           // 當前選中的語言
-                        onChange={(e) => handleLanguageChange(e.target.value as Language)} // 選擇變更事件
-                        // 自定義選中值的顯示方式：國旗 + 語言名稱
-                        renderValue={(value) => (
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                {getFlagByLanguage(value as Language)}
-                                <span>{getLanguageText(value as Language)}</span>
-                            </Box>
-                        )}
-                        // 下拉選單的樣式配置
-                        sx={{
-                            '& .MuiSelect-select': {
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 8,
-                                paddingY: '8px',
-                                color:theme.palette.primary.contrastText,
-                            },
-                            minHeight: size === 'small' ? 36 : 40,  // 根據尺寸設定最小高度
-                            borderRadius: 1.5,                      // 圓角邊框
-                        }}
+                <Select
+                    value={currentLanguage}
+                    onValueChange={(value) => handleLanguageChange(value as Language)}
+                >
+                    <SelectTrigger
+                        size={size === 'small' ? 'sm' : 'default'}
+                        className="min-w-[120px] border-[#3A332C]/20 bg-transparent text-[#3A332C]"
                     >
-                        {/* 遍歷語言配置生成選項 */}
+                        <SelectValue>
+                            {(value: Language) => (
+                                <span className="flex items-center gap-2">
+                                    {getFlagByLanguage(value)}
+                                    <span>{getLanguageText(value)}</span>
+                                </span>
+                            )}
+                        </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#F5F4EF] text-[#3A332C]">
                         {LANGUAGE_CONFIGS.map((config) => (
-                            <MenuItem key={config.code} value={config.code}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <SelectItem key={config.code} value={config.code}>
+                                <span className="flex items-center gap-2">
                                     {getFlagByLanguage(config.code as Language)}
                                     <span>{getLanguageText(config.code as Language)}</span>
-                                </Box>
-                            </MenuItem>
+                                </span>
+                            </SelectItem>
                         ))}
-                    </Select>
-                </FormControl>
-            </Box>
+                    </SelectContent>
+                </Select>
+            </div>
         );
     }
 
     // 單獨按鈕模式的渲染
     if (variant === 'button') {
         return (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <div className="flex items-center gap-1">
                 {/* 條件渲染標籤 */}
                 {showLabel && <span>{t('app.language.title')}</span>}
                 {/* 渲染所有語言按鈕 */}
                 {renderLanguageButtons()}
-            </Box>
+            </div>
         );
     }
 
     // 預設為 button-group 變體
     // 按鈕組模式：將所有按鈕組合在一起，形成統一的按鈕組
     return (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <div className="flex items-center gap-1">
             {/* 條件渲染標籤 */}
             {showLabel && <span>{t('app.language.title')}</span>}
-            {/* Material-UI 按鈕組組件 */}
-            <ButtonGroup size={size}>
-                {/* 渲染所有語言按鈕 */}
+            <div className={cn("flex flex-wrap gap-1")}>
                 {renderLanguageButtons()}
-            </ButtonGroup>
-        </Box>
+            </div>
+        </div>
     );
 };
 

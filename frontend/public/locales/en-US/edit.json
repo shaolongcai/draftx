@@ -1,4 +1,9 @@
 {
     "placeholder": "Start Writing here",
-    "titlePlaceholder": "Enter title"
+    "titlePlaceholder": "Enter title",
+    "imageMenu": {
+        "copy": "Copy image",
+        "shrink": "Shrink image",
+        "enlarge": "Enlarge image"
+    }
 }

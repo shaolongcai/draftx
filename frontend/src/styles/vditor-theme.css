@@ -52,6 +52,8 @@
     border: none;
     border-radius: 0;
     padding: 0 !important;
+    /* 编辑器已延伸到底部，底部工具栏为悬浮覆盖；预留滚动余量让最后一行能滚出工具栏遮挡区 */
+    padding-bottom: 80px !important;
     margin: 0;
 }
 
@@ -105,7 +107,7 @@
     color: #3A332C;
     font-family: 'Digits', 'Cormorant Garamond', 'LXGW WenKai Mono TC', 'Roboto', 'Noto Sans SC', serif;
     font-size: 20px;
-    line-height: 1.8;
+    line-height: 1.5;
     background-color: transparent;
 }
 
@@ -151,11 +153,13 @@
     color: #867A6C;
 }
 
-/* 图片圆角 */
+/* 图片圆角，宽度固定为编辑区的一半（百分比宽度，随窗口 resize 等比缩放） */
 .draftx-vditor .vditor-ir img,
 .draftx-vditor .vditor-reset img {
     border-radius: 8px;
     max-width: 100%;
+    width: 50%;
+    height: auto;
 }
 
 /* Tailwind v4 preflight 局部修复：列表与标题 */
@@ -169,6 +173,45 @@
     padding-left: 1.5em;
 }
 
+/* 待办列表 checkbox：自定义外观（原生样式无法设置背景色，appearance: none 后重绘） */
+.draftx-vditor .vditor-reset .vditor-task input {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    border: 1px solid #867A6C;
+    border-radius: 4px;
+    background-color: transparent;
+    font-size: 1em;
+    margin: 0 0.3em 0.25em -1.4em;
+    vertical-align: middle;
+    cursor: pointer;
+    position: relative;
+}
+
+/* 选中态：#867A6C 背景 + 对勾 */
+.draftx-vditor .vditor-reset .vditor-task input:checked {
+    background-color: #867A6C;
+}
+
+.draftx-vditor .vditor-reset .vditor-task input:checked::after {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 4px;
+    width: 6px;
+    height: 11px;
+    border: solid #F5F4EF;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* 待办列表：勾选后对应文案加删除线（1px 细线） */
+.draftx-vditor .vditor-reset .vditor-task:has(> input:checked) {
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+}
+
 .draftx-vditor .vditor-reset h1,
 .draftx-vditor .vditor-reset h2,
 .draftx-vditor .vditor-reset h3,
@@ -177,6 +220,12 @@
 .draftx-vditor .vditor-reset h6 {
     color: #3A332C;
     font-weight: 700;
+}
+
+/* 一级、二级标题不显示下方横线（Vditor 默认为 h1/h2 添加 border-bottom） */
+.draftx-vditor .vditor-reset h1,
+.draftx-vditor .vditor-reset h2 {
+    border-bottom: none;
 }
 
 /* 弹层（提示、emoji、上传等） */

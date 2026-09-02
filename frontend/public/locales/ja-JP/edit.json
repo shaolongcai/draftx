@@ -1,4 +1,9 @@
 {
     "placeholder": "ここから書き始める",
-    "titlePlaceholder": "タイトルを入力"
+    "titlePlaceholder": "タイトルを入力",
+    "imageMenu": {
+        "copy": "画像をコピー",
+        "shrink": "画像を縮小",
+        "enlarge": "画像を拡大"
+    }
 }

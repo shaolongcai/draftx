@@ -19,5 +19,22 @@
     },
     "exportMarkdown": "匯出為 Markdown",
     "downloading": "下載中...",
-    "updateAvailable": "有可用更新"
+    "updateAvailable": "有可用更新",
+    "formatBold": {
+        "mac": "加粗 ( ⌘ + B )",
+        "win": "加粗 ( Ctrl + B )"
+    },
+    "formatItalic": {
+        "mac": "斜體 ( ⌘ + I )",
+        "win": "斜體 ( Ctrl + I )"
+    },
+    "formatList": {
+        "mac": "待辦清單 ( ⌘ + T )",
+        "win": "待辦清單 ( Ctrl + T )"
+    },
+    "insertImage": "插入圖片",
+    "searchDrafts": {
+        "mac": "搜尋草稿 ( ⌘ + F )",
+        "win": "搜尋草稿 ( Ctrl + F )"
+    }
 }

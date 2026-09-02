@@ -1,4 +1,9 @@
 {
     "placeholder": "Hier mit dem Schreiben beginnen",
-    "titlePlaceholder": "Titel eingeben"
+    "titlePlaceholder": "Titel eingeben",
+    "imageMenu": {
+        "copy": "Bild kopieren",
+        "shrink": "Bild verkleinern",
+        "enlarge": "Bild vergrößern"
+    }
 }

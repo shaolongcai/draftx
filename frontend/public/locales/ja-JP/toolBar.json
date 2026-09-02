@@ -19,5 +19,22 @@
     },
     "exportMarkdown": "Markdownとしてエクスポート",
     "downloading": "ダウンロード中...",
-    "updateAvailable": "更新が利用可能です"
+    "updateAvailable": "更新が利用可能です",
+    "formatBold": {
+        "mac": "太字 ( ⌘ + B )",
+        "win": "太字 ( Ctrl + B )"
+    },
+    "formatItalic": {
+        "mac": "斜体 ( ⌘ + I )",
+        "win": "斜体 ( Ctrl + I )"
+    },
+    "formatList": {
+        "mac": "タスクリスト ( ⌘ + T )",
+        "win": "タスクリスト ( Ctrl + T )"
+    },
+    "insertImage": "画像を挿入",
+    "searchDrafts": {
+        "mac": "下書きを検索 ( ⌘ + F )",
+        "win": "下書きを検索 ( Ctrl + F )"
+    }
 }

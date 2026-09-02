@@ -1,6 +1,5 @@
 import { useState, useRef } from 'react'
 import './App.css'
-import { Stack } from '@mui/material'
 
 import Home from './pages/home'
 import { ToolBar } from './components'
@@ -54,12 +53,15 @@ function App() {
                   <div className={`${currentPage === 'list' ? '' : 'hidden'}`}>
                     <DraftList setCurrentPage={setCurrentPage} currentPage={currentPage} />
                   </div>
-                  <Stack className='absolute bottom-6 left-0 right-0 px-4 h-4'>
-                    <ToolBar
-                      currentPage={currentPage}
-                      setCurrentPage={setCurrentPage}
-                    />
-                  </Stack>
+                  {/* 旧 ToolBar 仅在草稿页显示，列表页使用 ListBottomBar（见 draftList.tsx） */}
+                  {currentPage === 'draft' && (
+                    <div className='absolute bottom-0 left-0 right-0 z-20'>
+                      <ToolBar
+                        currentPage={currentPage}
+                        setCurrentPage={setCurrentPage}
+                      />
+                    </div>
+                  )}
                 </>}
               />
               {/* 更新提示 */}

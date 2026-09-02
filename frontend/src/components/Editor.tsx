@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDebounceFn, useKeyPress } from "ahooks";
 import { v4 as uuidv4 } from 'uuid';
 import Vditor from 'vditor';
@@ -8,6 +8,13 @@ import { useEvent } from "@/contexts/EvenContext";
 import { useEditor } from "@/contexts/EditorContext";
 import { useTranslation } from "@/contexts/I18nContext";
 import { historyStack } from "@/utils/histroyStack";
+import {
+    ContextMenu,
+    ContextMenuContent,
+    ContextMenuItem,
+    ContextMenuSeparator,
+    ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 
 
 // 提取第一个一级标题作为笔记标题
@@ -70,6 +77,85 @@ const Editor: React.FC = () => {
                 img.src = toFileUrl(raw);
             }
         });
+    };
+
+    // ===== 图片右键菜单（复制 / 放大 / 缩小） =====
+    // 图片显示宽度只有两个档位：25%（小）与 50%（大，默认值见 vditor-theme.css 的 width: 50%）。
+    // 尺寸持久化到 markdown 图片 title 语法：![alt](url "w=25" | "w=50")，实测可完整往返 IR 渲染与 md 回写。
+    type ImageSize = 25 | 50;
+    const menuImageRef = useRef<HTMLElement | null>(null); // 当前右键命中的图片节点 span[data-type=img]
+    const [imageMenuSize, setImageMenuSize] = useState<ImageSize>(50); // 右键图片的当前档位，驱动菜单置灰
+
+    // 从图片节点的 title marker 读取尺寸档位（无 title 即默认 50%）
+    const getImageSize = (imgNode: HTMLElement): ImageSize => {
+        const title = imgNode.querySelector('.vditor-ir__marker--title')?.textContent || '';
+        return /w\s*=\s*25/.test(title) ? 25 : 50;
+    };
+
+    // 渲染后按 title 应用图片宽度（与 rewriteImages 一起在 MutationObserver 中调用）
+    const applyImageSizes = () => {
+        const container = containerRef.current;
+        if (!container) return;
+        container.querySelectorAll('[data-type="img"]').forEach((node) => {
+            const img = node.querySelector('img');
+            if (!img) return;
+            img.style.width = getImageSize(node as HTMLElement) === 25 ? '25%' : '';
+        });
+    };
+
+    // 右键捕获：仅当命中图片时放行给 ContextMenu（Base UI Trigger 在冒泡阶段监听 contextmenu），
+    // 其余位置阻止默认菜单且不打开自定义菜单
+    const handleContextMenuCapture = (e: React.MouseEvent) => {
+        const imgNode = (e.target as HTMLElement).closest?.('[data-type="img"]') as HTMLElement | null;
+        if (!imgNode) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
+        menuImageRef.current = imgNode;
+        setImageMenuSize(getImageSize(imgNode));
+    };
+
+    // 写回尺寸：把光标选到 title marker（无 title 则定位到右括号前），
+    // 借 execCommand('insertText') 走 Vditor 正常输入流程，自动触发 IR 重渲染、保存与撤销栈
+    const setImageSize = (size: ImageSize) => {
+        const imgNode = menuImageRef.current;
+        if (!imgNode || !vditorRef.current) return;
+        const titleSpan = imgNode.querySelector('.vditor-ir__marker--title');
+        const range = document.createRange();
+        if (titleSpan) {
+            range.selectNodeContents(titleSpan);
+        } else {
+            const parens = imgNode.querySelectorAll('.vditor-ir__marker--paren');
+            const closeParen = parens[parens.length - 1];
+            if (!closeParen) return;
+            range.setStartBefore(closeParen);
+            range.collapse(true);
+        }
+        const sel = window.getSelection();
+        sel?.removeAllRanges();
+        sel?.addRange(range);
+        document.execCommand('insertText', false, titleSpan ? `"w=${size}"` : ` "w=${size}"`);
+    };
+
+    // 复制图片到剪贴板（统一转 PNG，规避各格式 ClipboardItem 支持差异）
+    const handleCopyImage = async () => {
+        const img = menuImageRef.current?.querySelector('img');
+        if (!img) return;
+        try {
+            const blob = await (await fetch(img.src)).blob();
+            const bitmap = await createImageBitmap(blob);
+            const canvas = document.createElement('canvas');
+            canvas.width = bitmap.width;
+            canvas.height = bitmap.height;
+            canvas.getContext('2d')!.drawImage(bitmap, 0, 0);
+            const pngBlob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
+            if (!pngBlob) throw new Error('canvas.toBlob failed');
+            await navigator.clipboard.write([new ClipboardItem({ 'image/png': pngBlob })]);
+        } catch (err) {
+            console.error('复制图片失败', err);
+            notification.show('Copy image failed', { severity: 'error', autoHideDuration: 2000 });
+        }
     };
 
     // 预览模式下同样重写图片地址
@@ -225,6 +311,19 @@ const Editor: React.FC = () => {
         }
     };
 
+    // 粘贴时强制纯文本：捕获阶段拦截（早于 Vditor 绑定在 .vditor-ir 上的 paste 监听），
+    // 剥离剪贴板中的 HTML 富文本格式；无文本内容（如仅图片）时放行给 Vditor 走图片上传
+    const handlePlainTextPaste = (event: ClipboardEvent) => {
+        // 剪贴板含文件（截图、复制的图片文件）时放行，交给 Vditor 的 upload.handler 保存到 .asset
+        if (event.clipboardData && event.clipboardData.files.length > 0) return;
+        const text = event.clipboardData?.getData('text/plain');
+        if (!text) return;
+        event.preventDefault();
+        event.stopPropagation();
+        vditorRef.current?.focus();
+        vditorRef.current?.insertValue(text);
+    };
+
     // 初始化 Vditor
     useEffect(() => {
         let destroyed = false;
@@ -234,6 +333,7 @@ const Editor: React.FC = () => {
         // StrictMode 双挂载下若共用容器，旧实例会清空新实例的内容）
         const mountNode = document.createElement('div');
         mountNode.className = 'draftx-vditor h-full';
+        mountNode.addEventListener('paste', handlePlainTextPaste, true);
         containerRef.current!.appendChild(mountNode);
 
         const vditor = new Vditor(mountNode, {
@@ -271,14 +371,18 @@ const Editor: React.FC = () => {
                 mountNode.querySelectorAll('pre.vditor-reset').forEach((pre) => {
                     pre.setAttribute('placeholder', placeholderText);
                 });
-                // 监听 DOM 变化，重写 .asset 图片地址（IR 模式会不断重渲染块）
-                observer = new MutationObserver(() => rewriteImages());
+                // 监听 DOM 变化，重写 .asset 图片地址（IR 模式会不断重渲染块）并应用图片尺寸
+                observer = new MutationObserver(() => {
+                    rewriteImages();
+                    applyImageSizes();
+                });
                 observer.observe(mountNode, { childList: true, subtree: true });
                 // 加载草稿（引导/更新说明会覆盖当前草稿）
                 initDraft();
                 showGuideMemo();
                 showUpdateMemo();
                 rewriteImages();
+                applyImageSizes();
             },
         });
 
@@ -331,8 +435,9 @@ const Editor: React.FC = () => {
         <div
             className="flex flex-col px-12 py-8"
             style={{
-                height: 'calc(100vh - 64px)', // 预留底部 ToolBar 空间
+                height: '100vh', // 编辑器延伸到窗口底部，底部 ToolBar 为 hover 悬浮覆盖（absolute 定位，见 App.tsx）
             }}
+            onContextMenuCapture={handleContextMenuCapture}
         >
             {/* 标题输入（无边框无底色） */}
             <input
@@ -348,11 +453,31 @@ const Editor: React.FC = () => {
                     }
                 }}
             />
-            {/* 正文编辑器（Vditor 挂载到内部动态创建的节点上） */}
-            <div
-                ref={containerRef}
-                className="flex-1 min-h-0 leading-relaxed"
-            />
+            {/* 正文编辑器（Vditor 挂载到内部动态创建的节点上），图片右键菜单仅对图片生效（见 handleContextMenuCapture） */}
+            <ContextMenu>
+                <ContextMenuTrigger
+                    className="select-auto"
+                    render={
+                        <div
+                            ref={containerRef}
+                            className="flex-1 min-h-0 leading-relaxed"
+                        />
+                    }
+                />
+                <ContextMenuContent>
+                    <ContextMenuItem onClick={handleCopyImage}>
+                        {t('app.edit.imageMenu.copy')}
+                    </ContextMenuItem>
+                    <ContextMenuSeparator />
+                    {/* 已是小图（1/4）时置灰缩小，已是大图（1/2）时置灰放大 */}
+                    <ContextMenuItem disabled={imageMenuSize === 25} onClick={() => setImageSize(25)}>
+                        {t('app.edit.imageMenu.shrink')}
+                    </ContextMenuItem>
+                    <ContextMenuItem disabled={imageMenuSize === 50} onClick={() => setImageSize(50)}>
+                        {t('app.edit.imageMenu.enlarge')}
+                    </ContextMenuItem>
+                </ContextMenuContent>
+            </ContextMenu>
         </div>
     );
 };

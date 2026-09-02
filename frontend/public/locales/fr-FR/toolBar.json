@@ -19,5 +19,22 @@
     },
     "exportMarkdown": "Exporter en Markdown",
     "downloading": "Téléchargement...",
-    "updateAvailable": "Mise à jour disponible"
+    "updateAvailable": "Mise à jour disponible",
+    "formatBold": {
+        "mac": "Gras ( ⌘ + B )",
+        "win": "Gras ( Ctrl + B )"
+    },
+    "formatItalic": {
+        "mac": "Italique ( ⌘ + I )",
+        "win": "Italique ( Ctrl + I )"
+    },
+    "formatList": {
+        "mac": "Liste de tâches ( ⌘ + T )",
+        "win": "Liste de tâches ( Ctrl + T )"
+    },
+    "insertImage": "Insérer une image",
+    "searchDrafts": {
+        "mac": "Rechercher des brouillons ( ⌘ + F )",
+        "win": "Rechercher des brouillons ( Ctrl + F )"
+    }
 }

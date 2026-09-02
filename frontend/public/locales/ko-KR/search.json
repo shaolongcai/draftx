@@ -1,0 +1,8 @@
+{
+    "placeholder": "전체 노트 검색…",
+    "noResults": "결과 없음",
+    "untitled": "제목 없음",
+    "global": "전체 노트",
+    "inNote": "현재 노트",
+    "matches": "{{count}}개 일치"
+}

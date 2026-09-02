@@ -1,4 +1,9 @@
 {
     "placeholder": "在這裡開始書寫",
-    "titlePlaceholder": "輸入標題"
+    "titlePlaceholder": "輸入標題",
+    "imageMenu": {
+        "copy": "複製圖片",
+        "shrink": "縮小圖片",
+        "enlarge": "放大圖片"
+    }
 }
