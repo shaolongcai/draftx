@@ -14,11 +14,14 @@ import {
     Checklist as CheckListIcon,
     InsertPhoto as ImageIcon,
     Search as SearchIcon,
+    DeleteOutline as DeleteIcon,
 } from "@mui/icons-material";
 import { useEvent } from "@/contexts/EvenContext";
 import { useEditor } from "@/contexts/EditorContext";
 import ChatInput from "./ChatInput";
 import SearchPanel from "./SearchPanel";
+import { Popover, PopoverContent, PopoverHeader, PopoverTitle, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
 import { useKeyPress, useRequest } from "ahooks";
 import { historyStack } from "@/utils/histroyStack";
 import { useTranslation } from "@/contexts/I18nContext";
@@ -87,6 +90,7 @@ const ToolBar: React.FC<Props> = ({
     const [historyVersion, setHistoryVersion] = useState(0); // 历史版本号，用于刷新按钮状态
     const [downloadProgress, setDownloadProgress] = useState(0);
     const [isDownloading, setIsDownloading] = useState(false);
+    const [deletePopoverOpen, setDeletePopoverOpen] = useState(false); // 删除笔记确认气泡
 
     const inputRef = useRef<HTMLDivElement>(null);
     const imageInputRef = useRef<HTMLInputElement>(null);
@@ -455,6 +459,37 @@ const ToolBar: React.FC<Props> = ({
                         }
                         return <ToolButton key={index} {...button as ToolButtonProps} />
                     })}
+                    {/* 删除当前笔记：shadcn Popover 气泡二次确认（仅草稿页） */}
+                    {currentPage === 'draft' && (
+                        <Popover open={deletePopoverOpen} onOpenChange={setDeletePopoverOpen}>
+                            <PopoverTrigger render={<span className="inline-flex" />}>
+                                <ToolButton
+                                    icon={<DeleteIcon />}
+                                    tip={t('app.toolBar.deleteDraft')}
+                                />
+                            </PopoverTrigger>
+                            <PopoverContent side="top" sideOffset={8} className="w-60 bg-[#F5F4EF] ring-[#e3dcc9]">
+                                <PopoverHeader>
+                                    <PopoverTitle>{t('app.toolBar.deleteConfirmTitle')}</PopoverTitle>
+                                </PopoverHeader>
+                                <div className="flex justify-end gap-2">
+                                    <Button variant="outline" size="sm" onClick={() => setDeletePopoverOpen(false)}>
+                                        {t('app.toolBar.deleteCancel')}
+                                    </Button>
+                                    <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        onClick={() => {
+                                            setDeletePopoverOpen(false);
+                                            handleOnclickTool$.emit('deleteDraft');
+                                        }}
+                                    >
+                                        {t('app.toolBar.deleteConfirm')}
+                                    </Button>
+                                </div>
+                            </PopoverContent>
+                        </Popover>
+                    )}
                     {/* 右侧当前日期 */}
                     <Typography
                         variant="body2"

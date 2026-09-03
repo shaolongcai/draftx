@@ -1,5 +1,5 @@
 import { createServer } from 'http';
-import { getNotes, getNoteByUuid, getNoteByPath, saveNote } from '../database/repositories.js';
+import { deleteNoteByUuid, getNotes, getNoteByUuid, getNoteByPath, saveNote } from '../database/repositories.js';
 import { logger } from '../core/logger.js';
 import crypto from 'crypto';
 
@@ -61,13 +61,13 @@ export function startLocalServer() {
                             res.end(JSON.stringify({ success: false, error: '缺少 uuid 参数' }));
                             return;
                         }
-                        // 先确认笔记存在，再给空内容触发删除
+                        // 先确认笔记存在，再删除
                         if (!getNoteByUuid(data.uuid)) {
                             res.writeHead(404);
                             res.end(JSON.stringify({ success: false, error: '笔记不存在' }));
                             return;
                         }
-                        saveNote({ uuid: data.uuid, content: '' });
+                        deleteNoteByUuid(data.uuid);
                         res.writeHead(200);
                         res.end(JSON.stringify({ success: true, uuid: data.uuid }));
                     }

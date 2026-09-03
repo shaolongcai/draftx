@@ -57,23 +57,17 @@ const getNoteMetaByPath = (relPath: string): NoteRow | undefined => {
 
 /**
  * 保存笔记：写入 md 文件（事实来源），再同步元数据与 FTS 索引
- * - content 为空 = 删除该笔记（文件 + 元数据 + 索引）
- * @returns 保存结果；删除时返回 { deleted: true }
+ * - 从未保存过的新笔记且内容为空：不落盘（返回 null）
+ * - 已存在的笔记内容为空：保留笔记，仅清空内容（删除请用 deleteNoteByUuid）
  */
-export const saveNote = (note: NoteParmas): { uuid: string; path: string; mtime: number } | { deleted: true } | null => {
+export const saveNote = (note: NoteParmas): { uuid: string; path: string; mtime: number } | null => {
     try {
         const uuid = note.uuid || crypto.randomUUID();
         const existing = getNoteMetaByUuid(uuid);
 
-        // 空内容 = 删除笔记
-        if (!note.content.trim()) {
-            if (existing) {
-                deleteNote(existing.path);
-                deleteFts(existing.id);
-                db.prepare(`DELETE FROM notes WHERE id = ?`).run(existing.id);
-                logger.info(`笔记内容为空，已删除: ${existing.path}`);
-            }
-            return { deleted: true };
+        // 新笔记没有任何内容时不创建文件
+        if (!note.content.trim() && !existing) {
+            return null;
         }
 
         // 确定文件路径：已有笔记优先按标题同步文件名，否则按标题生成不冲突的新文件名
@@ -272,6 +266,25 @@ export const getNotes = (query?: string, limit: number = 50, timeFilter: NoteTim
     }
 }
 
+
+/**
+ * 删除笔记：md 文件 + 元数据 + FTS 索引
+ * @returns 是否删除成功（笔记不存在返回 false）
+ */
+export const deleteNoteByUuid = (uuid: string): boolean => {
+    try {
+        const existing = getNoteMetaByUuid(uuid);
+        if (!existing) return false;
+        deleteNote(existing.path);
+        deleteFts(existing.id);
+        db.prepare(`DELETE FROM notes WHERE id = ?`).run(existing.id);
+        logger.info(`笔记已删除: ${existing.path}`);
+        return true;
+    } catch (error) {
+        logger.error(error);
+        return false;
+    }
+}
 
 /**
  * 通过 UUID 获取笔记（元数据 + md 正文）

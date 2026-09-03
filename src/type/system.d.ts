@@ -1,7 +1,7 @@
 
 
 
-type ConfigName = 'isFinishGuide' | 'ai_provider' | 'autoLaunch' | 'licenseData' | 'currentUuid' | 'launchShortcut' | 'report_agreement' | 'version' | 'trialStartDate';
+type ConfigName = 'isFinishGuide' | 'ai_provider' | 'autoLaunch' | 'licenseData' | 'currentUuid' | 'launchShortcut' | 'report_agreement' | 'version' | 'trialStartDate' | 'app_language';
 
 
 

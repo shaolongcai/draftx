@@ -1,5 +1,5 @@
 import { ipcMain } from "electron";
-import { getNoteByUuid, getNotes, saveNote, type NoteTimeFilter } from "../database/repositories.js";
+import { deleteNoteByUuid, getNoteByUuid, getNotes, saveNote, type NoteTimeFilter } from "../database/repositories.js";
 import { saveAsset } from "../core/noteFileService.js";
 import pathConfig from "../core/pathConfigs.js";
 
@@ -7,9 +7,14 @@ import pathConfig from "../core/pathConfigs.js";
 
 export function initializeDraftApi() {
 
-    // 保存笔记（md 文件为事实来源；空内容 = 删除）
+    // 保存笔记（md 文件为事实来源；从未保存过的新笔记内容为空则不落盘）
     ipcMain.on('save-sticky', (event, note: NoteParmas) => {
         saveNote(note);
+    });
+
+    // 删除笔记（md 文件 + 元数据 + 索引），返回是否删除成功
+    ipcMain.handle('delete-note', (event, uuid: string) => {
+        return deleteNoteByUuid(uuid);
     });
 
     // 搜索/获取笔记列表（仅元数据，不含正文）

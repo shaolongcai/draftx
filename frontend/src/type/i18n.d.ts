@@ -54,6 +54,10 @@ export interface TranslationKeys {
         mac: string;
         win: string;
       };
+      deleteDraft: string;
+      deleteConfirmTitle: string;
+      deleteCancel: string;
+      deleteConfirm: string;
     };
     search: {
       placeholder: string;
@@ -184,6 +188,10 @@ export type TranslationKeyPath =
   | 'app.toolBar.insertImage'
   | 'app.toolBar.searchDrafts.mac'
   | 'app.toolBar.searchDrafts.win'
+  | 'app.toolBar.deleteDraft'
+  | 'app.toolBar.deleteConfirmTitle'
+  | 'app.toolBar.deleteCancel'
+  | 'app.toolBar.deleteConfirm'
   | 'app.search.placeholder'
   | 'app.search.noResults'
   | 'app.search.untitled'

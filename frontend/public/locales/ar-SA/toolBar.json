@@ -36,5 +36,9 @@
     "searchDrafts": {
         "mac": "البحث في المسودات ( ⌘ + F )",
         "win": "البحث في المسودات ( Ctrl + F )"
-    }
+    },
+    "deleteDraft": "حذف هذه المسودة",
+    "deleteConfirmTitle": "هل تريد حذف هذه المسودة؟ لا يمكن التراجع عن هذا الإجراء.",
+    "deleteCancel": "إلغاء",
+    "deleteConfirm": "حذف"
 }

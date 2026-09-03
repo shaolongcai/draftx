@@ -173,9 +173,8 @@ const Editor: React.FC = () => {
         const content = combineContent(title, body);
         // 若无变更则跳过
         if (content === lastSavedRef.current) return;
-        // 空内容 = 删除笔记（主进程语义）；"有无内容"状态翻转意味着笔记数量变化
-        const wasEmpty = lastSavedRef.current === '';
-        const isEmpty = content === '';
+        // 空内容不再删除笔记（删除走 deleteNote）；仅"从无到有"首次落盘时说明笔记数量增加
+        const isNewNote = lastSavedRef.current === '' && content !== '';
         try {
             window.electronAPI.saveSticky({
                 uuid,
@@ -183,7 +182,7 @@ const Editor: React.FC = () => {
                 content,
             });
             lastSavedRef.current = content;
-            if (wasEmpty !== isEmpty) notesChanged$.emit();
+            if (isNewNote) notesChanged$.emit();
         } catch (error) {
             const msg = error instanceof Error ? error.message : '保存失败';
             console.error(msg);
@@ -237,6 +236,39 @@ const Editor: React.FC = () => {
         notification.show('The previous draft has been saved', {
             severity: 'success',
         });
+    };
+
+    // 删除当前笔记，并跳转到上一篇（历史栈前一条；无则取最新一篇；再无可跳转则重置为全新空白草稿）
+    const deleteCurrentNote = async () => {
+        const uuid = currentUuidRef.current;
+        if (!uuid) return;
+        // 取消挂起的防抖保存，避免删除后又把内容写回
+        cancelSave();
+        await window.electronAPI.deleteNote(uuid);
+        // 从历史堆栈移除；remove 会把指针自动移到上一条（即「上一篇」）
+        historyStack.remove(uuid);
+        notesChanged$.emit();
+
+        const prevUuid = historyStack.getCurrent();
+        let target = prevUuid ? await window.electronAPI.getDraftByUuid(prevUuid) : null;
+        if (!target) {
+            const list = await window.electronAPI.getDraft('', 1);
+            target = list?.[0] ?? null;
+        }
+        if (target) {
+            await loadDraft(target);
+            return;
+        }
+        // 没有任何可跳转的笔记：重置为全新空白草稿（内容为空时不落盘）
+        const newUuid = uuidv4();
+        historyStack.push(newUuid);
+        window.electronAPI.setConfig({ key: 'currentUuid', value: newUuid, type: 'string' });
+        setUuid(newUuid);
+        lastSavedRef.current = '';
+        if (titleInputRef.current) {
+            titleInputRef.current.value = '';
+        }
+        vditorRef.current?.setValue('');
     };
 
     // 导出 Markdown（标题 + 正文合并）
@@ -407,12 +439,14 @@ const Editor: React.FC = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // 监听点击新建草稿 / 导出 Markdown
+    // 监听点击新建草稿 / 删除草稿 / 导出 Markdown
     handleOnclickTool$.useSubscription((tool) => {
         if (tool === 'addDraft') {
             addNewDraft();
         } else if (tool === 'exportMarkdown') {
             exportMarkdown();
+        } else if (tool === 'deleteDraft') {
+            deleteCurrentNote();
         }
     });
 

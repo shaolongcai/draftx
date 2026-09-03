@@ -36,5 +36,9 @@
     "searchDrafts": {
         "mac": "Search drafts ( ⌘ + F )",
         "win": "Search drafts ( Ctrl + F )"
-    }
+    },
+    "deleteDraft": "Delete this draft",
+    "deleteConfirmTitle": "Delete this draft? This cannot be undone.",
+    "deleteCancel": "Cancel",
+    "deleteConfirm": "Delete"
 }

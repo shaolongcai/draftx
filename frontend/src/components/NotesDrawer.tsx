@@ -36,7 +36,8 @@ const DRAWER_STYLE = `
  * - 点击条目加载到编辑器；当前笔记带圆点标记
  */
 const NotesDrawer: React.FC = () => {
-    const [collapsed, setCollapsed] = useState(false);
+    // 默认折叠：每次打开应用时不展示右侧抽屉
+    const [collapsed, setCollapsed] = useState(true);
     // 收起时鼠标是否悬停在右缘 / 把手上（控制把手浮现）
     const [edgeHover, setEdgeHover] = useState(false);
     const [handleHover, setHandleHover] = useState(false);
@@ -56,7 +57,7 @@ const NotesDrawer: React.FC = () => {
     useKeyPress('esc', () => {
         if (!collapsed) setCollapsed(true);
     });
-    const { loadStickys$, handleOnclickTool$ } = useEvent();
+    const { loadStickys$, handleOnclickTool$, notesChanged$ } = useEvent();
     const { t, currentLanguage } = useTranslation();
 
     // 全部笔记 / 搜索（空关键词返回全部，按修改时间倒序）
@@ -81,6 +82,8 @@ const NotesDrawer: React.FC = () => {
             });
         }
     });
+    // 笔记数量变化（新建首存 / 删除）后刷新列表
+    notesChanged$.useSubscription(() => refresh());
 
     const items = data ?? [];
     const searching = !!debounced;

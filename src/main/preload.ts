@@ -5,7 +5,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getAppVersion: () => ipcRenderer.invoke('get-app-version'),
 
   // 笔记相关（md 文件为事实来源）
-  saveSticky: (note: NoteParmas) => ipcRenderer.send('save-sticky', note), // 保存笔记（空内容 = 删除）
+  saveSticky: (note: NoteParmas) => ipcRenderer.send('save-sticky', note), // 保存笔记（新笔记内容为空则不落盘）
+  deleteNote: (uuid: string) => ipcRenderer.invoke('delete-note', uuid), // 删除笔记（文件 + 元数据 + 索引）
   getDraft: (query: string, limit: number, timeFilter?: { createdAfter?: string; createdBefore?: string; modifiedAfter?: string; modifiedBefore?: string }) => ipcRenderer.invoke('get-draft', query, limit, timeFilter),   // 搜索/获取笔记列表（仅元数据）
   getDraftByUuid: (uuid: string) => ipcRenderer.invoke('get-draft-by-uuid', uuid), // 根据 UUID 获取笔记（含 md 正文）
   saveImageAsset: (data: ArrayBuffer, ext?: string) => ipcRenderer.invoke('save-image-asset', data, ext), // 保存图片到 notes/.asset/，返回相对路径

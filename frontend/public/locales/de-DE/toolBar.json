@@ -36,5 +36,9 @@
     "searchDrafts": {
         "mac": "Entwürfe suchen ( ⌘ + F )",
         "win": "Entwürfe suchen ( Ctrl + F )"
-    }
+    },
+    "deleteDraft": "Diesen Entwurf löschen",
+    "deleteConfirmTitle": "Diesen Entwurf löschen? Dies kann nicht rückgängig gemacht werden.",
+    "deleteCancel": "Abbrechen",
+    "deleteConfirm": "Löschen"
 }

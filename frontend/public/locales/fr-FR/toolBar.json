@@ -36,5 +36,9 @@
     "searchDrafts": {
         "mac": "Rechercher des brouillons ( ⌘ + F )",
         "win": "Rechercher des brouillons ( Ctrl + F )"
-    }
+    },
+    "deleteDraft": "Supprimer ce brouillon",
+    "deleteConfirmTitle": "Supprimer ce brouillon ? Cette action est irréversible.",
+    "deleteCancel": "Annuler",
+    "deleteConfirm": "Supprimer"
 }

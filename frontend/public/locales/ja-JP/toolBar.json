@@ -36,5 +36,9 @@
     "searchDrafts": {
         "mac": "下書きを検索 ( ⌘ + F )",
         "win": "下書きを検索 ( Ctrl + F )"
-    }
+    },
+    "deleteDraft": "この下書きを削除",
+    "deleteConfirmTitle": "この下書きを削除しますか？この操作は元に戻せません。",
+    "deleteCancel": "キャンセル",
+    "deleteConfirm": "削除"
 }

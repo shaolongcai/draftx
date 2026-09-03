@@ -21,6 +21,12 @@ const Editor: React.FC = () => {
     // 初始化路由
     useEffect(() => {
         const init = async () => {
+            // 每次冷启动先进入引导页：未完成引导（isFinishGuide）时先选语言，开屏动画每次启动都播放
+            // （该页结束后会写入 sessionStorage 标记并回到首页，避免循环跳转）
+            if (!sessionStorage.getItem('onboarding_shown')) {
+                navigate('/onboarding')
+                return
+            }
             // 检查是否有激活，进入激活码环节
             const isPro = await window.electronAPI.verifyLicense()
             if (!isPro) {

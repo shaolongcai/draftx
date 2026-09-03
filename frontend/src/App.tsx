@@ -10,6 +10,7 @@ import HotkeysConfig from './pages/HotkeysConfig'
 import ImproveTips from './pages/ImproveTips'
 import RootProviders from './RootProviders'
 import ActivationCode from './pages/ActivationCode'
+import Onboarding from './pages/Onboarding'
 
 
 
@@ -68,6 +69,8 @@ function App() {
                   {currentPage === 'draft' && <GuideDot />}
                 </>}
               />
+              {/* 新手引导页（选择语言 + 动画，只出现一次） */}
+              <Route path='/onboarding' element={<Onboarding />} />
               {/* 更新提示 */}
               <Route path='/activationCode' element={<ActivationCode />} />
               {/* 配置热键 */}

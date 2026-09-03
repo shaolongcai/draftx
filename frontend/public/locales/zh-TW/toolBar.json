@@ -36,5 +36,9 @@
     "searchDrafts": {
         "mac": "搜尋草稿 ( ⌘ + F )",
         "win": "搜尋草稿 ( Ctrl + F )"
-    }
+    },
+    "deleteDraft": "刪除目前草稿",
+    "deleteConfirmTitle": "確認刪除這篇草稿？刪除後無法復原。",
+    "deleteCancel": "取消",
+    "deleteConfirm": "刪除"
 }

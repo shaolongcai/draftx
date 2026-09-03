@@ -7,6 +7,7 @@ import { verifyLicense } from '../core/license.js';
 import fs from 'fs';
 import path from 'path';
 import { decryptTimestamp, encryptTimestamp } from '../units/cyber.js';
+import { syncMcpServer } from '../server/mcpInstaller.js';
 import dayjs from 'dayjs';
 const { machineId } = pkg;
 
@@ -123,22 +124,9 @@ export function initializeSystemApi() {
     });
 
     ipcMain.handle('get-mcp-entry-path', () => {
-        const candidates: string[] = [];
-        if (app.isPackaged) {
-            candidates.push(path.join(process.resourcesPath, 'mcp-server', 'dist', 'index.js'));
-            candidates.push(path.join(process.resourcesPath, 'app.asar.unpacked', 'mcp-server', 'dist', 'index.js'));
-        }
-        candidates.push(path.resolve(app.getAppPath(), '..', 'mcp-server', 'dist', 'index.js'));
-        candidates.push(path.resolve(process.cwd(), 'mcp-server', 'dist', 'index.js'));
-
-        const matched = candidates.find((item) => fs.existsSync(item));
-        if (matched) {
-            return matched;
-        }
-        if (app.isPackaged) {
-            return path.join(process.resourcesPath, 'mcp-server', 'dist', 'index.js');
-        }
-        return path.resolve(process.cwd(), 'mcp-server', 'dist', 'index.js');
+        // 返回固定数据目录中的入口（~/.draftx/mcp-server/dist/index.js）
+        // syncMcpServer 幂等：版本戳一致时直接返回路径，不重复拷贝
+        return syncMcpServer() ?? '';
     });
 
     // 导出 Markdown

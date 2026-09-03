@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-// 保存笔记参数（content 为 markdown 原文；空字符串表示删除）
+// 保存笔记参数（content 为 markdown 原文；从未保存过的新笔记内容为空则不落盘）
 type NoteParmas = {
     uuid: string;
     title?: string;
@@ -44,9 +44,15 @@ interface ElectronAPI {
     getDraft: (query: string, limit?: number, timeFilter?: DraftTimeFilter) => Promise<DraftResult[]>;
 
     /**
-     * 保存笔记（写入 .md 文件；空内容 = 删除）
+     * 保存笔记（写入 .md 文件；从未保存过的新笔记内容为空则不落盘）
      */
     saveSticky: (params: NoteParmas) => void;
+
+    /**
+     * 删除笔记（md 文件 + 元数据 + 索引）
+     * @returns 是否删除成功（笔记不存在返回 false）
+     */
+    deleteNote: (uuid: string) => Promise<boolean>;
 
     /**
      * 保存图片到 notes/.asset/，返回相对路径（如 ".asset/xxx.png"）

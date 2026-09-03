@@ -172,13 +172,13 @@ const Setting = () => {
                     value={autoLaunch}
                     onAction={toggleAutoLaunch}
                 />
-                {/* 用户体验计划 */}
-                <SettingItem
+                {/* 用户体验计划（暂时隐藏） */}
+                {/* <SettingItem
                     title={t('app.settings.userExperience')}
                     type='switch'
                     value={reportAgreement}
                     onAction={toggleReportAgreement}
-                />
+                /> */}
             </SettingCard>
 
             {/* 语言 */}

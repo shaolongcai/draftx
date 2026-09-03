@@ -12,7 +12,7 @@ All notes are stored as plain **Markdown files** in your home directory (\`~/.dr
 
 - Press **Alt + Z** to summon DraftX anywhere.
 - Full Markdown support: headings, lists, tables, code blocks, math, mermaid, etc.
-- Notes are saved instantly as you type; empty notes are removed automatically.
+- Notes are saved instantly as you type; to delete a note, use the delete button in the bottom toolbar.
 - Paste or drop images — they are saved into \`notes/.asset/\` automatically.
 - 100% local data — nothing leaves your machine.
 - AI super-powers via Ollama: set your endpoint and model ID in settings.
@@ -29,7 +29,7 @@ All notes are stored as plain **Markdown files** in your home directory (\`~/.dr
 
 - 使用 **Alt + Z** 随时唤起 DraftX
 - 完整 Markdown 支持：标题、列表、表格、代码块、数学公式、Mermaid 图表等
-- 所有编辑即时保存为 md 文件；内容为空的笔记会被自动删除
+- 所有编辑即时保存为 md 文件；删除笔记可使用底部工具栏的删除按钮
 - 直接粘贴或拖入图片，会自动保存到 \`notes/.asset/\` 目录
 - 数据 100% 存储在本地
 - AI 功能由 Ollama 提供，你可以在设置中配置 Ollama 地址与模型 ID

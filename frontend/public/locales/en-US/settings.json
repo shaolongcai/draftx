@@ -37,9 +37,9 @@
     "trialDaysLeft": "{{days}} days left in trial",
 
     "mcpProvider": "MCP Service",
-    "mcpCommandDesc": "Add the following config into Trae mcp.json (under draftx-mcp):",
-    "mcpPathTip": "Note: the path is different on each computer and may change after packaging. Replace it with the absolute path of mcp-server/dist/index.js on your machine.",
-    "mcpCopyCommand": "Copy Config",
+    "mcpCommandDesc": "1. Add the following config to your MCP settings",
+    "mcpPathTip": "2. Please keep the app open",
+    "mcpCopyCommand": "Copy",
     "mcpCopyTemplate": "Copy Template",
     "mcpCommandCopied": "MCP config copied",
     "activationTrialExpired": "Trial expired"

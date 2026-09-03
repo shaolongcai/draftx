@@ -13,7 +13,9 @@ function RootProviders({ children }) {
     const [currentTheme, setCurrentTheme] = useState<Theme>(defaultTheme)
 
     useEffect(() => {
-        window.electronAPI.getConfig('app_language').then(setLang);
+        window.electronAPI.getConfig('app_language').then((l) => {
+            if (l) setLang(l);
+        });
         return () => { /* 如果暴露了移除监听就调用 */ };
     }, []);
 
