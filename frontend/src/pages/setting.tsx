@@ -126,12 +126,6 @@ const Setting = () => {
             {/* AI 服务 */}
             <SettingCard title={t('app.settings.aiSettings')}>
                 <SettingItem
-                    title={t('app.settings.aiProvider')}
-                    type='button'
-                    value={t('app.settings.set')}
-                    onAction={() => navigate('/AIProvider')}
-                />
-                <SettingItem
                     title={t('app.settings.mcpProvider')}
                     type='button'
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any

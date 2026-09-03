@@ -11,6 +11,7 @@ interface EventContextType {
     refreshContent$: EventEmitter<string>
     closePaste$: EventEmitter<void>
     handleOnclickTool$: EventEmitter<'addDraft' | 'allList' | 'draft' | 'exportMarkdown'> // 处理不同的工具按钮点击事件
+    notesChanged$: EventEmitter<void> // 笔记数量发生变化（新建首存 / 清空删除）
 }
 // 创建上下文
 const EventContext = createContext<EventContextType | undefined>(undefined);
@@ -26,6 +27,7 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const refreshContent$ = useEventEmitter<string>(); //刷新草稿内容
     const closePaste$ = useEventEmitter<void>(); //关闭粘贴弹窗
     const handleOnclickTool$ = useEventEmitter<'addDraft' | 'allList' | 'draft' | 'exportMarkdown'>(); // 处理不同的工具按钮点击事件
+    const notesChanged$ = useEventEmitter<void>(); // 笔记数量发生变化
 
     return (
         <EventContext.Provider
@@ -33,7 +35,8 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
                 loadStickys$,
                 refreshContent$,
                 closePaste$,
-                handleOnclickTool$
+                handleOnclickTool$,
+                notesChanged$
             }}
         >
             {children}

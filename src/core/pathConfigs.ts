@@ -21,6 +21,8 @@ interface PathsConfig {
     notes: string;
     /** 笔记图片等资源目录（notes/.asset） */
     notesAsset: string;
+    /** MCP Server 固定部署目录（~/.draftx/mcp-server），供外部 MCP 客户端引用 */
+    mcp: string;
 }
 
 /**
@@ -68,6 +70,8 @@ class PathConfig {
             notes: path.join(this.appDataPath, 'notes'),
             // 笔记图片等资源
             notesAsset: path.join(this.appDataPath, 'notes', '.asset'),
+            // MCP Server 固定部署目录（安装目录可变，数据目录固定）
+            mcp: path.join(this.appDataPath, 'mcp-server'),
         };
 
         //确保所有目录都存在

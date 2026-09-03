@@ -1,6 +1,7 @@
 export { default as Search } from './Search'
 export { default as SearchPanel } from './SearchPanel'
 export { default as NotesDrawer } from './NotesDrawer'
+export { default as GuideDot } from './GuideDot'
 export { default as EditorContext } from './Editor'
 export { default as DraftItem } from './DraftItem'
 export { default as ChatInput } from './ChatInput'

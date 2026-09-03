@@ -75,6 +75,10 @@ const NotesDrawer: React.FC = () => {
         if (cmd === 'addDraft') {
             setCurrentUuid('');
             refresh();
+            // 仅当当前只有一篇笔记（即正在新建第二篇）时自动展开抽屉，引导用户发现笔记列表
+            window.electronAPI.getDraft('', 4).then((list) => {
+                if ((list?.length ?? 0) === 1) setCollapsed(false);
+            });
         }
     });
 

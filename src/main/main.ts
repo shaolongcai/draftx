@@ -11,6 +11,7 @@ import { initializeAIApi } from '../api/ai.js';
 import { initializeUpdateApi } from '../api/update.js';
 import { reportErrorToWechat } from '../units/report.js';
 import { startLocalServer } from '../server/mcpLocalServer.js';
+import { syncMcpServer } from '../server/mcpInstaller.js';
 import pathConfig from '../core/pathConfigs.js';
 import pkg from 'node-machine-id';
 const { machineId } = pkg;
@@ -323,6 +324,11 @@ app.whenReady().then(async () => {
     initializeSystemApi();
     initializeAIApi();
     logger.info('所有API初始化完成');
+    // 同步 MCP Server 到固定数据目录（~/.draftx/mcp-server），供外部 MCP 客户端固定引用
+    const mcpEntry = syncMcpServer();
+    if (mcpEntry) {
+      logger.info(`MCP 客户端配置参考: { "command": "node", "args": ["${mcpEntry.replace(/\\/g, '\\\\')}"] }`);
+    }
     startLocalServer();
     createTray();
     if (process.platform === 'darwin') {

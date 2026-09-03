@@ -59,7 +59,7 @@ const Editor: React.FC = () => {
 
     const notification = useNotifications();
     const { vditorRef } = useEditor();
-    const { loadStickys$, handleOnclickTool$ } = useEvent();
+    const { loadStickys$, handleOnclickTool$, notesChanged$ } = useEvent();
     const { t, currentLanguage } = useTranslation();
     const isMac = window.electronUtils?.platform === 'darwin' || /macintosh|mac os x/i.test(navigator.userAgent);
 
@@ -173,6 +173,9 @@ const Editor: React.FC = () => {
         const content = combineContent(title, body);
         // 若无变更则跳过
         if (content === lastSavedRef.current) return;
+        // 空内容 = 删除笔记（主进程语义）；"有无内容"状态翻转意味着笔记数量变化
+        const wasEmpty = lastSavedRef.current === '';
+        const isEmpty = content === '';
         try {
             window.electronAPI.saveSticky({
                 uuid,
@@ -180,6 +183,7 @@ const Editor: React.FC = () => {
                 content,
             });
             lastSavedRef.current = content;
+            if (wasEmpty !== isEmpty) notesChanged$.emit();
         } catch (error) {
             const msg = error instanceof Error ? error.message : '保存失败';
             console.error(msg);
@@ -418,9 +422,9 @@ const Editor: React.FC = () => {
         loadDraft(sticky);
     });
 
-    // 注册 Alt+N（Mac ⌘N）新建便利贴
+    // 注册 Alt+N（Mac ⌘N）新建便利贴（统一走 addDraft 事件，保证抽屉等监听方行为一致）
     useKeyPress(isMac ? 'meta.n' : 'alt.n', () => {
-        addNewDraft();
+        handleOnclickTool$.emit('addDraft');
     });
 
     // 翻译是异步加载的，语言就绪/切换后同步正文编辑器的占位符

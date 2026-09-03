@@ -239,11 +239,11 @@ const ToolBar: React.FC<Props> = ({
 
         // 显示所有草稿与搜索
         if (currentPage === 'draft') {
-            buttons.push({
-                icon: <AllIcon />,
-                tip: t('app.toolBar.showAllDrafts'),
-                onClick: () => setCurrentPage('list'),
-            });
+            // buttons.push({
+            //     icon: <AllIcon />,
+            //     tip: t('app.toolBar.showAllDrafts'),
+            //     onClick: () => setCurrentPage('list'),
+            // });
 
             // 导出 Markdown
             buttons.push({

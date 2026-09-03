@@ -71,28 +71,84 @@ server.tool(
     }
 );
 
-// 2. 添加草稿
+// 2. 读取单篇笔记完整内容（按 uuid 或 path）
 server.tool(
-    "add_draft",
-    "向 DraftX 中添加一条新笔记（content 为 markdown 原文，会保存为 .md 文件）",
+    "get_draft",
+    "读取 DraftX 单篇笔记的完整 markdown 正文。uuid 和 path 至少传一个（优先用 uuid，均可从 get_drafts 结果中获取）。",
     {
-        title: z.string().describe("笔记的标题"),
-        content: z.string().describe("笔记的 markdown 内容"),
+        uuid: z.string().optional().describe("笔记 UUID"),
+        path: z.string().optional().describe("笔记的 .md 文件相对路径"),
     },
-    async ({ title, content }) => {
+    async ({ uuid, path }) => {
         try {
-            const result = await callBridge("add_draft", { title, content });
+            const result = await callBridge("get_draft", { uuid, path });
             return {
                 content: [
                     {
                         type: "text",
-                        text: `添加成功！笔记 UUID: ${result.uuid}，文件: ${result.path || "(空内容未创建)"}`,
+                        text: JSON.stringify(result.data, null, 2),
                     },
                 ],
             };
         } catch (error: any) {
             return {
-                content: [{ type: "text", text: `添加失败: ${error.message}` }],
+                content: [{ type: "text", text: `Error: ${error.message}` }],
+                isError: true,
+            };
+        }
+    }
+);
+
+// 3. 添加/更新草稿（传 uuid 则覆盖更新对应 .md 文件）
+server.tool(
+    "add_draft",
+    "向 DraftX 中添加一条新笔记（content 为 markdown 原文，会保存为 .md 文件）。传入已有笔记的 uuid 则覆盖更新该笔记的内容/标题。",
+    {
+        title: z.string().describe("笔记的标题"),
+        content: z.string().describe("笔记的 markdown 内容"),
+        uuid: z.string().optional().describe("已有笔记的 UUID，传入则为更新，否则新建"),
+    },
+    async ({ title, content, uuid }) => {
+        try {
+            const result = await callBridge("add_draft", { title, content, uuid });
+            return {
+                content: [
+                    {
+                        type: "text",
+                        text: `${uuid ? "更新" : "添加"}成功！笔记 UUID: ${result.uuid}，文件: ${result.path || "(空内容未创建)"}`,
+                    },
+                ],
+            };
+        } catch (error: any) {
+            return {
+                content: [{ type: "text", text: `${uuid ? "更新" : "添加"}失败: ${error.message}` }],
+                isError: true,
+            };
+        }
+    }
+);
+
+// 4. 删除草稿（按 uuid，删除 .md 文件及索引）
+server.tool(
+    "delete_draft",
+    "删除 DraftX 中的一条笔记（按 UUID，会同时删除对应 .md 文件）。",
+    {
+        uuid: z.string().describe("要删除的笔记 UUID"),
+    },
+    async ({ uuid }) => {
+        try {
+            await callBridge("delete_draft", { uuid });
+            return {
+                content: [
+                    {
+                        type: "text",
+                        text: `删除成功！笔记 UUID: ${uuid}`,
+                    },
+                ],
+            };
+        } catch (error: any) {
+            return {
+                content: [{ type: "text", text: `删除失败: ${error.message}` }],
                 isError: true,
             };
         }

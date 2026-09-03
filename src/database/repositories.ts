@@ -143,9 +143,21 @@ const buildTimeFilter = (timeFilter: NoteTimeFilter, conditions: string[], param
 /** 转义 FTS5 查询字符串（作为短语处理） */
 const escapeFtsQuery = (query: string) => `"${query.replace(/"/g, '""')}"`;
 
-/** 生成笔记纯文本预览（去除常见 Markdown 语法、折叠空白），供列表页展示 */
-const buildPreview = (content: string, maxLen = 120): string => {
-    const text = content
+/** 生成笔记纯文本预览（去除常见 Markdown 语法、折叠空白），供列表页展示；首行若为标题对应的 h1 则跳过，避免预览与标题重复 */
+const buildPreview = (content: string, maxLen = 120, title?: string): string => {
+    let source = content;
+    if (title) {
+        const lines = content.split('\n');
+        const firstIdx = lines.findIndex(l => l.trim() !== '');
+        if (firstIdx !== -1) {
+            const firstText = lines[firstIdx].replace(/^\s{0,3}#{1,6}\s+/, '').trim();
+            if (firstText === title.trim()) {
+                lines.splice(firstIdx, 1);
+                source = lines.join('\n');
+            }
+        }
+    }
+    const text = source
         .replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1')      // 图片 -> alt 文本
         .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')       // 链接 -> 链接文本
         .replace(/^\s{0,3}#{1,6}\s+/gm, '')            // 标题标记
@@ -227,8 +239,8 @@ export const getNotes = (query?: string, limit: number = 50, timeFilter: NoteTim
                 LIMIT ?
             `);
             const rows = stmt.all(...params, limit) as NoteRow[];
-            // 列表页需要内容预览：读取文件生成纯文本摘要（无搜索高亮）
-            return rows.map(row => ({ ...row, snippet: buildPreview(readNote(row.path) ?? '') }));
+            // 列表页需要内容预览：读取文件生成纯文本摘要（无搜索高亮，跳过与标题重复的首行）
+            return rows.map(row => ({ ...row, snippet: buildPreview(readNote(row.path) ?? '', 120, row.title ?? undefined) }));
         }
 
         // trigram 索引要求查询长度 >= 3 个字符，短查询回退到文件扫描
