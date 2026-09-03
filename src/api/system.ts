@@ -123,10 +123,10 @@ export function initializeSystemApi() {
         return app.getVersion();
     });
 
-    ipcMain.handle('get-mcp-entry-path', () => {
+    ipcMain.handle('get-mcp-entry-path', async () => {
         // 返回固定数据目录中的入口（~/.draftx/mcp-server/dist/index.js）
         // syncMcpServer 幂等：版本戳一致时直接返回路径，不重复拷贝
-        return syncMcpServer() ?? '';
+        return await syncMcpServer() ?? '';
     });
 
     // 导出 Markdown

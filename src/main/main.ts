@@ -332,12 +332,16 @@ app.whenReady().then(async () => {
       try {
         // 启动对账：md 文件是事实来源，同步元数据与全文索引
         syncNotesWithFiles();
-        // 同步 MCP Server 到固定数据目录（~/.draftx/mcp-server），供外部 MCP 客户端固定引用
-        const mcpEntry = syncMcpServer();
-        if (mcpEntry) {
-          logger.info(`MCP 客户端配置参考: { "command": "node", "args": ["${mcpEntry.replace(/\\/g, '\\\\')}"] }`);
-        }
+        // 启动本地 MCP 桥接服务（listen 本身异步，开销极小）
         startLocalServer();
+        // 同步 MCP Server 到固定数据目录（~/.draftx/mcp-server），供外部 MCP 客户端固定引用
+        // 异步执行不等待：目录约 58MB，首次/升级时的拷贝若同步执行会卡住主进程事件循环
+        // fire-and-forget，失败仅记录日志，不影响编辑器使用
+        void syncMcpServer().then((mcpEntry) => {
+          if (mcpEntry) {
+            logger.info(`MCP 客户端配置参考: { "command": "node", "args": ["${mcpEntry.replace(/\\/g, '\\\\')}"] }`);
+          }
+        });
         initializeGuideMemo()
         initializeUpdateDraft()
         initializeAITool()

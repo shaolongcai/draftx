@@ -23,11 +23,17 @@ const HotkeysConfig = () => {
                 // 需要检查是否已经设置,仅非设置页需要自动跳过
                 const from = searchParams.get('from');
                 if (from !== 'setting') {
-                    navigate('/');
+                    // 写入标记并进入开屏动画页
+                    await window.electronAPI.setConfig({
+                        key: 'isFinishGuide',
+                        value: true,
+                        type: 'boolean',
+                    });
+                    navigate('/onboarding');
                 }
             }
         }
-        checkConfig();
+        // checkConfig();
     }, []);
 
     // 监听键盘按下
@@ -141,15 +147,26 @@ const HotkeysConfig = () => {
             notification.show('Shortcut saved successfully', { severity: 'success', autoHideDuration: 1200 });
             // 根据参数判断跳转路径
             const from = searchParams.get('from');
-            navigate(from === 'setting' ? '/' : '/'); // 设置页面进入的，保存后回到设置页面
+            navigate(from === 'setting' ? '/' : '/onboarding'); // 设置页面进入的，保存后回到设置页面,主页的进入onboarding页面
         } catch (error) {
             console.error('Failed to save shortcut:', error);
             notification.show('Failed to save', { severity: 'error', autoHideDuration: 2000 });
         }
     };
 
-    // 系统保留快捷键列表
-    const reservedShortcuts = ['Alt+[', 'Alt+]', 'Alt+C', 'Alt+N'];
+    // 系统保留快捷键列表（与应用内已占用的快捷键冲突，禁止设置为全局唤起快捷键）
+    const reservedShortcuts = [
+        // 工具栏/编辑器快捷键（Win 端 Alt 组合）
+        'Alt+[', 'Alt+]', 'Alt+C', 'Alt+N',
+        // Mac 端前进/后退草稿（⌘+[ / ⌘+]）
+        'Meta+[', 'Meta+]',
+        // 工具栏编辑类快捷键：加粗/斜体/待办/搜索（Win: Ctrl，Mac: ⌘）
+        'Ctrl+B', 'Ctrl+I', 'Ctrl+T', 'Ctrl+F',
+        'Meta+B', 'Meta+I', 'Meta+T', 'Meta+F',
+        // 系统级快捷键：复制/粘贴/全选（Win: Ctrl，Mac: ⌘）
+        'Ctrl+C', 'Ctrl+V', 'Ctrl+A',
+        'Meta+C', 'Meta+V', 'Meta+A',
+    ];
     // 检查是否为保留快捷键（不区分大小写）
     const isReserved = reservedShortcuts.some(s => s.toLowerCase() === shortcut.toLowerCase());
 
@@ -204,7 +221,7 @@ const HotkeysConfig = () => {
                 <SettingTitle title={t('app.shortcut.title')} />
                 <Paper
                     elevation={0}
-                    className="mt-6 flex-1 rounded-2xl p-6 flex flex-col bg-[#EBE1D3]"
+                    className="mt-6 flex-1 rounded-2xl p-6 flex flex-col "
                 >
                     <Stack spacing={3} alignItems='center' justifyContent='center' className="flex-1">
                         {shortcutPanel}

@@ -27,10 +27,12 @@ const getSourceDir = (): string => {
 }
 
 /**
- * 同步 mcp-server 到固定数据目录
+ * 同步 mcp-server 到固定数据目录（异步版本）
+ * 目录约 58MB（含 node_modules），同步拷贝会阻塞主进程事件循环导致 UI 卡顿，
+ * 因此整体使用 fs.promises，调用方可 fire-and-forget 或按需 await
  * @returns 固定入口文件路径（同步失败时返回 null）
  */
-export const syncMcpServer = (): string | null => {
+export const syncMcpServer = async (): Promise<string | null> => {
     try {
         const sourceDir = getSourceDir();
         const targetDir = pathConfig.get('mcp');
@@ -45,15 +47,15 @@ export const syncMcpServer = (): string | null => {
         // 版本戳一致则跳过拷贝（避免每次启动覆盖 node_modules）
         const stampPath = path.join(targetDir, VERSION_STAMP);
         const currentVersion = app.getVersion();
-        const syncedVersion = fs.existsSync(stampPath) ? fs.readFileSync(stampPath, 'utf-8').trim() : '';
+        const syncedVersion = fs.existsSync(stampPath) ? (await fs.promises.readFile(stampPath, 'utf-8')).trim() : '';
         if (syncedVersion === currentVersion && fs.existsSync(entryPath)) {
             return entryPath;
         }
 
         // 清空旧目录后整体复制，避免残留旧版文件
-        fs.rmSync(targetDir, { recursive: true, force: true });
-        fs.cpSync(sourceDir, targetDir, { recursive: true });
-        fs.writeFileSync(stampPath, currentVersion, 'utf-8');
+        await fs.promises.rm(targetDir, { recursive: true, force: true });
+        await fs.promises.cp(sourceDir, targetDir, { recursive: true });
+        await fs.promises.writeFile(stampPath, currentVersion, 'utf-8');
 
         logger.info(`MCP Server 已同步到固定目录: ${entryPath}`);
         return entryPath;
