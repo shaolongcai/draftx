@@ -4,7 +4,7 @@ import './App.css'
 import Home from './pages/home'
 import { ToolBar, NotesDrawer, GuideDot } from './components'
 import DraftList from './pages/draftList'
-import { Routes, Route, HashRouter } from 'react-router-dom';
+import { Routes, Route, HashRouter, Navigate } from 'react-router-dom';
 import { EditorProvider } from './contexts/EditorContext'
 import HotkeysConfig from './pages/HotkeysConfig'
 import ImproveTips from './pages/ImproveTips'
@@ -18,6 +18,9 @@ function App() {
 
   const [currentPage, setCurrentPage] = useState<'draft' | 'list'>('draft') //当前的页面
   const rootRef = useRef(null)
+
+  // 冷启动门控：本次会话未展示开屏时直接跳引导页（sessionStorage 同步读取，避免先挂载整套编辑器再跳转）
+  const needOnboarding = !sessionStorage.getItem('onboarding_shown')
 
   return (
     <RootProviders>
@@ -47,7 +50,7 @@ function App() {
             <Routes>
               {/* 首页 （所有页面均先进入这个） */}
               <Route path='/'
-                element={<>
+                element={needOnboarding ? <Navigate to='/onboarding' replace /> : <>
                   <div className={`${currentPage === 'draft' ? '' : 'hidden'}`}>
                     <Home />
                   </div>

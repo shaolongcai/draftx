@@ -315,8 +315,6 @@ app.whenReady().then(async () => {
         return new Response('Not Found', { status: 404 });
       }
     });
-    // 启动对账：md 文件是事实来源，同步元数据与全文索引
-    syncNotesWithFiles();
     registerGlobalShortcut();
     logger.info('全局快捷键注册完成');
     initializeUpdateApi()
@@ -324,21 +322,32 @@ app.whenReady().then(async () => {
     initializeSystemApi();
     initializeAIApi();
     logger.info('所有API初始化完成');
-    // 同步 MCP Server 到固定数据目录（~/.draftx/mcp-server），供外部 MCP 客户端固定引用
-    const mcpEntry = syncMcpServer();
-    if (mcpEntry) {
-      logger.info(`MCP 客户端配置参考: { "command": "node", "args": ["${mcpEntry.replace(/\\/g, '\\\\')}"] }`);
-    }
-    startLocalServer();
     createTray();
     if (process.platform === 'darwin') {
       app.dock.hide();
     }
-    initializeGuideMemo()
-    initializeUpdateDraft()
-    initializeAITool()
-    initializeUserConfig();
-    logger.info('用户配置初始化完成');
+
+    // 耗时初始化挪到窗口内容加载完成后执行，避免阻塞首屏（窗口显示 / 开屏动画）
+    mainWindow?.webContents.once('did-finish-load', () => {
+      try {
+        // 启动对账：md 文件是事实来源，同步元数据与全文索引
+        syncNotesWithFiles();
+        // 同步 MCP Server 到固定数据目录（~/.draftx/mcp-server），供外部 MCP 客户端固定引用
+        const mcpEntry = syncMcpServer();
+        if (mcpEntry) {
+          logger.info(`MCP 客户端配置参考: { "command": "node", "args": ["${mcpEntry.replace(/\\/g, '\\\\')}"] }`);
+        }
+        startLocalServer();
+        initializeGuideMemo()
+        initializeUpdateDraft()
+        initializeAITool()
+        initializeUserConfig();
+        logger.info('用户配置初始化完成');
+      } catch (error) {
+        const msg = error instanceof Error ? `${error.message}\n${error.stack || ''}` : String(error);
+        logger.error(`延迟初始化失败: ${msg}`);
+      }
+    });
   } catch (error) {
     const msg = error instanceof Error ? `${error.message}\n${error.stack || ''}` : String(error);
     logger.error(`应用启动失败: ${msg}`);
