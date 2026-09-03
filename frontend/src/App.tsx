@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import './App.css'
 
 import Home from './pages/home'
-import { ToolBar } from './components'
+import { ToolBar, NotesDrawer } from './components'
 import DraftList from './pages/draftList'
 import { Routes, Route, HashRouter } from 'react-router-dom';
 import { EditorProvider } from './contexts/EditorContext'
@@ -62,6 +62,8 @@ function App() {
                       />
                     </div>
                   )}
+                  {/* 右侧「全部笔记」抽屉（仅草稿页）：搜索 + 全部笔记列表，可收起，参考 item-index.html */}
+                  {currentPage === 'draft' && <NotesDrawer />}
                 </>}
               />
               {/* 更新提示 */}

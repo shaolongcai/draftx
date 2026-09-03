@@ -5,6 +5,7 @@
     "autoLaunch": "开机自动启动",
     "language": "语言",
     "logFolder": "日志",
+    "mdFolder": "MD 文件夹",
     "open": "打开",
     "view": "查看",
     "theme": "主题",

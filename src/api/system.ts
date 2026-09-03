@@ -49,11 +49,15 @@ export function initializeSystemApi() {
     });
 
     // 打开文件夹,(send要用on的)
-    ipcMain.on('open-dir', (_event, type: 'runLog', path?: string) => {
+    ipcMain.on('open-dir', (_event, type: 'runLog' | 'notes', path?: string) => {
         switch (type) {
             case 'runLog':
                 const logsDir = pathConfig.get('logs')
                 shell.openPath(logsDir);
+                break;
+            case 'notes':
+                const notesDir = pathConfig.get('notes')
+                shell.openPath(notesDir);
                 break;
             default:
             // todo 留下做其他文件夹的打开

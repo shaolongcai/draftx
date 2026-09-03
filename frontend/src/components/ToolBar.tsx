@@ -349,10 +349,10 @@ const ToolBar: React.FC<Props> = ({
         insertList();
     })
 
-    // 站内搜索快捷键（Win: Ctrl+F，Mac: ⌘+F），任意页面可用
+    // 站内搜索快捷键（Win: Ctrl+F，Mac: ⌘+F），任意页面可用；面板已打开时再次按下则关闭
     useKeyPress((e) => (isMac ? e.metaKey : e.ctrlKey) && e.key.toLowerCase() === 'f', (e) => {
         e.preventDefault();
-        setIsSearchMode(true);
+        setIsSearchMode(v => !v);
     })
 
     // 前进或后退草稿

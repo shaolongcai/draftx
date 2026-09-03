@@ -220,8 +220,7 @@ const SearchPanel: React.FC<Props> = ({ onClose, onSelectDraft, onEnterNoteMode 
 
     return (
         <>
-            {/* 透明遮罩：点击面板外关闭 */}
-            <div className="fixed inset-0 z-40" onClick={onClose} />
+            {/* 不使用遮罩层：搜索打开时笔记仍可滚动与交互（Esc / Ctrl+F 关闭面板） */}
             <div
                 className="fixed top-10 right-4 z-50 w-[380px] rounded-lg border shadow-xl overflow-hidden"
                 style={{ background: '#F5F4EF', borderColor: '#E1E0DA', color: '#3A332C' }}

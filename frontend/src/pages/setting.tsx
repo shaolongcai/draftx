@@ -95,9 +95,9 @@ const Setting = () => {
     }
 
 
-    return <div className="w-full h-full px-12 py-8 overflow-y-auto scrollbar-thin" >
-        {/* 标题栏 */}
-        <div className="flex items-center justify-between">
+    return <div className="flex h-full w-full flex-col px-12 pt-8" >
+        {/* 标题栏（固定不滚动） */}
+        <div className="flex shrink-0 items-center justify-between">
             <div className="flex items-center gap-2">
                 <h1 className="text-[32px] font-semibold text-[#3A332C]">
                     {t('app.settings.title')}
@@ -114,13 +114,15 @@ const Setting = () => {
             <button
                 type='button'
                 onClick={() => window.electronAPI.closeSettingsWindow()}
-                className="flex size-9 cursor-pointer items-center justify-center rounded-full border-2 border-[#3A332C] text-[#3A332C] transition-colors hover:bg-[#3A332C]/5"
+                className="flex size-10 cursor-pointer items-center justify-center rounded-full border-2 border-[#3A332C] text-[#3A332C] transition-colors hover:bg-[#3A332C]/5"
             >
                 <CloseIcon className="size-4" strokeWidth={2.5} />
             </button>
         </div>
 
-        <div className="mt-5 flex flex-col gap-4">
+        {/* 可滚动内容区 */}
+        <div className="mt-5 flex-1 overflow-y-auto scrollbar-thin pb-8">
+        <div className="flex flex-col gap-4">
             {/* AI 服务 */}
             <SettingCard title={t('app.settings.aiSettings')}>
                 <SettingItem
@@ -152,6 +154,14 @@ const Setting = () => {
                     title={t('app.settings.logFolder')}
                     value={t('app.settings.open')}
                     onAction={() => window.electronAPI.openDir('runLog')}
+                    type='button'
+                />
+                {/* 打开 MD 文件夹 */}
+                <SettingItem
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    title={t('app.settings.mdFolder' as any)}
+                    value={t('app.settings.open')}
+                    onAction={() => window.electronAPI.openDir('notes')}
                     type='button'
                 />
                 {/* 快捷键设置 */}
@@ -191,6 +201,7 @@ const Setting = () => {
             <SettingCard title={t('app.settings.contact')}>
                 <Contact />
             </SettingCard>
+        </div>
         </div>
     </div>
 
