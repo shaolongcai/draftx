@@ -48,7 +48,7 @@ const SelectLanguage: React.FC = () => {
         setLanguage(code);
     };
 
-    // 确认语言选择：写入 isFinishGuide 后进入开屏动画页
+    // 确认语言选择：生成对应语言的引导笔记，然后进入 hotkey 设置页
     const handleChoose = async () => {
         if (!selected || saving) return;
         setSaving(true);
@@ -58,6 +58,13 @@ const SelectLanguage: React.FC = () => {
         //     type: 'boolean',
         // });
         // navigate('/onboarding', { replace: true });
+
+        // 选择完语言后生成对应语言的引导笔记（幂等，已存在则不重复创建；失败不阻塞流程）
+        try {
+            await window.electronAPI.initializeGuideNote(selected);
+        } catch (error) {
+            console.error('初始化引导笔记失败:', error);
+        }
 
         // 跳转到设置hotkey页面（路由表注册的路径是 /hotkeys）
         navigate('/hotkeys', { replace: true });

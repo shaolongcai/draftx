@@ -65,6 +65,12 @@ interface ElectronAPI {
     getNotesDir: () => Promise<string>;
 
     /**
+     * 选择语言后初始化引导笔记（根据语言生成中/英文版本；已存在则不重复创建）
+     * @returns 是否新建了引导笔记
+     */
+    initializeGuideNote: (language: string) => Promise<boolean>;
+
+    /**
      * 设置窗口背景颜色
      */
     setBackgroundColor: (color: string) => void;

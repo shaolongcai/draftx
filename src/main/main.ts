@@ -3,18 +3,15 @@ import * as path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import { getConfig, initializeDatabase, setConfig } from '../database/sqlite.js';
 import { initializeDraftApi } from '../api/draft.js';
-import { getAITools, getNoteByUuid, saveAITool, saveNote, syncNotesWithFiles } from '../database/repositories.js';
+import { getAITools, saveAITool, saveNote, syncNotesWithFiles } from '../database/repositories.js';
 import { initializeSystemApi } from '../api/system.js';
 import { logger } from '../core/logger.js';
-import { GuidContent, UpdateContent } from '../data/data.js';
+import { UpdateContent } from '../data/data.js';
 import { initializeAIApi } from '../api/ai.js';
 import { initializeUpdateApi } from '../api/update.js';
-import { reportErrorToWechat } from '../units/report.js';
 import { startLocalServer } from '../server/mcpLocalServer.js';
 import { syncMcpServer } from '../server/mcpInstaller.js';
 import pathConfig from '../core/pathConfigs.js';
-import pkg from 'node-machine-id';
-const { machineId } = pkg;
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -224,24 +221,8 @@ function createTray() {
 
 
 // 初始化引导笔记（md 文件）
-const initializeGuideMemo = async () => {
-  //查询是否已经有引导笔记
-  const guideMemo = getNoteByUuid('guide');
-  if (!guideMemo) {
-    // 初始化时，发送消息到企业微信
-    const id = await machineId(true);
-    reportErrorToWechat({
-      类型: '新增一个用户',
-      机器码: id,
-    })
-    // 没有引导笔记，创建一个
-    saveNote({
-      uuid: 'guide',
-      title: 'Welcome',
-      content: GuidContent,
-    });
-  }
-}
+// 已迁移：改为用户在引导页选择完语言后，由前端调用 'initialize-guide-note'（见 src/api/draft.ts）
+// 按所选语言生成中/英文版本，避免启动时语言未知导致生成错语言
 
 // 初始化更新说明笔记
 const initializeUpdateDraft = async () => {
@@ -342,7 +323,6 @@ app.whenReady().then(async () => {
             logger.info(`MCP 客户端配置参考: { "command": "node", "args": ["${mcpEntry.replace(/\\/g, '\\\\')}"] }`);
           }
         });
-        initializeGuideMemo()
         initializeUpdateDraft()
         initializeAITool()
         initializeUserConfig();
