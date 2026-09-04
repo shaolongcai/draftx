@@ -1,57 +1,95 @@
-import { useState, useEffect, useRef } from 'react'
-import { Grid, Stack, Typography } from '@mui/material'
-import { useDebounce, useKeyPress, useRequest, useSize } from 'ahooks'
+import { useState, useRef, useEffect } from 'react'
+import { useSize } from 'ahooks'
 import './App.css'
-import { Search, MemoItem, Editor2, MemoList } from '@/components'
-import { ThemeProvider } from '@mui/material'
-import { theme } from './theme'
+import { Stack, ThemeProvider } from '@mui/material'
+
+import { theme as editorTheme } from './theme/editorTheme'
 import { NotificationsProvider } from '@toolpad/core/useNotifications';
 import { EventProvider } from './contexts/EvenContext'
+import Home from './pages/home'
+import { ToolBar } from './components'
+import DraftList from './pages/draftList'
+import { Routes, Route, HashRouter } from 'react-router-dom';
+import Update from './pages/update'
+import { LexicalComposer } from '@lexical/react/LexicalComposer';
+import { mermaidNode } from "@/nodes/MermaidNode";
+import { ListItemNode, ListNode } from '@lexical/list';
+import { AutoLinkNode, LinkNode } from '@lexical/link';
+import { HeadingNode, QuoteNode } from '@lexical/rich-text';
+import { CodeHighlightNode, CodeNode } from '@lexical/code';
+import { HorizontalRuleNode } from '@/nodes/HorizontalRuleNode';
+import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
+import { MathNode } from "@/nodes/MathNode";
+import { MathItemNode } from "@/nodes/MathItemNode";
+import { BlockTitleNode } from "@/nodes/BlockTitleNode";
+import { BlockTipNode } from "@/nodes/BlockTipNode";
+import { PasteNode } from "@/nodes/PasteNode";
+import { LoadingNode } from "@/nodes/LoadingNode";
+import HotkeysConfig from './pages/HotkeysConfig'
+import ImproveTips from './pages/ImproveTips'
+import { CaluResultNode } from './nodes/CaluResultNode'
+import { UnitConversionNode } from './nodes/UnitConversionNode'
+import { CurrencyConversionNode } from './nodes/CurrencyConversionNode'
+import { ResponseNode } from './nodes/ResponseNode'
+import { ImageNode } from './nodes/imageNode/EditorImageNode'
+import RootProviders from './RootProviders'
+import ActivationCode from './pages/ActivationCode'
+
+
 
 function App() {
 
-
-  const [searchValue, setSearchValue] = useState('')
-  const [showMemoList, setShowMemoList] = useState(false)
-  const debouncedValue = useDebounce(searchValue, { wait: 200 })
+  const [currentPage, setCurrentPage] = useState<'draft' | 'list'>('draft') //当前的页面
   const rootRef = useRef(null)
-  const size = useSize(rootRef)
 
-  // 注册alt+s 展示出memoList
-  useKeyPress('alt.s', () => {
-    setShowMemoList(pre => !pre);
-  })
-
-
-  // 触发变更窗口大小
-  useRequest(() => window.electronAPI.resizeWindow(size), {
-    ready: Boolean(size),
-    refreshDeps: [size],
-  })
-
-  // 搜索
-  const { data } = useRequest(
-    () => window.electronAPI.searchSticky(debouncedValue),
-    {
-      ready: Boolean(debouncedValue),
-      refreshDeps: [debouncedValue],
-    }
-  );
-
+  const initialConfig = {
+    namespace: 'MyEditor',
+    theme: editorTheme,
+    onError: (error: Error) => {
+      console.error(error.message);
+    },
+    nodes: [
+      HeadingNode,
+      QuoteNode,
+      ListNode,
+      ListItemNode,
+      CodeNode,
+      CodeHighlightNode,
+      LinkNode,
+      AutoLinkNode,
+      TableNode,
+      TableCellNode,
+      HorizontalRuleNode,
+      TableRowNode,
+      BlockTitleNode,
+      BlockTipNode,
+      mermaidNode,
+      MathNode,
+      MathItemNode,
+      PasteNode,
+      LoadingNode,
+      CaluResultNode,
+      UnitConversionNode,
+      CurrencyConversionNode,
+      ResponseNode,
+      ImageNode,
+    ],
+  };
 
   return (
-    <NotificationsProvider slotProps={{
-      snackbar: {
-        anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
-        autoHideDuration: 2000,
-      },
-    }} >
-      <ThemeProvider theme={theme}>
-        <EventProvider >
-          <div ref={rootRef} className='w-fit'>
-            {/* 展示最近的memo,要通过样式的hidden来隐藏，否则监听不了事件 */}
-            <Stack spacing={2} className={`w-lg ${showMemoList ? 'hidden' : ''}`}>
-              <style>{`
+    <RootProviders>
+      <LexicalComposer initialConfig={initialConfig}>
+        <HashRouter>
+          {/* {
+                import.meta.env.DEV &&
+                <div className='absolute top-0 left-0 right-0 h-8 z-10 bg-primary text-primary-contrastText text-center'>开发环境</div>
+              } */}
+          <div ref={rootRef} >
+            {/* 顶部拖拽条 */}
+            <div
+              className="drag absolute top-0 left-0 right-0 h-8 z-10 "
+            />
+            <style>{`
                 /* root隐藏滚动条但保持可滚动 */
                 ::-webkit-scrollbar {
                     display: none;
@@ -63,52 +101,35 @@ function App() {
                     -ms-overflow-style: none;
                 }
             `}</style>
-              <Search onSearch={setSearchValue} />
-              {
-                (data?.length > 0 && searchValue) &&
-                <Grid container columns={2} className='max-h-[600px] overflow-auto'>
-                  {
-                    data.map(item =>
-                      <Grid key={item.id} size={1} >
-                        <MemoItem
-                          id={item.id}
-                          title={item.title}
-                          content={item.content}
-                          snippet={item.snippet}
-                          lineClamp={5}
-                          {...item}
-                        />
-                      </Grid>
-                    )
-                  }
-                </Grid>
-              }
-              <div className={searchValue ? 'hidden' : ''}>
-                <Editor2 />
-              </div>
-              <Stack
-                // onClick={() => setShowMemoList(pre => !pre)}
-                className='bg-[#F9F3E5] opacity-85 p-2 rounded-md mx-auto w-fit'
-                direction="row" spacing={0.5} alignItems="center" justifyContent='center'
-              >
-                <span className="border border-text-secondary border-gray-300  rounded px-2 py-1 text-xs leading-none">
-                  Alt
-                </span>
-                <Typography variant="bodySmall" color="textSecondary">+</Typography>
-                <span className="border border-text-secondary border-gray-300  rounded px-2 py-1 text-xs leading-none">
-                  S
-                </span>
-                <Typography variant="bodySmall" color="textSecondary" className="pl-1">
-                  to display the most recent memos
-                </Typography>
-              </Stack>
-            </Stack>
-            {/* 展示memo列表 */}
-            <MemoList handleChooseMemo={() => setShowMemoList(false)} isOpen={showMemoList} />
+            <Routes>
+              {/* 首页 （所有页面均先进入这个） */}
+              <Route path='/'
+                element={<>
+                  <div className={`${currentPage === 'draft' ? '' : 'hidden'}`}>
+                    <Home />
+                  </div>
+                  <div className={`${currentPage === 'list' ? '' : 'hidden'}`}>
+                    <DraftList setCurrentPage={setCurrentPage} currentPage={currentPage} />
+                  </div>
+                  <Stack className='absolute bottom-6 left-0 right-0 px-4 h-4'>
+                    <ToolBar
+                      currentPage={currentPage}
+                      setCurrentPage={setCurrentPage}
+                    />
+                  </Stack>
+                </>}
+              />
+              {/* 更新提示 */}
+              <Route path='/activationCode' element={<ActivationCode />} />
+              {/* 配置热键 */}
+              <Route path='/hotkeys' element={<HotkeysConfig />} />
+              {/* 提升体验提示 */}
+              <Route path='/improveTips' element={<ImproveTips />} />
+            </Routes>
           </div>
-        </EventProvider>
-      </ThemeProvider>
-    </NotificationsProvider>
+        </HashRouter>
+      </LexicalComposer>
+    </RootProviders>
   )
 }
 

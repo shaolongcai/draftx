@@ -4,11 +4,12 @@
 type StickyParmas = {
     uuid: string;
     title?: string;
-    content?: string;
+    content: string;
+    contentJson: string;
 }
 
 // 配置类型
-type ConfigType = 'isFinishGuide'
+type ConfigType = 'isFinishGuide' | 'ai_provider' | 'licenseData' | 'currentUuid' | 'launchShortcut' | 'report_agreement' | 'version' | 'theme' | 'app_language'
 // 配置参数
 export type ConfigParams = {
     key: ConfigType;
@@ -16,16 +17,31 @@ export type ConfigParams = {
     type?: 'boolean' | 'string' | 'number' | 'json';
 }
 
+type ChatData = {
+    content: string;
+    type: 'stream' | 'done'
+}
+
+type DraftTimeFilter = {
+    createdAfter?: string;
+    createdBefore?: string;
+    modifiedAfter?: string;
+    modifiedBefore?: string;
+}
+
+// 试用期验证的枚举
+export type TrialType = 'NOT_INITIALIZED' | 'MISMATCH' | 'VALID' | 'EXPIRED'
+
 
 
 interface ElectronAPI {
 
     /**
-     * 搜索便利贴
+     * 获取所有草稿
      * @param query 搜索词
-     * @returns 便利贴列表
+     * @returns 直接返回草稿列表
      */
-    searchSticky: (query: string) => Promise<StickyResult[]>;
+    getDraft: (query: string, limit?: number, timeFilter?: DraftTimeFilter) => Promise<DraftResult[]>;
 
     /**
      * 保存便利贴
@@ -33,26 +49,26 @@ interface ElectronAPI {
     saveSticky: (params: StickyParmas) => void;
 
     /**
-     * 增加删除时间
+     * 刷新删除时间（默认30天）
      */
-    addDeleteDay: (id: number) => void;
+    refreshDeleteDay: (id: number) => void;
 
     /**
-     * 变更窗口大小
+     * 设置窗口背景颜色
      */
-    resizeWindow: (size: { width: number, height: number }) => Promise<void>;
+    setBackgroundColor: (color: string) => void;
 
     /**
-     * 获取最近的项目
-     * @param limit 获取最近的项目数
+     * 获取应用版本
      */
-    getRecentStickys: (limit: number) => Promise<StickyResult[]>
+    getAppVersion: () => Promise<string>;
+    getMcpEntryPath: () => Promise<string>;
 
     /**
      * 获取配置
      * @param 可选 isFinishGuide 是否完成引导
      */
-    getConfig: (key: ConfigType) => Promise<any>;
+    getConfig: (key?: ConfigType) => Promise<any>;
 
     /**
      * 设置配置
@@ -61,9 +77,132 @@ interface ElectronAPI {
     setConfig: (params: ConfigParams) => Promise<void>;
 
     /**
+     * 监听配置变更
+     */
+    onConfigChange: (callback: (config: ConfigParams) => void) => () => void;
+
+    /**
      * 获取引导memo
+     * @deprecated 已废弃，使用 getDraftByUuid 替代
      */
     getGuideMemo: () => Promise<StickyResult>
+
+    /**
+     * 根据UUID获取草稿
+     */
+    getDraftByUuid: (uuid: string) => Promise<DraftResult | null>;
+
+    /**
+     * 检查Ollama服务是否可用
+     * @param host Ollama服务地址
+     * @returns code: 0 表示成功，1 表示失败 ,errMsg: 错误信息
+     */
+    checkOllamaServer: (host: string, modelID: string) => Promise<{ code: number, errMsg?: string }>
+
+    /**
+     * 更新托盘菜单语言
+     */
+    updateTrayLanguage(language: string): void;
+
+    /**
+     * 开始试用
+     */
+    startTrial: () => Promise<{ success: boolean, message?: string }>;
+
+    /**
+     * 验证试用
+     * @returns Promise<{ success: boolean, message?: string, trialType: TrialType, trialEndDate?: number,试用结束时间 }>
+     */
+    verifyTrial: () => Promise<{ success: boolean, message?: string, trialType: TrialType, trialEndDate?: number }>;
+
+
+
+    /**
+     * 发起流式对话
+     * @param currentStickyId 便利贴的ID
+     * @param message 用户消息
+     * @param context 上下文
+     */
+    chatStream: (message: string, context?: string) => void;
+
+    /**
+     * 监听流式数据
+     * @returns 取消监听的函数
+     */
+    onChatStream: (callback: (chunk: ChatData) => void) => () => void;
+
+    /**
+     * 监听流式结束
+     * @returns 取消监听的函数
+     */
+    onChatStreamEnd: (callback: () => void) => () => void;
+
+    /**
+     * 监听流式错误
+     * @returns 取消监听的函数
+     */
+    onChatStreamError: (callback: (error: string) => void) => () => void;
+
+    /**
+     * 读取系统剪贴板文本
+     */
+    readClipboardText: () => Promise<string>;
+
+    /**
+     * 检查是否有更新
+     */
+    checkForUpdates: () => Promise<{ isUpdateAvailable: boolean, message: string }>;
+
+    /**
+     * 下载更新
+     */
+    downloadUpdate: () => Promise<void>;
+
+    /**
+     * 监听下载进度
+     * @returns 取消监听的函数
+     */
+    onDownloadProgress: (callback: (progress: number) => void) => () => void;
+
+    /**
+     *  打开系统目录
+     * @param type 目录类型
+     * @param path 可选路径
+     */
+    openDir(type: OpenDirType, path?: string): Promise<void>;
+
+    /**
+     * 自动启动，静默启动
+     */
+    setAutoLaunch: (autoLaunch: boolean) => Promise<void>;
+
+    /**
+     * 打开外部链接
+     */
+    openExternalUrl: (url: string) => Promise<void>;
+
+    /**
+     * 关闭设置窗口
+     */
+    closeSettingsWindow: () => Promise<void>;
+
+    /**
+     * 获取唯一机器码
+     * @returns 机器码(原始，未被hash)
+     */
+    getMachineId: () => Promise<string>;
+
+    /**
+     * 验证许可证
+     */
+    verifyLicense: () => Promise<boolean>;
+
+    /**
+     * 导出 Markdown
+     */
+    saveMarkdown: (content: string, name?: string) => Promise<{ success: boolean, message?: string, filePath?: string }>;
+
+    onLanguageChanged(callback: (language: string) => void): void; // 語言更改監聽
 }
 
 

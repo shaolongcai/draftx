@@ -66,10 +66,29 @@ if not exist "node_modules" (
 REM 返回根目录
 popd
 
+pushd "mcp-server"
+if not exist "node_modules" (
+    %log_info% Installing MCP server dependencies...
+    call npm install
+    if %errorlevel% neq 0 (
+        %log_error% Failed to install MCP server dependencies
+        popd
+        pause
+        exit /b 1
+    )
+) else (
+    %log_info% MCP server dependencies already installed
+)
+popd
+
 REM --- 清理之前编译的后端文件 ---
 if exist "dist" (
     %log_info% Cleaning previously compiled backend...
     rmdir /s /q "dist"
+)
+if exist "mcp-server\dist" (
+    %log_info% Cleaning previously compiled MCP server...
+    rmdir /s /q "mcp-server\dist"
 )
 
 REM --- 编译TypeScript文件 ---
@@ -79,7 +98,7 @@ REM REM 检查 npx 是否可用
 call npx --version >nul 2>&1
 if %errorlevel% equ 0 (
     REM 检查是否有 TypeScript 文件
-    dir "src\*.ts" >nul 2>&1
+    dir /s /b "src\*.ts" >nul 2>&1
     if %errorlevel% equ 0 (
         %log_info% Found TypeScript files, compiling with tsconfig.json...
         call npx tsc
@@ -90,6 +109,16 @@ if %errorlevel% equ 0 (
         )
         
         %log_success% TypeScript compilation completed
+
+        %log_info% Building MCP server...
+        call npm run build:mcp
+        if %errorlevel% neq 0 (
+            %log_error% Failed to build MCP server
+            pause
+            exit /b 1
+        )
+
+        %log_success% MCP server build completed
         
         REM --- 重新編譯 native 模塊 ---
         %log_info% Rebuilding native modules for Electron...

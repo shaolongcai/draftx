@@ -1,0 +1,23 @@
+{
+    "navDraftBack": {
+        "mac": "عودة للمسودة السابقة ( ⌘ + [ )",
+        "win": "عودة للمسودة السابقة ( Alt + [ )"
+    },
+    "navDraftForward": {
+        "mac": "ذهاب للمسودة التالية ( ⌘ + ] )",
+        "win": "ذهاب للمسودة التالية ( Alt + ] )"
+    },
+    "addDraft": {
+        "mac": "إضافة مسودة جديدة ( ⌘ + N )",
+        "win": "إضافة مسودة جديدة ( Alt + N )"
+    },
+    "showAllDrafts": "إظهار كل المسودات",
+    "backDraft": "عودة للمسودة",
+    "chatAI": {
+        "mac": "دردشة مع AI ( ⌥ + C )",
+        "win": "دردشة مع AI ( Alt + C )"
+    },
+    "exportMarkdown": "تصدير كـ Markdown",
+    "downloading": "جاري التنزيل...",
+    "updateAvailable": "تحديث متاح"
+}

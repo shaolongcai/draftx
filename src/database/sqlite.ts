@@ -3,7 +3,7 @@ import pathConfig from '../core/pathConfigs.js'
 import path from 'path'
 import { logger } from '../core/logger.js'
 // import { pinyin } from "pinyin-pro";
-import { createConfigDb, createStickysDb, createStickysFtsDb } from './schrma.js'
+import { createAIToolsDb, createConfigDb, createStickysDb, createStickysFtsDb } from './schrma.js'
 
 let db: Database.Database | null = null
 
@@ -33,15 +33,20 @@ export function initializeDatabase(): Database.Database {
         } catch (error) {
             logger.error(`创建表失败: ${JSON.stringify(error)}`)
         }
-        try {
-            createStickysFtsDb(db)
-        } catch (error) {
-            logger.error(`FTS表创建失败: ${JSON.stringify(error)}`)
-        }
+        // try {
+        //     createStickysFtsDb(db)
+        // } catch (error) {
+        //     logger.error(`FTS表创建失败: ${JSON.stringify(error)}`)
+        // }
         try {
             createConfigDb(db)
         } catch (error) {
-            logger.error(`创建表失败3: ${JSON.stringify(error)}`)
+            logger.error(`创建用户配置表失败或跳过: ${JSON.stringify(error)}`)
+        }
+        try {
+            createAIToolsDb(db)
+        } catch (error) {
+            logger.error(`创建表失败4: ${JSON.stringify(error)}`)
         }
 
         // 添加新的字段
@@ -66,30 +71,54 @@ export function initializeDatabase(): Database.Database {
 }
 
 
+// 根据类型转换值
+const convertValue = (value: string, type: string): any => {
+    switch (type) {
+        case 'number':
+            return Number(value)
+        case 'boolean':
+            return value === 'true'
+        case 'json':
+            return JSON.parse(value)
+        default:
+            return value
+    }
+}
 /**
  * 获取配置值
  * @param key 配置键名
- * @returns 配置值，如果不存在返回null
+ * @returns 配置值，根据类型会自动转换为对应类型
  */
-export function getConfig(key: ConfigName | string): any {
+export function getConfig(key?: ConfigName): UserConfig | string | boolean | number | null {
     try {
         const db = getDatabase()
-        const stmt = db.prepare('SELECT config_value, config_type FROM user_config WHERE config_key = ?')
-        const result = stmt.get(key) as { config_value: string; config_type: string } | undefined
+        let result: any | undefined
+        let stmt: Database.Statement | undefined
+        // 若没传入key,则返回所有配置
+        if (!key) {
+            stmt = db.prepare('SELECT config_key, config_value, config_type FROM user_config')
+            result = stmt.all() as Array<{ config_key: string; config_value: string; config_type: string }>
+        }
+        else {
+            stmt = db.prepare('SELECT config_value, config_type FROM user_config WHERE config_key = ?')
+            result = stmt.get(key) as { config_value: string; config_type: string } | undefined
+        }
 
         if (!result) return null
 
-        // 根据类型转换值
-        switch (result.config_type) {
-            case 'number':
-                return Number(result.config_value)
-            case 'boolean':
-                return result.config_value === 'true'
-            case 'json':
-                return JSON.parse(result.config_value)
-            default:
-                return result.config_value
+
+        // 若result 是数组
+        if (Array.isArray(result)) {
+            const config: UserConfig = {} as UserConfig
+            result.forEach(item => {
+                config[item.config_key] = convertValue(item.config_value, item.config_type)
+            })
+            return config
         }
+        else {
+            return convertValue(result.config_value, result.config_type) //直接返回值
+        }
+
     } catch (error) {
         logger.error(`获取配置失败: ${key}, ${error}`)
         return null
@@ -102,10 +131,10 @@ export function getConfig(key: ConfigName | string): any {
  * @param value 配置值
  * @param type 数据类型
  */
-export function setConfig(key: string, value: any, type: 'boolean' | 'string' | 'number' | 'json'  = 'string'): boolean {
+export function setConfig(key: ConfigName, value: any, type: 'boolean' | 'string' | 'number' | 'json' = 'string'): boolean {
     try {
         const db = getDatabase()
-        let configValue: string
+        let configValue: string // 建表的时候这个值就是字符串
 
         // 根据类型转换值为字符串
         switch (type) {
@@ -128,37 +157,6 @@ export function setConfig(key: string, value: any, type: 'boolean' | 'string' | 
     }
 }
 
-/**
- * 获取所有配置
- */
-export function getAllConfigs(): Record<string, any> {
-    try {
-        const db = getDatabase()
-        const stmt = db.prepare('SELECT config_key, config_value, config_type FROM user_config')
-        const results = stmt.all() as Array<{ config_key: string; config_value: string; config_type: string }>
-
-        const configs: Record<string, any> = {}
-        results.forEach(row => {
-            switch (row.config_type) {
-                case 'number':
-                    configs[row.config_key] = Number(row.config_value)
-                    break
-                case 'boolean':
-                    configs[row.config_key] = row.config_value === 'true'
-                    break
-                case 'json':
-                    configs[row.config_key] = JSON.parse(row.config_value)
-                    break
-                default:
-                    configs[row.config_key] = row.config_value
-            }
-        })
-        return configs
-    } catch (error) {
-        logger.error(`获取所有配置失败: ${error}`)
-        return {}
-    }
-}
 
 
 /**

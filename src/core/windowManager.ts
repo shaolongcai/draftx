@@ -19,6 +19,7 @@ class WindowManager {
     // 这里应该要私有化，提供get方法，暂时公开
     public mainWindow: BrowserWindow; //search 窗口
     public settingsWindow: BrowserWindow; //settings 窗口
+    public isQuitting: boolean = false; // 是否正在退出
 
 
     private constructor() {
@@ -36,22 +37,26 @@ class WindowManager {
     // 初始化main窗口
     private initMainWindow() {
         this.mainWindow = new BrowserWindow({
-            width: 512,
-            height: 700,
+            width: 460,
+            height: 500,
+            minWidth: 360,
+            minHeight: 360,
             x: 0,               // 后面会计算居中
             y: 0,
-            frame: false,       // 无边框
-            resizable: false,
+            frame: true,       // 有无边框
+            resizable: true, // 是否可调整大小
             movable: true,
             alwaysOnTop: true,  // 总在最前
             skipTaskbar: true,  // 不占用任务栏
             show: false,        // 先不显示
-            transparent: true,
-            backgroundColor: '#00000000',
-            // backgroundColor: '#E92828',
-
+            // transparent: true,
+            // backgroundColor: '#00000000',
+            roundedCorners: true,
+            hasShadow: true,
+            backgroundColor: '#F9F3E5',
             // vibrancy: 'under-window', // macOS 模糊效果，增强边框层次
-            // titleBarStyle: 'hidden', // 隐藏原生标题栏，保留边框
+            titleBarStyle: process.platform === 'darwin' ? 'customButtonsOnHover' : 'hidden', // 隐藏原生标题栏，保留边框
+            // titleBarStyle: 'hiddenInset',
             webPreferences: {
                 preload: path.join(__dirname, '../main/preload.js'),
                 nodeIntegration: false,
@@ -78,23 +83,36 @@ class WindowManager {
                 }
             }
         });
+
+        // 拦截关闭事件：如果是Cmd+W或点击关闭按钮，只隐藏窗口而不销毁
+        this.mainWindow.on('close', (event) => {
+            if (!this.isQuitting) {
+                event.preventDefault();
+                this.mainWindow.hide();
+            }
+        });
     }
 
     // 初始化settings窗口
     private initSettingsWindow() {
         this.settingsWindow = new BrowserWindow({
-            width: 480,
+            width: 512,
             height: 700,
+            minWidth: 360,
+            minHeight: 360,
             x: 0,               // 后面会计算居中
             y: 0,
-            frame: false,       // 无边框
-            resizable: false,
+            frame: true,       // 无边框
+            resizable: true,
             movable: true,
             alwaysOnTop: true,  // 总在最前
             skipTaskbar: true,  // 不占用任务栏
             show: false,        // 先不显示
-            transparent: true,
-            backgroundColor: '#00000000',
+            roundedCorners: true,
+            hasShadow: true,
+            backgroundColor: '#F9F3E5',
+            transparent: false,
+            titleBarStyle: process.platform === 'darwin' ? 'customButtonsOnHover' : 'hidden', // 隐藏原生标题栏，保留边框
             // backgroundColor: '#E92828', //测试大小专用色
             webPreferences: {
                 preload: path.join(__dirname, '../main/preload.js'),
@@ -104,6 +122,14 @@ class WindowManager {
         });
 
         this.settingsWindow.webContents.on('before-input-event', this.disableDevTools);
+
+        // 拦截关闭事件 （是为了防止mac os concrlt+w 直接关闭）
+        this.settingsWindow.on('close', (event) => {
+            if (!this.isQuitting) {
+                event.preventDefault();
+                this.settingsWindow.hide();
+            }
+        });
     }
 
     // 返回实例
@@ -118,14 +144,14 @@ class WindowManager {
     private loadWindows() {
         if (isDev) {
             this.mainWindow.loadURL('http://localhost:5173');   // 加载搜索条HTML
-            // this.settingsWindow.loadURL('http://localhost:5173/setting.html');   // 加载设置条HTML
+            this.settingsWindow.loadURL('http://localhost:5173/setting.html');   // 加载设置条HTML
             this.mainWindow.webContents.openDevTools(); //打开开发者工具        
-            // this.settingsWindow.webContents.openDevTools(); //打开开发者工具
+            this.settingsWindow.webContents.openDevTools(); //打开开发者工具
         } else {
             // 获取应用根目录
             const appPath = app.getAppPath();
             const mainPath = path.join(appPath, 'frontend/dist/index.html');
-            // const settingPath = path.join(__dirname, '../frontend/dist/setting.html');
+            const settingPath = path.join(appPath, 'frontend/dist/setting.html');
 
             // 檢查文件是否存在
             if (!existsSync(mainPath)) {
@@ -135,13 +161,13 @@ class WindowManager {
                     logger.error(`加載主窗口文件失敗: ${error}`);
                 });
             }
-            // if (!existsSync(settingPath)) {
-            //     logger.error(`設置窗口文件不存在: ${settingPath}`);
-            // } else {
-            //     this.settingsWindow.loadFile(settingPath).catch((error) => {
-            //         logger.error(`加載設置窗口文件失敗: ${error}`);
-            //     });
-            // }
+            if (!existsSync(settingPath)) {
+                logger.error(`設置窗口文件不存在: ${settingPath}`);
+            } else {
+                this.settingsWindow.loadFile(settingPath).catch((error) => {
+                    logger.error(`加載設置窗口文件失敗: ${error}`);
+                });
+            }
         }
 
         // 當搜索框失去焦點時自動隱藏（開發模式下禁用，避免與開發者工具衝突）
@@ -152,6 +178,16 @@ class WindowManager {
         //     }
         //   });
         // }
+    }
+
+    // 设置窗口背景颜色
+    public setBackgroundColor(color: string) {
+        if (this.mainWindow && !this.mainWindow.isDestroyed()) {
+            this.mainWindow.setBackgroundColor(color);
+        }
+        if (this.settingsWindow && !this.settingsWindow.isDestroyed()) {
+            this.settingsWindow.setBackgroundColor(color);
+        }
     }
 
     // 计算屏幕居中
@@ -186,16 +222,6 @@ class WindowManager {
         if (input.control && input.shift && input.key.toLowerCase() === 'c') {
             event.preventDefault();
         }
-    }
-
-    // 变更窗口大小
-    public resizeWindow(size: { width: number, height: number }) {
-        if (!size.height || !size.width) return;
-        // 暂时固定窗口伸展大小
-        this.mainWindow.setBounds({
-            width: size.width + 8,
-            height: size.height + 8 || this.mainWindow.getBounds().height + 8
-        });
     }
 
     destroy() {

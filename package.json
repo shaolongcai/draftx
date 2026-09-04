@@ -1,10 +1,12 @@
 {
-  "name": "osticky",
+  "name": "draftx",
   "type": "module",
-  "version": "0.3.0",
+  "version": "1.5.0",
   "description": "Electron app with React frontend and Node.js backend",
   "main": "dist/main/main.js",
   "scripts": {
+    "compile": "tsc -b",
+    "obfuscate": "javascript-obfuscator ./dist --output ./dist --compact true --self-defending true --disable-console-output true --dead-code-injection true --string-array true --string-array-rotate true --string-array-shuffle true",
     "electron": "electron .",
     "electron:dev": "concurrently \"npm run frontend:dev\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .\"",
     "frontend:dev": "cd frontend && npm run dev",
@@ -12,7 +14,10 @@
     "make": "electron-forge make",
     "start": "electron-forge start",
     "package": "electron-forge package",
-    "build:win": "electron-builder --win --x64"
+    "build:mcp": "npm --prefix mcp-server run build",
+    "build:main": "npm run compile && npm run obfuscate",
+    "build:mac": "npm run build:mcp && npm run build:main && electron-builder --mac",
+    "build:win": "npm run build:mcp && electron-builder --win --x64"
   },
   "devDependencies": {
     "@types/node": "^24.3.1",
@@ -21,21 +26,26 @@
     "electron": "^38.0.0",
     "electron-builder": "^26.0.12",
     "electron-rebuild": "^3.2.9",
+    "javascript-obfuscator": "^5.1.0",
     "rimraf": "^5.0.0",
     "typescript": "^5.0.0",
     "wait-on": "^9.0.3"
   },
   "dependencies": {
+    "axios": "^1.13.4",
     "better-sqlite3": "^12.5.0",
     "dayjs": "^1.11.19",
+    "electron-updater": "^6.7.3",
+    "node-machine-id": "^1.1.12",
+    "ollama": "^0.6.3",
     "sqlite3": "^5.1.6"
   },
   "build": {
     "electronDownload": {
       "mirror": "https://npmmirror.com/mirrors/electron/"
     },
-    "appId": "com.osticky.app",
-    "productName": "OSticky",
+    "appId": "com.draftx.app",
+    "productName": "DraftX",
     "files": [
       "!*.traineddata",
       "dist/**/*",
@@ -52,9 +62,31 @@
       "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
       "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
       "!**/{appveyor.yml,.travis.yml,circle.yml}",
-      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
+      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}",
+      "!scripts/**/*"
     ],
-    "extraResources": [],
+    "extraResources": [
+      {
+        "from": "resources/license-public.pem",
+        "to": "license-public.pem"
+      },
+      {
+        "from": "resources/app-update.yml",
+        "to": "app-update.yml"
+      },
+      {
+        "from": "mcp-server/package.json",
+        "to": "mcp-server/package.json"
+      },
+      {
+        "from": "mcp-server/dist",
+        "to": "mcp-server/dist"
+      },
+      {
+        "from": "mcp-server/node_modules",
+        "to": "mcp-server/node_modules"
+      }
+    ],
     "directories": {
       "output": "out"
     },
@@ -82,12 +114,14 @@
           ]
         }
       ],
-      "icon": "./dist-electron/resources/assets/icon.icns",
+      "icon": "./electron/resources/assets/icon.icns",
       "category": "public.app-category.utilities",
       "entitlements": "build/entitlements.mac.plist",
       "entitlementsInherit": "build/entitlements.mac.plist",
       "hardenedRuntime": true,
-      "gatekeeperAssess": false
+      "gatekeeperAssess": false,
+      "identity": "Zhongshan Wugui Kuaipao Technology Co., Ltd (BVCT4B89P3)",
+      "provisioningProfile": null
     },
     "nsis": {
       "oneClick": false,
@@ -95,7 +129,7 @@
       "allowElevation": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "OSticky",
+      "shortcutName": "DraftX",
       "installerIcon": "./electron/resources/assets/logo-256.ico",
       "uninstallerIcon": "./electron/resources/assets/logo-256.ico",
       "installerHeaderIcon": "./electron/resources/assets/logo-256.ico",

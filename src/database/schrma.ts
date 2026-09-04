@@ -15,6 +15,7 @@ export const createStickysDb = (db: Database) => {
               uuid TEXT UNIQUE,
               title TEXT,
               content TEXT NOT NULL,
+              content_json TEXT NOT NULL,
               created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
               modified_at DATETIME DEFAULT CURRENT_TIMESTAMP,
               deleted_at DATETIME ,
@@ -100,5 +101,24 @@ export const createConfigDb = (db: Database) => {
               updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );
             CREATE UNIQUE INDEX IF NOT EXISTS idx_config_key ON user_config (config_key);
+          `)
+}
+
+
+/**
+ * 创建AI工具表
+ * 存储用户自定义的AI工具配置
+ * @param db 
+ */
+export const createAIToolsDb = (db: Database) => {
+  db.exec(`
+            CREATE TABLE IF NOT EXISTS ai_tools (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              name TEXT NOT NULL,
+              prompt TEXT NOT NULL,
+              emoji TEXT,
+              created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+              updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
           `)
 }

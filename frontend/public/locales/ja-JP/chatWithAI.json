@@ -1,0 +1,13 @@
+{
+    "placeholder": "Enterキーで送信",
+    "chip": {
+        "withDraft": "下書きを使用して生成",
+        "freedom": "自由入力"
+    },
+    "close": {
+        "mac": "チャットを閉じる ( ⌘ + C )",
+        "win": "チャットを閉じる ( Alt + C )"
+    },
+    "configureTips": "設定でAIプロバイダーを構成してください。",
+    "Generating": "AI生成中..."
+}

@@ -1,9 +1,7 @@
-import { Box, Card, Stack, Tooltip, Typography } from "@mui/material"
-
+import { Box, useTheme } from "@mui/material"
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { CodeHighlightPlugin } from '@/plugin/CodeHighlightPlugin';
 import { CodeActionPlugin } from '@/plugin/CodeActionPlugin';
-import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
@@ -12,17 +10,13 @@ import { MarkdownShortcutPlugin } from "@/plugin/MarkdownShortcutPlugin";
 import { MarkdownPastePlugin } from "@/plugin/MarkdownPastePlugin";
 import { TableKeyboardPlugin } from "@/plugin/TableKeyboardPlugin";
 import { MermaidPlugin } from "@/plugin/MermaidPlugin";
-import { mermaidNode } from "@/nodes/MermaidNode";
-import { ListItemNode, ListNode } from '@lexical/list';
-import { AutoLinkNode, LinkNode } from '@lexical/link';
-import { HeadingNode, QuoteNode } from '@lexical/rich-text';
-import { CodeHighlightNode, CodeNode } from '@lexical/code';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
-import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
+import { HorizontalRuleNode } from '@/nodes/HorizontalRuleNode';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
-import { $createParagraphNode, $getRoot, $getSelection, $isRangeSelection, COMMAND_PRIORITY_CRITICAL, type EditorThemeClasses, PASTE_COMMAND } from 'lexical';
+import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
+import { $createParagraphNode, $getRoot } from 'lexical';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { useEffect, useRef, useState } from "react";
 import { useDebounceFn, useKeyPress, useUpdateEffect } from "ahooks";
@@ -30,86 +24,44 @@ import { v4 as uuidv4 } from 'uuid';
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useNotifications } from "@toolpad/core/useNotifications";
 import { useEvent } from "@/contexts/EvenContext";
-import { HelpOutline } from "@mui/icons-material";
-import dayjs from "dayjs";
-import { $convertFromMarkdownString, TRANSFORMERS } from "@lexical/markdown";
+import { $convertFromMarkdownString, $convertToMarkdownString, TRANSFORMERS } from "@lexical/markdown";
+import { CUSTOM_TRANSFORMERS } from "@/utils/transformers";
+import TabFocusPlugin from '@/plugin/TabFocusPlugin';
+import PickerPlugin from "@/plugin/PickerPlugin";
+import { MathPlugin } from "@/plugin/MathPlugin";
+import { AutoPastePlugin } from "@/plugin/AutoPastePlugin";
+import { BlockTipPlugin } from "@/plugin/BlockTipPlugin";
+import { ConfigParams } from "@/type/electron";
+import { historyStack } from "@/utils/histroyStack";
+import RandomPlugin from "@/plugin/RandomPlugin";
+import { CalculatePlugin } from "@/plugin/CalculatePlugin";
+import { UnitConversionPlugin } from "@/plugin/UnitConversionPlugin";
+import { CurrencyConversionPlugin } from "@/plugin/CurrencyConversionPlugin";
+import { StatisticsPlugin } from "@/plugin/StatisticsPlugin";
+import { $isHeadingNode } from "@lexical/rich-text";
+import { RequestPlugin } from "@/plugin/RequestPlugin";
+import { useTranslation } from "@/contexts/I18nContext";
+import ImagesPlugin from "@/plugin/ImagesPlugin";
 
-const theme: EditorThemeClasses = {
-    paragraph: 'editor-paragraph',
-    heading: {
-        h1: 'editor-h1',
-        h2: 'editor-h2',
-        h3: 'editor-h3',
-    },
-    quote: 'editor-quote',
-    code: 'editor-code',
-    text: {
-        code: 'editor-text-code',
-        bold: 'editor-text-bold',
-    },
-    codeHighlight: {
-        atrule: 'editor-tokenAttr',
-        attr: 'editor-tokenAttr',
-        boolean: 'editor-tokenProperty',
-        builtin: 'editor-tokenSelector',
-        cdata: 'editor-tokenComment',
-        char: 'editor-tokenSelector',
-        class: 'editor-tokenFunction',
-        'class-name': 'editor-tokenFunction',
-        comment: 'editor-tokenComment',
-        constant: 'editor-tokenProperty',
-        deleted: 'editor-tokenProperty',
-        doctype: 'editor-tokenComment',
-        entity: 'editor-tokenOperator',
-        function: 'editor-tokenFunction',
-        important: 'editor-tokenVariable',
-        inserted: 'editor-tokenSelector',
-        keyword: 'editor-tokenAttr',
-        namespace: 'editor-tokenVariable',
-        number: 'editor-tokenProperty',
-        operator: 'editor-tokenOperator',
-        prolog: 'editor-tokenComment',
-        property: 'editor-tokenProperty',
-        punctuation: 'editor-tokenPunctuation',
-        regex: 'editor-tokenVariable',
-        selector: 'editor-tokenSelector',
-        string: 'editor-tokenSelector',
-        symbol: 'editor-tokenProperty',
-        tag: 'editor-tokenProperty',
-        url: 'editor-tokenOperator',
-        variable: 'editor-tokenVariable',
-    },
-    list: {
-        nested: {
-            listitem: 'editor-nested-listitem',
-        },
-        ol: 'editor-list-ol',
-        listitemChecked: 'editor-listItemChecked',
-        listitemUnchecked: 'editor-listItemUnchecked',
-        olDepth: [
-            'editor-list-oll1',
-            'editor-list-ol2',
-            'editor-list-ol3',
-            'editor-list-ol4',
-            'editor-list-ol5',
-        ],
-        ulDepth: [
-            'editor-list-ul1',
-            'editor-list-ul2',
-            'editor-list-ul3',
-            'editor-list-ul4',
-            'editor-list-ul5',
-        ],
-    },
-    table: 'editor-table',
-    tableCell: 'editor-tableCell',
-    tableCellHeader: 'editor-tableCellHeader',
-    tableCellSelected: 'editor-tableCellSelected',
-    tableSelection: 'editor-tableSelection',
 
-}
 
-function Placeholder() {
+
+/**
+ * 内容编辑器
+ */
+const EditorContext: React.FC = () => {
+
+    const [currentUuid, setCurrentUuid] = useState<string>('');
+    const lastSavedRef = useRef<{ title?: string; contentJson: string; contentText: string }>({ contentJson: '', contentText: '' }); // 上次已保存
+
+    const theme = useTheme()
+    const notification = useNotifications();
+    const [editor] = useLexicalComposerContext()
+    const { loadStickys$, handleOnclickTool$ } = useEvent();
+    const { t, isLoading } = useTranslation()
+    const isMac = window.electronUtils?.platform === 'darwin' || /macintosh|mac os x/i.test(navigator.userAgent); //考虑放到context中
+
+    function Placeholder() {
     return <Box sx={{
         color: '#ccc',
         // overflow: 'hidden',
@@ -119,75 +71,73 @@ function Placeholder() {
         userSelect: 'none',
         display: 'inline-block',
         pointerEvents: 'none',
-    }}>支持markdown格式输入...</Box>;
+    }}>{t('app.edit.placeholder')}</Box>;
 }
 
-
-interface EditorContextProps {
-    getDeleteDay: (date: string) => void;
-}
-/**
- * 内容编辑器
- */
-const EditorContext: React.FC<EditorContextProps> = ({
-    getDeleteDay,
-}) => {
-
-    const [currentUuid, setCurrentUuid] = useState<string>('');
-    const lastSavedRef = useRef<{ title?: string; contentJson: string; contentText: string }>({ contentJson: '', contentText: '' }); // 上次已保存
-
-    const [editor] = useLexicalComposerContext()
-    const { loadStickys$ } = useEvent();
-    const notification = useNotifications();
-
-
-
-    // 监听粘贴事件
-    // useEffect(() => {
-    //     return editor.registerCommand(
-    //         PASTE_COMMAND,
-    //         (event: ClipboardEvent) => {
-    //             event.preventDefault(); // 阻止默认行为
-    //             event.stopPropagation();
-    //             const pastedText = event.clipboardData?.getData('text');
-    //             console.log('粘贴文本', pastedText);
-
-    //             // 手动插入到编辑器
-    //             if (pastedText) {
-    //                 editor.update(() => {
-    //                     // 获取当前选择范围
-    //                     const selection = $getSelection();
-    //                     if ($isRangeSelection(selection)) {
-    //                         const { anchor, focus } = selection;
-    //                         // 获取光标位置
-    //                         const cursorNode = anchor.getNode();
-    //                         // 在selection后面创建新段落
-    //                         const temp = $createParagraphNode();
-    //                         // 光标位置插入temp
-    //                         cursorNode.insertAfter(temp);
-    //                         temp.selectEnd();
-    //                         $convertFromMarkdownString(pastedText, TRANSFORMERS, temp);
-    //                     }
-    //                 });
-    //             }
-    //             return true; // 📌 关键：命令已消费，让后面的插件不再触发
-    //         },
-    //         COMMAND_PRIORITY_CRITICAL // 最高优先级
-    //     )
-    // }, [editor]);
-
-
-
-    // 初始化uuid
+    // 初始化
     useEffect(() => {
-        setCurrentUuid(uuidv4());
+        const init = async () => {
+            // 获取当前草稿uuid
+            const uuid = await window.electronAPI.getConfig('currentUuid');
+            if (uuid) {
+                // 读取草稿
+                const draft = await window.electronAPI.getDraftByUuid(uuid)
+                console.log('读取缓存草稿', draft);
+                if (draft) {
+                    setCurrentUuid(uuid);
+                    // 解析草稿内容
+                    const initialEditorState = editor.parseEditorState(draft.content_json);
+                    editor.setEditorState(initialEditorState);
+                    // 记录该草稿到草稿历史
+                    historyStack.push(uuid);
+                    return
+                }
+            }
+            // 当前没有草稿，则生成新的uuid
+            const newUuid = uuidv4();
+            setCurrentUuid(newUuid);
+            window.electronAPI.setConfig({ key: 'currentUuid', value: newUuid, type: 'string' });
+        }
+        init()
+        getGuideMemo();
+        getUpdateDraft();
     }, []);
+
+    // 监听点击新建草稿
+    handleOnclickTool$.useSubscription((tool) => {
+        if (tool === 'addDraft') {
+            addNewDraft();
+        } else if (tool === 'exportMarkdown') {
+            exportMarkdown();
+        }
+    })
+
+    // 导出 Markdown
+    const exportMarkdown = () => {
+        editor.read(() => {
+            const markdown = $convertToMarkdownString(CUSTOM_TRANSFORMERS);
+            window.electronAPI.saveMarkdown(markdown, lastSavedRef.current?.title).then(res => {
+                if (res.success) {
+                    notification.show('Export successful', {
+                        severity: 'success',
+                    });
+                } else if (res.message !== 'Canceled') {
+                    notification.show(res.message || 'Export failed', {
+                        severity: 'error',
+                    });
+                }
+            });
+        });
+    }
 
     // 监听加载新的便利贴
     loadStickys$.useSubscription((sticky) => {
-        // 新增天数
-        window.electronAPI.addDeleteDay(sticky.id);
-        getDeleteDay(sticky.deleted_at)
+        console.log('加载新的便利贴', sticky);
+        // 刷新删除天数
+        window.electronAPI.refreshDeleteDay(sticky.id);
+        window.electronAPI.setConfig({ key: 'currentUuid', value: sticky.uuid, type: 'string' });
+        // 压栈
+        historyStack.push(sticky.uuid);
         // 清空编辑器内容
         editor.update(() => {
             const root = $getRoot();
@@ -197,8 +147,7 @@ const EditorContext: React.FC<EditorContextProps> = ({
                 // 创建root
                 const root = $getRoot();
                 root.append($createParagraphNode());
-                // console.log('插入新内容', sticky);
-                const initialEditorState = editor.parseEditorState(sticky.content_string);
+                const initialEditorState = editor.parseEditorState(sticky.content_json);
                 editor.setEditorState(initialEditorState);
                 setCurrentUuid(sticky.uuid);
             } catch (error) {
@@ -208,13 +157,101 @@ const EditorContext: React.FC<EditorContextProps> = ({
         });
     })
 
+    // 决定展示guide的meomo，还是初始化uuid;由于setData 异步，所以这里需要直接传入实例
+    const getGuideMemo = async () => {
+        // 是否完成引导
+        const isFinishGuide = await window.electronAPI.getConfig('isFinishGuide')
+        if (!isFinishGuide) {
+            //展示引导memo
+            const guideMemo = await window.electronAPI.getDraftByUuid('guide');
+            // 压栈
+            historyStack.push(guideMemo.uuid);
+            editor.update(() => {
+                const root = $getRoot();
+                root.clear();
+                // 创建root
+                root.append($createParagraphNode());
+                const initialEditorState = editor.parseEditorState(guideMemo.content_json);
+                editor.setEditorState(initialEditorState);
+            })
+
+            setCurrentUuid(guideMemo.uuid)
+            // 设置为已引导
+            const configParams: ConfigParams = {
+                key: 'isFinishGuide',
+                value: true,
+                type: 'boolean'
+            }
+            window.electronAPI.setConfig(configParams)
+            window.electronAPI.setConfig({ key: 'currentUuid', value: guideMemo.uuid, type: 'string' });
+        }
+    }
+
+
+    // 决定展示update的草稿，还是初始化uuid;由于setData 异步，所以这里需要直接传入实例
+    const getUpdateDraft = async () => {
+        // 通过将更新后的版本号与数据库版本号（之前的版本作对比）
+        const currentVesion = await window.electronAPI.getAppVersion();
+        console.log('当前版本', currentVesion);
+        const oldVersion = await window.electronAPI.getConfig('version') as string;
+        // 如果数据库没版本号，则代表新用户
+        if (!oldVersion) {
+            // 初始化版本号
+            window.electronAPI.setConfig({ key: 'version', value: currentVesion, type: 'string' });
+            return;
+        }
+        if (currentVesion !== oldVersion) {
+            //展示更新memo
+            const updateMemo = await window.electronAPI.getDraftByUuid('update');
+            // 压栈
+            historyStack.push(updateMemo.uuid);
+            editor.update(() => {
+                const root = $getRoot();
+                root.clear();
+                // 创建root
+                root.append($createParagraphNode());
+                const initialEditorState = editor.parseEditorState(updateMemo.content_json);
+                editor.setEditorState(initialEditorState);
+            })
+
+            setCurrentUuid(updateMemo.uuid)
+            // 设置当前版本号覆盖数据库版本号
+            const configParams: ConfigParams = {
+                key: 'version',
+                value: currentVesion,
+                type: 'string'
+            }
+            window.electronAPI.setConfig(configParams)
+            window.electronAPI.setConfig({ key: 'currentUuid', value: updateMemo.uuid, type: 'string' });
+        }
+    }
+
+    // 新建草稿
+    const addNewDraft = () => {
+        const uuid = uuidv4();
+        // 添加到历史堆栈
+        historyStack.push(uuid);
+        // 保存现在的内容
+        scheduleSave(lastSavedRef.current);
+        window.electronAPI.setConfig({ key: 'currentUuid', value: uuid, type: 'string' });
+        setCurrentUuid(uuid);
+        // 清空编辑器内容
+        editor.update(() => {
+            const root = $getRoot();
+            root.clear();
+        });
+
+        notification.show('The previous draft has been saved', {
+            severity: 'success',
+        });
+    }
+
     // 防抖保存
-    const AUTOSAVE_WAIT_MS = 1000;
+    const AUTOSAVE_WAIT_MS = 200;
     const { run: scheduleSave } = useDebounceFn(
         async (payload: { title?: string; contentJson: string; contentText: string }) => {
-
             // 内容为空则跳过
-            if (!payload.contentText) return;
+            // if (!payload.contentText) return;
             // 若无变更则跳过
             if (payload.contentJson === lastSavedRef.current.contentJson) return
             try {
@@ -222,9 +259,9 @@ const EditorContext: React.FC<EditorContextProps> = ({
                     uuid: currentUuid,
                     title: payload.title,
                     content: payload.contentText,
+                    contentJson: payload.contentJson, // 这里已经是字符串化
                 });
                 lastSavedRef.current = payload;
-                // console.log('已自动保存', payload);
                 // 如需提示可开启：message.success('已自动保存');
             } catch (error) {
                 const msg = error instanceof Error ? error.message : '保存失败';
@@ -235,42 +272,39 @@ const EditorContext: React.FC<EditorContextProps> = ({
     );
 
     // 注册Shitf+A 新建便利贴
-    useKeyPress('shift.enter', () => {
-        scheduleSave(lastSavedRef.current);
-        setCurrentUuid(uuidv4());
-        // 清空编辑器内容
-        editor.update(() => {
-            const root = $getRoot();
-            root.clear();
-        });
-
-        notification.show('The sticky has been saved', {
-            severity: 'success',
-        });
+    useKeyPress(isMac ? 'meta.n' : 'alt.n', () => {
+        addNewDraft();
     })
 
-    return <div className="scrollbar-thin!">
+
+    return <div className="scrollbar-thin!  rounded-xl h-full font-mono  leading-relaxed " 
+    style={{
+        color:theme.palette.text.primary,
+    }}>
         <RichTextPlugin
             contentEditable={
-                <ContentEditable style={{
-                    maxHeight: '600px',
-                    minHeight: '240px',
-                    overflow: 'auto',
-                    outline: 'none',
-                    boxSizing: 'border-box',
-                    scrollbarColor: 'rgba(0, 0, 0, 0.5) transparent',
-                    scrollbarWidth: 'none',
-                    paddingBottom: '40px', // 增加底部內邊距，方便點擊跳出代碼塊
-                    // scrollbarColor: '#888 #f1f1f1',
-                }} />
+                <ContentEditable
+                    spellCheck={false}
+                    style={{
+                        width: '100%',
+                        maxHeight: 'calc(100vh - 64px)',
+                        minHeight: '240px',
+                        overflow: 'auto',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                        scrollbarColor: 'rgba(0, 0, 0, 0.5) transparent',
+                        scrollbarWidth: 'none',
+                        paddingBottom: '40px', // 增加底部內邊距，方便點擊跳出代碼塊
+                        // scrollbarColor: '#888 #f1f1f1',
+                    }} />
             }
             ErrorBoundary={LexicalErrorBoundary}
             placeholder={Placeholder}
         />
         <HistoryPlugin />
         <AutoFocusPlugin />
-        <ListPlugin />
         <TabIndentationPlugin />
+        <ListPlugin hasStrictIndent={false} />
         <TablePlugin />
         <TableKeyboardPlugin />
         <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
@@ -278,85 +312,39 @@ const EditorContext: React.FC<EditorContextProps> = ({
         <CodeHighlightPlugin />
         <CodeActionPlugin />
         <MermaidPlugin />
+        <ImagesPlugin />
+        <PickerPlugin />
+        {/* <AiPickerPlugin /> */}
+        <CalculatePlugin />
+        <UnitConversionPlugin />
+        <CurrencyConversionPlugin />
+        <StatisticsPlugin />
+        <RequestPlugin />
+        <RandomPlugin />
+        <TabFocusPlugin />
+        <CheckListPlugin />
+        {/* <MathPlugin /> */}
+        <AutoPastePlugin />
+        <BlockTipPlugin />
         <OnChangePlugin onChange={(editorState) => {
-            // 获取第一个 # 的标题
-            const firstHeading = editorState.read(() => $getRoot().getFirstChild()?.getTextContent());
-            // 判断类型是否为 HeadingNode
-            // let title: string | undefined = undefined;
-            // if (firstHeading?.getType() !== 'heading') {
-            //     title = firstHeading?.getTextContent();
-            // };
-            // console.log('firstHeading', firstHeading);
             // 获取纯文本内容
             const plain = editorState.read(() => $getRoot().getTextContent());
+            // 获取标题
+            const title = editorState.read(() => {
+                const root = $getRoot();
+                // 遍历根节点的子节点，寻找第一个 h1
+                const children = root.getChildren();
+                for (const child of children) {
+                    if ($isHeadingNode(child) && child.getTag() === 'h1') {
+                        return child.getTextContent();
+                    }
+                }
+            });
             const json = editorState.toJSON();
-            scheduleSave({ title: firstHeading, contentJson: json, contentText: plain });
+            scheduleSave({ contentJson: JSON.stringify(json), contentText: plain, title });
         }} />
     </div>
 }
 
 
-
-const Editor = () => {
-
-    const [deletedAt, setDeletedAt] = useState<number>();
-
-    const initialConfig = {
-        namespace: 'MyEditor',
-        theme: theme,
-        onError: (error: Error) => {
-            console.error(error);
-        },
-        nodes: [
-            HeadingNode,
-            QuoteNode,
-            ListNode,
-            ListItemNode,
-            CodeNode,
-            CodeHighlightNode,
-            LinkNode,
-            AutoLinkNode,
-            TableNode,
-            TableCellNode,
-            HorizontalRuleNode,
-            TableRowNode,
-            mermaidNode,
-        ]
-    };
-
-    return <Card className="relative" >
-        <LexicalComposer initialConfig={initialConfig}>
-            <EditorContext getDeleteDay={(deletedAt) => {
-                // 换成与今天的差距
-                const diff = dayjs(deletedAt).diff(dayjs(), 'day');
-                console.log('diff', diff);
-                setDeletedAt(diff);
-            }} />
-        </LexicalComposer>
-        <Stack direction='row' justifyContent='space-between' alignItems="center">
-            <Stack direction="row" spacing={0.5} alignItems="center" >
-                <Typography variant="bodySmall" color="textSecondary">
-                    {/* 删除的天数，+3天是因为点击后会加3天删除时间，修改增加的删除时间时，需要同步更改这里 */}
-                    {deletedAt ? deletedAt + 3 : 7} 天后删除
-                </Typography>
-                <Tooltip title="Each view adds 3 days to deletion">
-                    <HelpOutline fontSize="small" className="cursor-pointer" color='action' />
-                </Tooltip>
-            </Stack>
-            <Stack direction="row" spacing={0.5} alignItems="center" >
-                <span className="border border-text-secondary border-gray-300  rounded px-2 py-1 text-xs leading-none">
-                    ⇧
-                </span>
-                <Typography variant="bodySmall" color="textSecondary">+</Typography>
-                <span className="border border-gray-300 rounded px-2 py-1 text-xs leading-none">
-                    ↵
-                </span>
-                <Typography variant="bodySmall" color="textSecondary" className="pl-1">
-                    新的便利贴
-                </Typography>
-            </Stack>
-        </Stack>
-    </Card>
-}
-
-export default Editor
+export default EditorContext;

@@ -1,7 +1,7 @@
 /**
  * 发送消息到前端的channel类型
  */
-type ChannelType = 'index-progress' | 'system-info';
+type ChannelType = 'download-progress';
 
 
 
@@ -12,6 +12,7 @@ type StickyParmas = {
     uuid: string;
     title?: string;
     content: string;
+    contentJson: string;
 }
 
 
@@ -28,4 +29,4 @@ type ConfigParams = {
  * 配置种类,每多一个，这里手工添加
  * @param isFinishGuide  是否已经完成引导配置，完成则不再需要配置
  */
-type ConfigType = 'isFinishGuide'
+type ConfigType = 'isFinishGuide' | 'launchShortcut';

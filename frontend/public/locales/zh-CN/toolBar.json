@@ -1,0 +1,23 @@
+{
+    "navDraftBack": {
+        "mac": "回到上一个草稿 ( ⌘ + [ )",
+        "win": "回到上一个草稿 ( Alt + [ )"
+    },
+    "navDraftForward": {
+        "mac": "前往下一个草稿 ( ⌘ + ] )",
+        "win": "前往下一个草稿 ( Alt + ] )"
+    },
+    "addDraft": {
+        "mac": "新增草稿 ( ⌘ + N )",
+        "win": "新增草稿 ( Alt + N )"
+    },
+    "showAllDrafts": "显示所有草稿",
+    "backDraft": "回到草稿",
+    "chatAI": {
+        "mac": "与 AI 对话 ( ⌥ + C )",
+        "win": "与 AI 对话 ( Alt + C )"
+    },
+    "exportMarkdown": "导出为 Markdown",
+    "downloading": "下载中...",
+    "updateAvailable": "有可用更新"
+}

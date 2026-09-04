@@ -18,6 +18,38 @@
   padding-left: 1.25rem;
 } */
 
+body {
+  padding: 24px;
+  background-color: transparent;
+  min-width: 320px;
+  min-height: 100vh;
+  font-family: 'Roboto', 'Noto Sans SC', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  position: relative; /* 确保伪元素定位参考 */
+}
+
+/* 使用伪元素设置半透明背景图，避免影响内容透明度 */
+body::before {
+  content: "";
+  position: fixed; /* 固定定位，确保覆盖全屏 */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* 置于内容底层 */
+  
+  /* 背景图设置：叠加半透明黑色遮罩 */
+  /* 遮罩层：0.2 表示 20% 黑色 */
+  /* background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.25)),  
+    url('./assets/images/bg9.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center; */
+  
+  /* 移除 opacity，改用 gradient 遮罩 */
+  /* opacity: 0.85; */ 
+}
+
 /* 字体定义 */
 @font-face {
   font-family: 'Roboto';
@@ -43,6 +75,14 @@
 }
 
 
+.drag {
+  -webkit-app-region: drag;
+}
+
+.no-drag {
+  -webkit-app-region: no-drag;
+}
+
 :root {
   font-family: 'Roboto', 'Noto Sans SC', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -50,15 +90,10 @@
   overflow: hidden;
 }
 
-body {
-  min-width: 320px;
-  min-height: 100vh;
-  font-family: 'Roboto', 'Noto Sans SC', system-ui, Avenir, Helvetica, Arial, sans-serif;
-}
 
 /* 自定义滚动条 */
 .scrollbar-thin {
-  scrollbar-width:none;
+  scrollbar-width: none;
   scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
 }
 
@@ -77,15 +112,6 @@ body {
 
 
 
-
-
-.editor-listitem {
-  margin: 0 32px;
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  font-size: 1rem;
-  background-color: transparent;
-}
-
 .editor-listItem::marker {
   color: var(--listitem-marker-color);
   background-color: var(--listitem-marker-background-color);
@@ -93,74 +119,7 @@ body {
   font-size: var(--listitem-marker-font-size);
 }
 
-.PlaygroundEditorTheme__listItemChecked,
-.PlaygroundEditorTheme__listItemUnchecked {
-  position: relative;
-  margin-left: 0.5em;
-  margin-right: 0.5em;
-  padding-left: 1.5em;
-  padding-right: 1.5em;
-  list-style-type: none;
-  outline: none;
-  display: block;
-  min-height: 1.5em;
-}
 
-.PlaygroundEditorTheme__listItemChecked>*,
-.PlaygroundEditorTheme__listItemUnchecked>* {
-  margin-left: 0.01em;
-}
-
-.PlaygroundEditorTheme__listItemUnchecked:before,
-.PlaygroundEditorTheme__listItemChecked:before {
-  content: '\200B';
-  width: 0.9em;
-  height: 0.9em;
-  top: 50%;
-  left: 0;
-  cursor: pointer;
-  display: block;
-  background-size: cover;
-  position: absolute;
-  transform: translateY(-50%);
-}
-
-.PlaygroundEditorTheme__listItemChecked {
-  text-decoration: line-through;
-}
-
-.PlaygroundEditorTheme__listItemUnchecked:focus:before,
-.PlaygroundEditorTheme__listItemChecked:focus:before {
-  box-shadow: 0 0 0 2px #a6cdfe;
-  border-radius: 2px;
-}
-
-.PlaygroundEditorTheme__listItemUnchecked:before {
-  border: 1px solid #999;
-  border-radius: 2px;
-}
-
-.PlaygroundEditorTheme__listItemChecked:before {
-  border: 1px solid rgb(61, 135, 245);
-  border-radius: 2px;
-  background-color: #3d87f5;
-  background-repeat: no-repeat;
-}
-
-.PlaygroundEditorTheme__listItemChecked:after {
-  content: '';
-  cursor: pointer;
-  border-color: #fff;
-  border-style: solid;
-  position: absolute;
-  display: block;
-  top: 45%;
-  width: 0.2em;
-  left: 0.35em;
-  height: 0.4em;
-  transform: translateY(-50%) rotate(45deg);
-  border-width: 0 0.1em 0.1em 0;
-}
 
 /* 引用塊樣式 */
 .editor-quote {
@@ -337,7 +296,7 @@ hr {
   background-color: rgba(172, 206, 247, 0.7);
 }
 
-/* 禁用表格選區時的默認選區顏色 */
-.editor-table ::selection {
+/* 禁用表格选区时的默認選區顏色 */
+.editor-tableCellSelected ::selection {
   background-color: transparent;
 }

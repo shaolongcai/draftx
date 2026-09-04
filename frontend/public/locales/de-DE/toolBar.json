@@ -1,0 +1,23 @@
+{
+    "navDraftBack": {
+        "mac": "Zurück zum vorherigen Entwurf ( ⌘ + [ )",
+        "win": "Zurück zum vorherigen Entwurf ( Alt + [ )"
+    },
+    "navDraftForward": {
+        "mac": "Weiter zum nächsten Entwurf ( ⌘ + ] )",
+        "win": "Weiter zum nächsten Entwurf ( Alt + ] )"
+    },
+    "addDraft": {
+        "mac": "Neuen Entwurf hinzufügen ( ⌘ + N )",
+        "win": "Neuen Entwurf hinzufügen ( Alt + N )"
+    },
+    "showAllDrafts": "Alle Entwürfe anzeigen",
+    "backDraft": "Zurück zum Entwurf",
+    "chatAI": {
+        "mac": "Mit KI chatten ( ⌥ + C )",
+        "win": "Mit KI chatten ( Alt + C )"
+    },
+    "exportMarkdown": "Als Markdown exportieren",
+    "downloading": "Herunterladen...",
+    "updateAvailable": "Update verfügbar"
+}

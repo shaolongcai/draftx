@@ -1,0 +1,33 @@
+import { ipcMain } from 'electron';
+import { updateService } from '../server/updateService.js';
+import { logger } from '../core/logger.js';
+
+
+export function initializeUpdateApi() {
+
+    // 手动检查更新
+    ipcMain.handle('check-for-updates', async () => {
+        try {
+            return await updateService.manualCheckForUpdates();
+        } catch (error) {
+            const msg = error instanceof Error ? error.message : '检查更新失败';
+            logger.error(`手动检查更新失败: ${msg}`);
+            return {
+                isUpdateAvailable: false,
+                message: msg
+            };
+        }
+    });
+
+    // 手动下载更新包
+    ipcMain.handle('download-update', async () => {
+        try {
+            await updateService.downloadUpdate();
+            return true;
+        } catch (error) {
+            const msg = error instanceof Error ? error.message : '下载更新失败';
+            logger.error(`下载更新失败: ${msg}`);
+            return false;
+        }
+    });
+}

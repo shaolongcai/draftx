@@ -1,0 +1,23 @@
+{
+    "navDraftBack": {
+        "mac": "Retour au brouillon précédent ( ⌘ + [ )",
+        "win": "Retour au brouillon précédent ( Alt + [ )"
+    },
+    "navDraftForward": {
+        "mac": "Avancer au brouillon suivant ( ⌘ + ] )",
+        "win": "Avancer au brouillon suivant ( Alt + ] )"
+    },
+    "addDraft": {
+        "mac": "Ajouter un nouveau brouillon ( ⌘ + N )",
+        "win": "Ajouter un nouveau brouillon ( Alt + N )"
+    },
+    "showAllDrafts": "Afficher tous les brouillons",
+    "backDraft": "Retour au brouillon",
+    "chatAI": {
+        "mac": "Discuter avec l'IA ( ⌥ + C )",
+        "win": "Discuter avec l'IA ( Alt + C )"
+    },
+    "exportMarkdown": "Exporter en Markdown",
+    "downloading": "Téléchargement...",
+    "updateAvailable": "Mise à jour disponible"
+}

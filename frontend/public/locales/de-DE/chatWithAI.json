@@ -1,0 +1,13 @@
+{
+    "placeholder": "Drücken Sie Enter zum Senden",
+    "chip": {
+        "withDraft": "Mit Entwurf generieren",
+        "freedom": "Freiheit"
+    },
+    "close": {
+        "mac": "Chat schließen ( ⌘ + C )",
+        "win": "Chat schließen ( Alt + C )"
+    },
+    "configureTips": "Bitte konfigurieren Sie zuerst den AI-Anbieter in den Einstellungen.",
+    "Generating": "KI generiert..."
+}

@@ -1,4 +1,4 @@
-import { getDatabase } from './sqlite.js'
+import { getConfig, getDatabase } from './sqlite.js'
 import { logger } from '../core/logger.js';
 import dayjs from 'dayjs';
 
@@ -11,19 +11,30 @@ const db = getDatabase()
  */
 export const saveStickyNote = (stickyNote: StickyParmas) => {
     try {
+        // 若content为空，则删除该草稿
+        if (!stickyNote.content.trim()) {
+            const deleteStmt = db.prepare(`
+                DELETE FROM stickys
+                WHERE uuid = ?
+            `);
+            deleteStmt.run(stickyNote.uuid);
+            return;
+        }
+
         const now = new Date().toISOString();
         // const deletedAt = dayjs().add(30, 'day').toISOString();
-        const deletedAt = dayjs().add(7, 'day').toISOString(); //测试用，只增加一天
+        const deletedAt = dayjs().add(30, 'day').toISOString(); //测试用，只增加一天
         // 存在即更新，不存在则插入
         const upsertStmt = db.prepare(`
-                INSERT INTO stickys ( uuid, content, title, created_at, modified_at,deleted_at)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO stickys ( uuid, content, content_json, title, created_at, modified_at, deleted_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT( uuid ) DO UPDATE SET
                     content = excluded.content,
+                    content_json = excluded.content_json,
                     title = excluded.title,
                     modified_at = excluded.modified_at
             `);
-        upsertStmt.run(stickyNote.uuid, stickyNote.content, stickyNote.title, now, now, deletedAt);
+        upsertStmt.run(stickyNote.uuid, stickyNote.content, stickyNote.contentJson, stickyNote.title, now, now, deletedAt);
     } catch (error) {
         logger.error(error)
     }
@@ -31,71 +42,103 @@ export const saveStickyNote = (stickyNote: StickyParmas) => {
 
 
 /**
- * 搜索 stickyNote 从数据库
- * @param query 
- * @returns 
+ * 从数据库获取操作
+ * @param query 搜索关键词 如果没有则返回所有
+ * @param limit 限制返回数量
+ * @returns 直接返回草稿列表
  */
-export const searchStickyNote = (query: string, limit: number = 50) => {
-    try {
-        // 拆分为单字的方法（用于 FTS5 前缀查询，FTS5会把每个字作为一个 token，作为倒排）
-        const buildFtsQuery = (input: string) => {
-            const tokens = input
-                .toLowerCase()
-                .trim()
-                .split(/\s+/)
-                .filter(t => t.length > 0 && t.length <= 32)
-                .slice(0, 8); // 控制词数，避免过长导致性能问题
-            if (tokens.length === 0) return input.toLowerCase();
-            // 用 OR + 前缀匹配扩大召回（fts5 支持 token* 前缀查询）
-            return tokens.map(t => `${t}*`).join(' OR ');
-        };
-        const ftsQuery = buildFtsQuery(query);
+export type DraftTimeFilter = {
+    createdAfter?: string;
+    createdBefore?: string;
+    modifiedAfter?: string;
+    modifiedBefore?: string;
+}
 
-        const stmt = db.prepare(`
-            WITH q(query) AS (SELECT lower(?)),
-            ftsHits AS (
-                SELECT 
-                    rowid,
-                    snippet(stickys_fts, 0, '<mark>', '</mark>', '...', 32) AS snippet,
-                    bm25(stickys_fts) AS fts_score
-                FROM stickys_fts
-                WHERE stickys_fts MATCH ?
-                ORDER BY bm25(stickys_fts)
+export const getDraft = (query?: string, limit: number = 50, timeFilter: DraftTimeFilter = {}) => {
+    try {
+        const normalizedQuery = query?.trim();
+        const createdAfter = timeFilter.createdAfter;
+        const createdBefore = timeFilter.createdBefore;
+        const modifiedAfter = timeFilter.modifiedAfter;
+        const modifiedBefore = timeFilter.modifiedBefore;
+
+        // 空查询：直接返回全部，按修改时间排序
+        if (!normalizedQuery) {
+            const conditions: string[] = [];
+            const params: any[] = [];
+
+            if (createdAfter) {
+                conditions.push(`datetime(s.created_at) >= datetime(?)`);
+                params.push(createdAfter);
+            }
+            if (createdBefore) {
+                conditions.push(`datetime(s.created_at) <= datetime(?)`);
+                params.push(createdBefore);
+            }
+            if (modifiedAfter) {
+                conditions.push(`datetime(s.modified_at) >= datetime(?)`);
+                params.push(modifiedAfter);
+            }
+            if (modifiedBefore) {
+                conditions.push(`datetime(s.modified_at) <= datetime(?)`);
+                params.push(modifiedBefore);
+            }
+
+            const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+            const stmt = db.prepare(`
+                SELECT id, uuid, title, content, content_json, created_at, modified_at, deleted_at
+                FROM stickys s
+                ${whereClause}
+                ORDER BY s.modified_at DESC
                 LIMIT ?
-            )
-            SELECT 
-                s.id, s.uuid, s.title, s.content, s.created_at, s.modified_at,s.deleted_at,
-                (
-                    0.35 * CASE WHEN lower(s.title) LIKE q.query || '%' THEN CAST(length(q.query) AS REAL) / NULLIF(length(s.title), 0) ELSE 0 END
-                    + 0.25 * CASE WHEN instr(lower(s.title), q.query) > 0 THEN 1 - (instr(lower(s.title), q.query) - 1) / CAST(length(s.title) AS REAL) ELSE 0 END
-                    + 0.18 * COALESCE(1.0 / (ftsHits.fts_score + 1.0), 0.0)
-                    + 0.10 * (1.0 - 1.0 / (COALESCE(s.click_count, 0) + 1))
-                    + 0.06 * (
-                        CASE 
-                            WHEN s.last_access_time IS NULL THEN 0
-                            ELSE 
-                                CASE 
-                                    WHEN (julianday('now') - julianday(s.last_access_time)) <= 0.5 THEN 1.0
-                                    WHEN (julianday('now') - julianday(s.last_access_time)) >= 90.0 THEN 0.0
-                                    ELSE 1.0 - ((julianday('now') - julianday(s.last_access_time)) - 0.5) / (90.0 - 0.5)
-                                END
-                        END
-                    )
-                    + 0.04 * (1.0 - MIN(length(s.title), 255) / 255.0)
-                ) AS score,
-                ftsHits.snippet AS snippet
-            FROM stickys s
-            LEFT JOIN ftsHits ON ftsHits.rowid = s.id
-            CROSS JOIN q
-            WHERE (
+            `);
+            const rows = stmt.all(...params, limit);
+            return rows;
+        }
+
+        const conditions: string[] = [
+            `(
                 lower(s.title) LIKE '%' || q.query || '%'
                 OR lower(s.content) LIKE '%' || q.query || '%'
-                OR ftsHits.rowid IS NOT NULL
-            )
+            )`
+        ];
+        const params: any[] = [normalizedQuery];
+
+        if (createdAfter) {
+            conditions.push(`datetime(s.created_at) >= datetime(?)`);
+            params.push(createdAfter);
+        }
+        if (createdBefore) {
+            conditions.push(`datetime(s.created_at) <= datetime(?)`);
+            params.push(createdBefore);
+        }
+        if (modifiedAfter) {
+            conditions.push(`datetime(s.modified_at) >= datetime(?)`);
+            params.push(modifiedAfter);
+        }
+        if (modifiedBefore) {
+            conditions.push(`datetime(s.modified_at) <= datetime(?)`);
+            params.push(modifiedBefore);
+        }
+
+        const stmt = db.prepare(`
+            WITH q(query) AS (SELECT lower(?))
+            SELECT 
+                s.id, s.uuid, s.title, s.content, s.content_json, s.created_at, s.modified_at, s.deleted_at,
+                (
+                    0.40 * CASE WHEN lower(s.title) LIKE q.query || '%' THEN CAST(length(q.query) AS REAL) / NULLIF(length(s.title), 0) ELSE 0 END
+                    + 0.30 * CASE WHEN instr(lower(s.title), q.query) > 0 THEN 1 - (instr(lower(s.title), q.query) - 1) / CAST(length(s.title) AS REAL) ELSE 0 END
+                    + 0.15 * CASE WHEN instr(lower(s.content), q.query) > 0 THEN 1.0 ELSE 0 END
+                    + 0.10 * (1.0 - 1.0 / (COALESCE(s.click_count, 0) + 1))
+                    + 0.05 * (1.0 - MIN(length(s.title), 255) / 255.0)
+                ) AS score
+            FROM stickys s
+            CROSS JOIN q
+            WHERE ${conditions.join(' AND ')}
             ORDER BY score DESC, s.title
             LIMIT ?
         `);
-        const rows = stmt.all(query, ftsQuery, limit, limit);
+        const rows = stmt.all(...params, limit);
         return rows;
     } catch (error) {
         logger.error(error)
@@ -105,22 +148,13 @@ export const searchStickyNote = (query: string, limit: number = 50) => {
 
 
 /**
- * 增加天数
+ * 增加天数：刷新删除天数
  */
-export const addDeleteDay = (id: number) => {
+export const refreshDeleteDay = (id: number) => {
     try {
-        // 取出deleted_at
-        const stmt = db.prepare(`
-            SELECT deleted_at FROM stickys WHERE id = ?
-        `);
-        const row = stmt.get(id);
-        if (!row) {
-            logger.error('sticky note not found');
-            return;
-        }
-        const deletedAt = row.deleted_at;
+        logger.info(`刷新删除的时间，草稿ID：${id}`);
         // 增加3天，并更新数据库
-        const newDeletedAt = dayjs(deletedAt).add(3, 'day').toISOString(); // 转换为 ISO 字符串
+        const newDeletedAt = dayjs().add(30, 'day').toISOString(); // 转换为 ISO 字符串
         const updateStmt = db.prepare(`
             UPDATE stickys SET deleted_at = ? WHERE id = ?
         `);
@@ -160,32 +194,15 @@ export const deleteExpiredStickys = () => {
 }
 
 
-/**
- * 获取最近的便利贴
- */
-export const getRecentStickys = (limit: number = 12) => {
-    try {
-        const stmt = db.prepare(`
-            SELECT id, uuid, title, content, created_at, modified_at, deleted_at
-            FROM stickys
-            ORDER BY modified_at DESC
-            LIMIT ?
-        `);
-        return stmt.all(limit);
-    } catch (error) {
-        logger.error(error);
-        return [];
-    }
-};
-
 
 /**
  * 获取UUID为guid 的便利贴
+ * @deprecated 使用 getDraftByUuid 替代
  */
 export const getGuideMemo = () => {
     try {
         const stmt = db.prepare(`
-            SELECT id, uuid, title, content, created_at, modified_at, deleted_at
+            SELECT id, uuid, title, content, content_json, created_at, modified_at, deleted_at
             FROM stickys
             WHERE uuid = ?
             LIMIT 1
@@ -194,5 +211,137 @@ export const getGuideMemo = () => {
     } catch (error) {
         logger.error(error);
         return null;
+    }
+}
+
+/**
+ * 通过UUID获取草稿
+ */
+export const getDraftByUuid = (uuid: string) => {
+    try {
+        const stmt = db.prepare(`
+            SELECT id, uuid, title, content, content_json, created_at, modified_at, deleted_at
+            FROM stickys
+            WHERE uuid = ?
+            LIMIT 1
+        `);
+        return stmt.get(uuid);
+    } catch (error) {
+        logger.error(error);
+        return null;
+    }
+}
+
+/**
+ * 通过id获取便利贴
+ * @deprecated 使用 getStickyByUuid 替代
+ */
+export const getStickyById = (id: number) => {
+    try {
+        const stmt = db.prepare(`
+            SELECT id, uuid, title, content, content_json, created_at, modified_at, deleted_at
+            FROM stickys
+            WHERE id = ?
+            LIMIT 1
+        `);
+        return stmt.get(id);
+    } catch (error) {
+        logger.error(error);
+        return null;
+    }
+}
+
+
+
+/**
+ * 添加AI工具
+ */
+export const saveAITool = (tool: AITool): void => {
+    try {
+        if (tool.id) {
+            // 若有ID则为更新
+            const stmt = db.prepare(`
+                UPDATE ai_tools 
+                SET name = ?, prompt = ?, emoji = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            `);
+            stmt.run(tool.name, tool.prompt, tool.emoji || null, tool.id);
+        } else {
+            // 若没有ID则为新增
+            const stmt = db.prepare(`
+                INSERT INTO ai_tools (name, prompt, emoji, created_at, updated_at)
+                VALUES (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            `);
+            stmt.run(tool.name, tool.prompt, tool.emoji || null);
+        }
+    } catch (error) {
+        logger.error(error);
+    }
+}
+
+
+/**
+ * 获取AI工具
+ */
+export const getAITools = (id?: number): AITool | AITool[] | null => {
+    try {
+        if (id) {
+            // 根据ID获取单个AI工具
+            const stmt = db.prepare(`
+                SELECT id, name, prompt, emoji, created_at, updated_at
+                FROM ai_tools
+                WHERE id = ?
+            `);
+            return stmt.get(id) as AITool;
+        } else {
+            // 获取所有AI工具
+            const stmt = db.prepare(`
+                SELECT id, name, prompt, emoji, created_at, updated_at
+                FROM ai_tools
+                ORDER BY created_at DESC
+            `);
+            return stmt.all() as AITool[];
+        }
+    } catch (error) {
+        logger.error(error);
+        return null;
+    }
+}
+
+
+/**
+ * 删除AI工具
+ */
+export const deleteAITool = (id: number): void => {
+    try {
+        const stmt = db.prepare(`
+            DELETE FROM ai_tools WHERE id = ?
+        `);
+        stmt.run(id);
+    } catch (error) {
+        logger.error(error);
+    }
+}
+
+
+/**
+ * 获取 Ollama 配置
+ */
+export const getOllamaConfig = (): { host: string; model: string } => {
+    try {
+        const aiProvider = getConfig('ai_provider') as string
+        const host = JSON.parse(aiProvider).host
+        const model = JSON.parse(aiProvider).model
+
+        return {
+            host: host,
+            model: model
+        };
+    } catch (error) {
+        logger.error(error);
+        return {
+            host: 'http://127.0.0.1:11434',
+            model: 'qwen2.5vl:3b'
+        };
     }
 }

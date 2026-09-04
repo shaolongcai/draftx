@@ -1,35 +1,100 @@
-import { createTheme } from "@mui/material";
+import { Theme } from "@mui/material";
+import { createTheme } from '@mui/material/styles';
 // When using TypeScript 3.x and below
 // import '@mui/lab/themeAugmentation';
+import { alpha } from "@mui/material/styles"
 
 //主题
 export const theme = createTheme({
+
+    // cssVariables: {
+    //     colorSchemeSelector: 'class', // 使用 class 切换主题，避免闪烁
+    // },
+    colorSchemes: {
+        // light: {
+        //     palette: {
+        //         primary: {
+        //             main: '#0F766E',
+        //             contrastText: '#FFFFFF',
+        //         },
+        //         text: {
+        //             primary: 'rgba(0, 0, 0, 0.85)',
+        //         },
+        //         background: {
+        //             default: '#FFFFFF',
+        //             paper: '#FAFAFA',
+        //         },
+        //     },
+        // },
+        // dark: {
+        //     palette: {
+        //         primary: {
+        //             main: '#E36F1C',
+        //             contrastText: '#FFFFFF',
+        //         },
+        //         text: {
+        //             primary: '#FFFFFF',
+        //         },
+        //         background: {
+        //             default: '#0A0A0A',
+        //             paper: '#2D2D2D',
+
+        //         },
+        //         // ...other tokens
+        //     },
+        // },
+    },
 
     //组件
     components: {
 
         MuiCard: {
             styleOverrides: {
-                root: {
+                root: ({ theme }: { theme: Theme }) => ({
                     borderRadius: '16px',
                     padding: '24px',
-                    backgroundColor: '#F9F3E5',
-                    border: '4px solid #33322E',
-                    boxShadow: '12px 12px 0px #33322E',
-                    margin: '12px'
-                }
+                    backgroundColor: theme.palette.background.default,
+                    border: '1px solid rgba(0, 0, 0, 0.25)',
+                    boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.05)',
+                }),
+            },
+        },
+
+        // 按钮
+        MuiButton: {
+            styleOverrides: {
+                contained: ({ theme }: { theme: Theme }) => ({
+                    backgroundColor: theme.palette.primary.main,
+                    color: theme.palette.primary.contrastText,
+                    border: 'none',
+                    '&:hover': {
+                        backgroundColor: alpha(theme.palette.primary.main, 0.85), // 85% 透明度
+                    },
+                        
+                    '&.Mui-disabled': {
+                        backgroundColor: alpha(theme.palette.primary.main, 0.25),
+                        color: alpha(theme.palette.primary.contrastText, 0.75),
+                        cursor: 'not-allowed',
+                    }
+                }),
+                containedSecondary: ({ theme }: { theme: Theme }) => ({
+                    backgroundColor: theme.palette.secondary.main,
+                    color: theme.palette.secondary.contrastText,
+                    border: 'none',
+                    '&:hover': {
+                        backgroundColor: theme.palette.background.paper, // 85% 透明度
+                    },
+                    '&.Mui-disabled': {
+                        backgroundColor: alpha(theme.palette.secondary.main, 0.25),
+                        color: alpha(theme.palette.secondary.contrastText, 0.75),
+                        cursor: 'not-allowed',
+                    }
+                })
             }
         },
 
         MuiChip: {
             styleOverrides: {
-                colorPrimary: {
-                    // 只有在filled变体时才应用这个背景色
-                    '&.MuiChip-filled': {
-                        backgroundColor: '#DBF0FF',
-                        color: '#1890FF', // 设置文字颜色，与主题色匹配
-                    }
-                },
                 outlinedPrimary: {
                     borderColor: '#3AACFF',
                     color: '#1890FF',
@@ -131,24 +196,74 @@ export const theme = createTheme({
             fontWeight: 'Regular',
         },
     },
+})
 
-
-    //调色板
+// 默认主题
+export const defaultTheme = createTheme(theme, {
     palette: {
-        text: {
-            primary: 'rgba(0, 0, 0, 0.85)', //在背景上的颜色
-            secondary: 'rgba(0, 0, 0, 0.65)',
-            tertiary: 'rgba(0, 0, 0, 0.45)',
-            disabled: 'rgba(0, 0, 0, 0.25)',
-        },
         primary: {
-            main: '#1890FF',
+            main: '#9F7207',
+            contrastText: '#FFFFFF',
         },
-        // secondary: {
-        //     main: '#D4E4F6',
-        // },
-        error: {
-            main: '#FF4D4F',
+        text: {
+            primary: 'rgba(0, 0, 0, 0.85)',
         },
-    }
+        background: {
+            default: '#F9F3E5',
+            paper: '#F9F3E5',
+        },
+    },
+})
+
+// 森林主题
+export const forestTheme = createTheme(theme, {
+    palette: {
+        primary: {
+            main: '#51B343',
+            contrastText: '#FFFFFF',
+        },
+        text: {
+            primary: 'rgba(0, 0, 0, 0.85)',
+        },
+        background: {
+            default: '#F5FFF5',
+            paper: '#DEFFDE',
+        },
+    },
+})
+
+// 暗黑主题
+export const darkTheme = createTheme(theme, {
+    palette: {
+        primary: {
+            main: '#E36F1C',
+            contrastText: '#FFFFFF',
+        },
+        text: {
+            primary: '#FFFFFF',
+            secondary: '#FFFFFF'
+        },
+        background: {
+            default: '#0A0A0A',
+            paper: '#2D2D2D',
+
+        },
+    },
+})
+
+// 白色主题
+export const whiteTheme = createTheme(theme, {
+    palette: {
+        primary: {
+            main: '#0F766E',
+            contrastText: '#FFFFFF',
+        },
+        text: {
+            primary: 'rgba(0, 0, 0, 0.85)',
+        },
+        background: {
+            default: '#FFFFFF',
+            paper: '#FFFFFF',
+        },
+    },
 })
