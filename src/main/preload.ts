@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getDraftByUuid: (uuid: string) => ipcRenderer.invoke('get-draft-by-uuid', uuid), // 根据 UUID 获取笔记（含 md 正文）
   saveImageAsset: (data: ArrayBuffer, ext?: string) => ipcRenderer.invoke('save-image-asset', data, ext), // 保存图片到 notes/.asset/，返回相对路径
   getNotesDir: () => ipcRenderer.invoke('get-notes-dir'), // 获取笔记根目录绝对路径
+  initializeGuideNote: (language: string) => ipcRenderer.invoke('initialize-guide-note', language), // 选择语言后初始化引导笔记（按语言生成中/英文，幂等）
 
   // 系统相关
   setConfig: (params: ConfigParams) => ipcRenderer.invoke('set-config', params.key, params.value, params.type), // 设置用户配置

@@ -4,6 +4,8 @@
 
 This is a lightweight note-taking app for those "I just want to jot something down" moments. It stores notes as local Markdown files (you can also think of it as an MD editor).
 
+![笔记截图](image.png)
+
 ## 🚀 Tech Stack
 
 - Built with **Electron**, packaged for both Windows and macOS

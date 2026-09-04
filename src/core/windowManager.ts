@@ -1,4 +1,4 @@
-import { app, BrowserWindow, screen } from 'electron';
+import { app, BrowserWindow, screen, shell } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { logger } from './logger.js';
@@ -34,6 +34,16 @@ class WindowManager {
         this.loadWindows();
     }
 
+    // 拦截 window.open / target=_blank（如编辑器中点击链接），改为系统默认浏览器打开
+    private bindOpenExternalLinks = (webContents: Electron.WebContents) => {
+        webContents.setWindowOpenHandler(({ url }) => {
+            if (/^https?:\/\//i.test(url)) {
+                shell.openExternal(url);
+            }
+            return { action: 'deny' };
+        });
+    }
+
     // 初始化main窗口
     private initMainWindow() {
         this.mainWindow = new BrowserWindow({
@@ -66,6 +76,8 @@ class WindowManager {
 
         // 生產環境：屏蔽開發者工具快捷鍵
         this.mainWindow.webContents.on('before-input-event', this.disableDevTools);
+
+        this.bindOpenExternalLinks(this.mainWindow.webContents);
 
         // 窗口加载完成后(同时所有窗口变更)
         this.mainWindow.once('ready-to-show', () => {
@@ -122,6 +134,8 @@ class WindowManager {
         });
 
         this.settingsWindow.webContents.on('before-input-event', this.disableDevTools);
+
+        this.bindOpenExternalLinks(this.settingsWindow.webContents);
 
         // 拦截关闭事件 （是为了防止mac os concrlt+w 直接关闭）
         this.settingsWindow.on('close', (event) => {

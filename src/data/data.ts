@@ -2,7 +2,8 @@
  * 内置笔记内容（markdown 原文，启动时写入 notes/ 目录）
  */
 
-export const GuidContent = `# Welcome
+// 引导笔记（英文版）
+export const GuideContentEn = `# Welcome
 
 This is a guide note, written entirely by this app.
 
@@ -16,10 +17,10 @@ All notes are stored as plain **Markdown files** in your home directory (\`~/.dr
 - Paste or drop images — they are saved into \`notes/.asset/\` automatically.
 - 100% local data — nothing leaves your machine.
 - AI super-powers via Ollama: set your endpoint and model ID in settings.
+`
 
----
-
-# 欢迎使用
+// 引导笔记（中文版，简体中文/繁体中文共用）
+export const GuideContentZh = `# 欢迎使用
 
 这是一个指南笔记，正如你所见，完完全全由此应用所写。
 
@@ -34,6 +35,14 @@ All notes are stored as plain **Markdown files** in your home directory (\`~/.dr
 - 数据 100% 存储在本地
 - AI 功能由 Ollama 提供，你可以在设置中配置 Ollama 地址与模型 ID
 `
+
+// 根据用户选择的语言返回对应语言的引导笔记（中文 zh-* → 中文版，其余 → 英文版）
+export const getGuideContent = (language?: string): { title: string; content: string } => {
+  if (language && language.toLowerCase().startsWith('zh')) {
+    return { title: '欢迎使用', content: GuideContentZh };
+  }
+  return { title: 'Welcome', content: GuideContentEn };
+}
 
 
 // 更新说明
