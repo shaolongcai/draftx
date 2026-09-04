@@ -10,7 +10,7 @@
    - `notes` 表：`path`（相对 notes 目录的文件路径）、`title`（笔记标题）、`mtime`（文件修改时间，毫秒时间戳）、`hash`（内容 sha1，用于检测外部修改）、`uuid`、`created_at`
    - `fts_index` 表：FTS5 全文索引虚表（`title` + `content` 两列，`tokenize='trigram'` 以支持中文检索；trigram 仅支持 ≥3 字符的查询，更短的查询回退到文件扫描），rowid 与 notes.id 对应，由 repositories 在写入时手动同步
 3. 启动时通过 `syncNotesWithFiles()` 对账：磁盘新增文件入库、hash 变化重建索引、文件消失删除元数据
-4. 空内容的笔记会被自动删除（md 文件 + 元数据 + 索引一起删）
+4. 空内容笔记的处理：从未保存过的新笔记内容为空时不落盘；已存在的笔记内容为空时保留笔记，仅清空内容（删除笔记请用 `deleteNoteByUuid`，会同时删除 md 文件 + 元数据 + 索引）
 5. 渲染进程通过自定义协议 `draftx-asset://notes/<相对路径>` 访问 notes 目录内的图片等资源（dev 的 http 环境与生产的 file:// 环境均可用）
 
 
