@@ -7,6 +7,7 @@ import { verifyLicense } from '../core/license.js';
 import fs from 'fs';
 import path from 'path';
 import { decryptTimestamp, encryptTimestamp } from '../units/cyber.js';
+import { syncMcpServer } from '../server/mcpInstaller.js';
 import dayjs from 'dayjs';
 const { machineId } = pkg;
 
@@ -49,11 +50,15 @@ export function initializeSystemApi() {
     });
 
     // 打开文件夹,(send要用on的)
-    ipcMain.on('open-dir', (_event, type: 'runLog', path?: string) => {
+    ipcMain.on('open-dir', (_event, type: 'runLog' | 'notes', path?: string) => {
         switch (type) {
             case 'runLog':
                 const logsDir = pathConfig.get('logs')
                 shell.openPath(logsDir);
+                break;
+            case 'notes':
+                const notesDir = pathConfig.get('notes')
+                shell.openPath(notesDir);
                 break;
             default:
             // todo 留下做其他文件夹的打开
@@ -118,23 +123,10 @@ export function initializeSystemApi() {
         return app.getVersion();
     });
 
-    ipcMain.handle('get-mcp-entry-path', () => {
-        const candidates: string[] = [];
-        if (app.isPackaged) {
-            candidates.push(path.join(process.resourcesPath, 'mcp-server', 'dist', 'index.js'));
-            candidates.push(path.join(process.resourcesPath, 'app.asar.unpacked', 'mcp-server', 'dist', 'index.js'));
-        }
-        candidates.push(path.resolve(app.getAppPath(), '..', 'mcp-server', 'dist', 'index.js'));
-        candidates.push(path.resolve(process.cwd(), 'mcp-server', 'dist', 'index.js'));
-
-        const matched = candidates.find((item) => fs.existsSync(item));
-        if (matched) {
-            return matched;
-        }
-        if (app.isPackaged) {
-            return path.join(process.resourcesPath, 'mcp-server', 'dist', 'index.js');
-        }
-        return path.resolve(process.cwd(), 'mcp-server', 'dist', 'index.js');
+    ipcMain.handle('get-mcp-entry-path', async () => {
+        // 返回固定数据目录中的入口（~/.draftx/mcp-server/dist/index.js）
+        // syncMcpServer 幂等：版本戳一致时直接返回路径，不重复拷贝
+        return await syncMcpServer() ?? '';
     });
 
     // 导出 Markdown

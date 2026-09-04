@@ -1,5 +1,6 @@
-import { DraftItem, Search } from "@/components"
-import { Stack } from "@mui/material"
+import { DraftItem, ListBottomBar, Search } from "@/components"
+import { useTranslation } from "@/contexts/I18nContext"
+import { alpha, useTheme } from "@mui/material"
 import { useDebounce, useRequest } from "ahooks"
 import { useState } from "react"
 
@@ -14,6 +15,8 @@ const DraftList: React.FC<Props> = ({
 }) => {
 
     const [searchValue, setSearchValue] = useState('')
+    const { t } = useTranslation()
+    const theme = useTheme()
 
     const debouncedValue = useDebounce(searchValue, { wait: 200 })
 
@@ -28,36 +31,57 @@ const DraftList: React.FC<Props> = ({
         }
     );
 
-    return < div
-    // className={`${showDraftList ? '' : 'hidden'}`}
-    >
-        <Search onSearch={setSearchValue} />
-        {
-            (data?.length > 0) &&
-            <div className='max-h-[calc(100vh-144px)] overflow-y-auto mt-4'>
-                <Stack className='flex flex-wrap gap-2' direction='row' justifyContent='space-between'>
+    return <div className="h-screen flex flex-col px-10 pt-12">
+        {/* 头部：标题 + 搜索框 */}
+        <div className="flex items-center justify-between gap-4">
+            <h1
+                className="text-4xl font-bold select-none"
+                style={{ color: theme.palette.text.primary }}
+            >
+                {t('app.list.myNotes')}
+            </h1>
+            <div className="w-[320px] flex-none">
+                <Search onSearch={setSearchValue} />
+            </div>
+        </div>
+        <div className="border-b mt-4" style={{ borderColor: '#E1E0DA' }} />
+
+        {/* 笔记列表（底部留出 ListBottomBar 的空间） */}
+        <div className="flex-1 overflow-y-auto pb-20">
+            {
+                (data?.length > 0) &&
+                <>
                     {
                         data.map(item =>
-                            <div key={item.id} className='w-[200px] flex-none'>
-                                <DraftItem
-                                    id={item.id}
-                                    title={item.title}
-                                    content={item.content}
-                                    snippet={item.snippet}
-                                    uuid={item.uuid}
-                                    lineClamp={5}
-                                    onClick={() => setCurrentPage('draft')} //点击后跳转回草稿
-                                    {...item}
-                                />
-                            </div>
+                            <DraftItem
+                                key={item.id}
+                                id={item.id}
+                                title={item.title}
+                                mtime={item.mtime}
+                                snippet={item.snippet}
+                                uuid={item.uuid}
+                                onClick={() => setCurrentPage('draft')} //点击后跳转回草稿
+                                {...item}
+                            />
                         )
                     }
-                </Stack>
-            </div>
-        }
-        {/* <div className='mx-auto mt-4 w-fit'>
-            <ToolBar currentPage='list' />
-        </div> */}
+                    {/* 列表结束标记 */}
+                    <div
+                        className="text-center py-8 select-none tracking-widest"
+                        style={{ color: alpha(theme.palette.text.primary, 0.35) }}
+                    >
+                        {t('app.list.end')}
+                    </div>
+                </>
+            }
+        </div>
+
+        {/* 列表页底部栏：进入时显示，3 秒后渐变隐藏，hover 再显示 */}
+        <ListBottomBar
+            currentPage={currentPage}
+            total={data?.length ?? 0}
+            setCurrentPage={setCurrentPage}
+        />
     </div >
 }
 

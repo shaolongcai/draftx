@@ -1,16 +1,18 @@
-import { app, BrowserWindow, nativeImage, Tray, globalShortcut, Menu } from 'electron';
+import { app, BrowserWindow, nativeImage, Tray, globalShortcut, Menu, protocol, net } from 'electron';
 import * as path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import { getConfig, initializeDatabase, setConfig } from '../database/sqlite.js';
 import { initializeDraftApi } from '../api/draft.js';
-import { deleteExpiredStickys, getAITools, getDraftByUuid, getGuideMemo, saveAITool, saveStickyNote } from '../database/repositories.js';
+import { getAITools, getNoteByUuid, saveAITool, saveNote, syncNotesWithFiles } from '../database/repositories.js';
 import { initializeSystemApi } from '../api/system.js';
 import { logger } from '../core/logger.js';
-import { GuidJson, GuidContent, UpdateContent, UpdateJson } from '../data/data.js';
+import { GuidContent, UpdateContent } from '../data/data.js';
 import { initializeAIApi } from '../api/ai.js';
 import { initializeUpdateApi } from '../api/update.js';
 import { reportErrorToWechat } from '../units/report.js';
 import { startLocalServer } from '../server/mcpLocalServer.js';
+import { syncMcpServer } from '../server/mcpInstaller.js';
+import pathConfig from '../core/pathConfigs.js';
 import pkg from 'node-machine-id';
 const { machineId } = pkg;
 
@@ -18,6 +20,16 @@ const { machineId } = pkg;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const isMac = process.platform === 'darwin';
+
+// 注册笔记资源协议（必须在 app ready 之前调用）
+// 渲染进程通过 draftx-asset://notes/<相对路径> 访问 notes 目录内的文件（如 .asset 图片），
+// 在 dev（http://localhost:5174）与生产（file://）环境下均可加载，避免 file:// 被拦截
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: 'draftx-asset',
+    privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true, bypassCSP: true }
+  }
+]);
 
 let tray: Tray | null = null;
 let mainWindow: BrowserWindow | null;
@@ -211,10 +223,10 @@ function createTray() {
 }
 
 
-// 初始化引导的memo
+// 初始化引导笔记（md 文件）
 const initializeGuideMemo = async () => {
-  //查询是否已经有引导memo
-  const guideMemo = getDraftByUuid('guide');
+  //查询是否已经有引导笔记
+  const guideMemo = getNoteByUuid('guide');
   if (!guideMemo) {
     // 初始化时，发送消息到企业微信
     const id = await machineId(true);
@@ -222,16 +234,16 @@ const initializeGuideMemo = async () => {
       类型: '新增一个用户',
       机器码: id,
     })
-    // 没有引导memo，创建一个
-    saveStickyNote({
+    // 没有引导笔记，创建一个
+    saveNote({
       uuid: 'guide',
+      title: 'Welcome',
       content: GuidContent,
-      contentJson: JSON.stringify(GuidJson),
     });
   }
 }
 
-// 初始化更新说明草稿
+// 初始化更新说明笔记
 const initializeUpdateDraft = async () => {
   // 查询当前版本
   const currentVersion = app.getVersion();
@@ -241,10 +253,10 @@ const initializeUpdateDraft = async () => {
   if (version === currentVersion) {
     return;
   }
-  saveStickyNote({
+  saveNote({
     uuid: 'update',
+    title: 'Release Notes',
     content: UpdateContent,
-    contentJson: JSON.stringify(UpdateJson),
   });
 }
 
@@ -287,6 +299,22 @@ app.whenReady().then(async () => {
     settingsWindow = windowManager.settingsWindow;
     initializeDatabase();
     logger.info('数据库初始化完成');
+    // 笔记资源协议处理器：draftx-asset://notes/<相对路径> → notes 目录内文件
+    protocol.handle('draftx-asset', (request) => {
+      try {
+        const url = new URL(request.url);
+        const rel = decodeURIComponent(url.pathname).replace(/^\/+/, '');
+        const notesRoot = pathConfig.get('notes');
+        const abs = path.normalize(path.join(notesRoot, rel));
+        // 防止路径穿越：只允许访问 notes 目录内的文件
+        if (!abs.startsWith(path.normalize(notesRoot))) {
+          return new Response('Forbidden', { status: 403 });
+        }
+        return net.fetch(pathToFileURL(abs).toString());
+      } catch {
+        return new Response('Not Found', { status: 404 });
+      }
+    });
     registerGlobalShortcut();
     logger.info('全局快捷键注册完成');
     initializeUpdateApi()
@@ -294,18 +322,36 @@ app.whenReady().then(async () => {
     initializeSystemApi();
     initializeAIApi();
     logger.info('所有API初始化完成');
-    startLocalServer();
     createTray();
     if (process.platform === 'darwin') {
       app.dock.hide();
     }
-    initializeGuideMemo()
-    initializeUpdateDraft()
-    initializeAITool()
-    initializeUserConfig();
-    logger.info('用户配置初始化完成');
-    deleteExpiredStickys();
-    logger.info('所有过期的便利贴已删除');
+
+    // 耗时初始化挪到窗口内容加载完成后执行，避免阻塞首屏（窗口显示 / 开屏动画）
+    mainWindow?.webContents.once('did-finish-load', () => {
+      try {
+        // 启动对账：md 文件是事实来源，同步元数据与全文索引
+        syncNotesWithFiles();
+        // 启动本地 MCP 桥接服务（listen 本身异步，开销极小）
+        startLocalServer();
+        // 同步 MCP Server 到固定数据目录（~/.draftx/mcp-server），供外部 MCP 客户端固定引用
+        // 异步执行不等待：目录约 58MB，首次/升级时的拷贝若同步执行会卡住主进程事件循环
+        // fire-and-forget，失败仅记录日志，不影响编辑器使用
+        void syncMcpServer().then((mcpEntry) => {
+          if (mcpEntry) {
+            logger.info(`MCP 客户端配置参考: { "command": "node", "args": ["${mcpEntry.replace(/\\/g, '\\\\')}"] }`);
+          }
+        });
+        initializeGuideMemo()
+        initializeUpdateDraft()
+        initializeAITool()
+        initializeUserConfig();
+        logger.info('用户配置初始化完成');
+      } catch (error) {
+        const msg = error instanceof Error ? `${error.message}\n${error.stack || ''}` : String(error);
+        logger.error(`延迟初始化失败: ${msg}`);
+      }
+    });
   } catch (error) {
     const msg = error instanceof Error ? `${error.message}\n${error.stack || ''}` : String(error);
     logger.error(`应用启动失败: ${msg}`);

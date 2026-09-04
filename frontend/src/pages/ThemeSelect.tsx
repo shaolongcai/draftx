@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { SettingTitle } from '@/components';
-import { Box, Card, CardActionArea, CardMedia, Grid, Stack, Typography, useTheme } from '@mui/material';
+import { Box, Card, CardActionArea, CardMedia, Grid, Typography, useTheme } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { useNavigate } from 'react-router-dom';
 import { useGlobal } from '@/contexts/GlobalContext';
 // Import images
 import themeDefault from '@/assets/images/theme-default.png';

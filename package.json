@@ -8,7 +8,7 @@
     "compile": "tsc -b",
     "obfuscate": "javascript-obfuscator ./dist --output ./dist --compact true --self-defending true --disable-console-output true --dead-code-injection true --string-array true --string-array-rotate true --string-array-shuffle true",
     "electron": "electron .",
-    "electron:dev": "concurrently \"npm run frontend:dev\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .\"",
+    "electron:dev": "concurrently \"npm run frontend:dev\" \"wait-on http://localhost:5174 && cross-env NODE_ENV=development electron .\"",
     "frontend:dev": "cd frontend && npm run dev",
     "rebuild": "electron-rebuild",
     "make": "electron-forge make",
@@ -37,8 +37,7 @@
     "dayjs": "^1.11.19",
     "electron-updater": "^6.7.3",
     "node-machine-id": "^1.1.12",
-    "ollama": "^0.6.3",
-    "sqlite3": "^5.1.6"
+    "ollama": "^0.6.3"
   },
   "build": {
     "electronDownload": {

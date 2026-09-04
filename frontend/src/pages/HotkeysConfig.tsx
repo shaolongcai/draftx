@@ -1,4 +1,4 @@
-import { Button, Stack, Typography, useTheme } from "@mui/material";
+import { Button, Paper, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNotifications } from "@toolpad/core/useNotifications";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -13,7 +13,6 @@ const HotkeysConfig = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const { t } = useTranslation();
-    const theme = useTheme()
 
     // 检查是否已完成初始配置，检查热键配置
     useEffect(() => {
@@ -24,11 +23,17 @@ const HotkeysConfig = () => {
                 // 需要检查是否已经设置,仅非设置页需要自动跳过
                 const from = searchParams.get('from');
                 if (from !== 'setting') {
-                    navigate('/');
+                    // 写入标记并进入开屏动画页
+                    await window.electronAPI.setConfig({
+                        key: 'isFinishGuide',
+                        value: true,
+                        type: 'boolean',
+                    });
+                    navigate('/onboarding');
                 }
             }
         }
-        checkConfig();
+        // checkConfig();
     }, []);
 
     // 监听键盘按下
@@ -142,59 +147,95 @@ const HotkeysConfig = () => {
             notification.show('Shortcut saved successfully', { severity: 'success', autoHideDuration: 1200 });
             // 根据参数判断跳转路径
             const from = searchParams.get('from');
-            navigate(from === 'setting' ? '/' : '/'); // 设置页面进入的，保存后回到设置页面
+            navigate(from === 'setting' ? '/' : '/onboarding'); // 设置页面进入的，保存后回到设置页面,主页的进入onboarding页面
         } catch (error) {
             console.error('Failed to save shortcut:', error);
             notification.show('Failed to save', { severity: 'error', autoHideDuration: 2000 });
         }
     };
 
-    // 系统保留快捷键列表
-    const reservedShortcuts = ['Alt+[', 'Alt+]', 'Alt+C', 'Alt+N'];
+    // 系统保留快捷键列表（与应用内已占用的快捷键冲突，禁止设置为全局唤起快捷键）
+    const reservedShortcuts = [
+        // 工具栏/编辑器快捷键（Win 端 Alt 组合）
+        'Alt+[', 'Alt+]', 'Alt+C', 'Alt+N',
+        // Mac 端前进/后退草稿（⌘+[ / ⌘+]）
+        'Meta+[', 'Meta+]',
+        // 工具栏编辑类快捷键：加粗/斜体/待办/搜索（Win: Ctrl，Mac: ⌘）
+        'Ctrl+B', 'Ctrl+I', 'Ctrl+T', 'Ctrl+F',
+        'Meta+B', 'Meta+I', 'Meta+T', 'Meta+F',
+        // 系统级快捷键：复制/粘贴/全选（Win: Ctrl，Mac: ⌘）
+        'Ctrl+C', 'Ctrl+V', 'Ctrl+A',
+        'Meta+C', 'Meta+V', 'Meta+A',
+    ];
     // 检查是否为保留快捷键（不区分大小写）
     const isReserved = reservedShortcuts.some(s => s.toLowerCase() === shortcut.toLowerCase());
 
-    return (
+    // 快捷键展示区域（设置页与初始配置页共用）
+    const shortcutPanel = (
         <>
-            {
-                // 仅设置页面进入需要标题
-                searchParams.get('from') === 'setting' && (
-                    <SettingTitle title={t('app.shortcut.title')} />
-                )
-            }
-            <Stack spacing={3} alignItems='center' justifyContent='center' className="h-screen pb-20">
-                <Typography variant='bodyLarge' fontWeight={700} textAlign='center' color='textPrimary'>
-                    {t('app.shortcut.brief')}
-                </Typography>
-                <Stack alignItems="center" spacing={1}>
-                    <Typography
-                        variant='headlineMedium'
-                        className={`border-2 px-4 py-2 rounded-xl transition-colors ${isReserved
-                            ? 'border-red-500 text-red-500 bg-red-50'
-                            : 'border-[#9F7207]'
-                            }`}
-                        color='textPrimary'
-                    >
-                        {formatShortcutForDisplay(shortcut)}
-                    </Typography>
-                    {isReserved && (
-                        <Typography variant="bodySmall" color="error" textAlign='center' >
-                            {t('app.shortcut.error')}
-                        </Typography>
-                    )}
-                </Stack>
-
-                <Button
-                    variant='contained'
-                    size='large'
-                    onClick={handleSave}
-                    disabled={isReserved}
-                    color={isReserved ? "error" : "primary"}
+            <Typography variant='titleLarge' fontWeight={700} textAlign='center' color='textPrimary'>
+                {t('app.shortcut.brief')}
+            </Typography>
+            <Stack alignItems="center" spacing={1}>
+                <Typography
+                    variant='headlineMedium'
+                    className={`border-2 px-4 py-2 rounded-xl transition-colors ${isReserved
+                        ? 'border-red-500 text-red-500 bg-red-50'
+                        : 'border-[#8D8577]'
+                        }`}
+                    color='textPrimary'
                 >
-                    {t('app.shortcut.button')}
-                </Button>
+                    {formatShortcutForDisplay(shortcut)}
+                </Typography>
+                {isReserved && (
+                    <Typography variant="bodySmall" color="error" textAlign='center' >
+                        {t('app.shortcut.error')}
+                    </Typography>
+                )}
             </Stack>
+
+            <Button
+                variant='contained'
+                size='large'
+                onClick={handleSave}
+                disabled={isReserved}
+                color={isReserved ? "error" : "primary"}
+                sx={{
+                    bgcolor: isReserved ? undefined : '#8D8577',
+                    borderRadius: '12px',
+                    px: 4,
+                    py: 1.5,
+                    boxShadow: 'none',
+                    '&:hover': { bgcolor: isReserved ? undefined : '#7C7466', boxShadow: 'none' },
+                }}
+            >
+                {t('app.shortcut.button')}
+            </Button>
         </>
+    );
+
+    // 设置页面进入：采用与 MCP 服务页一致的卡片布局
+    if (searchParams.get('from') === 'setting') {
+        return (
+            <div className="h-full px-[48px] py-[32px] flex flex-col">
+                <SettingTitle title={t('app.shortcut.title')} />
+                <Paper
+                    elevation={0}
+                    className="mt-6 flex-1 rounded-2xl p-6 flex flex-col "
+                >
+                    <Stack spacing={3} alignItems='center' justifyContent='center' className="flex-1">
+                        {shortcutPanel}
+                    </Stack>
+                </Paper>
+            </div>
+        )
+    }
+
+    // 初始配置页：保持全屏居中布局
+    return (
+        <Stack spacing={3} alignItems='center' justifyContent='center' className="h-screen pb-20">
+            {shortcutPanel}
+        </Stack>
     )
 }
 

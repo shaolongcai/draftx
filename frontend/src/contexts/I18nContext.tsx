@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Language, TranslationKeys, TranslationKeyPath, I18nContextType, TranslationResources } from '@/type/i18n';
-import { SUPPORTED_LANGUAGES } from '@/config/languages';
 
 // 創建翻譯上下文
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
@@ -106,7 +106,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({
                         };
                         deepMerge(combined, legacy);
                     }
-                } catch { }
+                } catch { /* 舊版單檔 JSON 不存在時忽略 */ }
 
                 setTranslations(prev => ({
                     ...prev,
@@ -225,8 +225,11 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({
             // 設置初始語言
             setCurrentLanguage(initialLanguage);
 
-            // 預載入所有支援的語言
-            await Promise.all(SUPPORTED_LANGUAGES.map(lang => loadTranslation(lang)));
+            // 只預載入當前語言（en-US 作為回退語言一併載入）；其他語言在切換時由 setLanguage 按需載入
+            const langsToLoad = initialLanguage === 'en-US'
+                ? ['en-US' as Language]
+                : [initialLanguage, 'en-US' as Language];
+            await Promise.all(langsToLoad.map(lang => loadTranslation(lang)));
 
             // 同步語言設置到數據庫（確保托盤菜單顯示正確的語言）
             // 注意：必須在前端完全初始化前就同步，確保托盤菜單使用正確的語言

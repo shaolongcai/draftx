@@ -3,7 +3,7 @@ import pathConfig from '../core/pathConfigs.js'
 import path from 'path'
 import { logger } from '../core/logger.js'
 // import { pinyin } from "pinyin-pro";
-import { createAIToolsDb, createConfigDb, createStickysDb, createStickysFtsDb } from './schrma.js'
+import { createAIToolsDb, createConfigDb, createFtsIndexDb, createNotesDb, dropLegacyStickysDb } from './schrma.js'
 
 let db: Database.Database | null = null
 
@@ -29,15 +29,19 @@ export function initializeDatabase(): Database.Database {
 
         //创建表
         try {
-            createStickysDb(db)
+            // 删除旧版 stickys 表（笔记已迁移为 .md 文件存储，不兼容旧数据）
+            dropLegacyStickysDb(db)
+            // 笔记元数据表
+            createNotesDb(db)
         } catch (error) {
             logger.error(`创建表失败: ${JSON.stringify(error)}`)
         }
-        // try {
-        //     createStickysFtsDb(db)
-        // } catch (error) {
-        //     logger.error(`FTS表创建失败: ${JSON.stringify(error)}`)
-        // }
+        try {
+            // FTS5 全文索引（trigram 分词，支持中文检索）
+            createFtsIndexDb(db)
+        } catch (error) {
+            logger.error(`FTS表创建失败: ${JSON.stringify(error)}`)
+        }
         try {
             createConfigDb(db)
         } catch (error) {

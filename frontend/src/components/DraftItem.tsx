@@ -1,85 +1,79 @@
 import { useEvent } from "@/contexts/EvenContext"
-import { historyStack } from "@/utils/histroyStack";
-import { Card, Stack, Typography, useTheme } from "@mui/material"
-
-
-// 截断行数的映射
-const lineClampMap = {
-    5: 'line-clamp-5',
-    6: 'line-clamp-6',
-    7: 'line-clamp-7',
-    8: 'line-clamp-8',
-};
+import { useTranslation } from "@/contexts/I18nContext"
+import { formatModifiedTime } from "@/utils/formatTime"
+import { alpha, useTheme } from "@mui/material"
 
 
 interface Props {
     id: number,
     title?: string,
-    content: string,
+    /** 文件修改时间（毫秒时间戳） */
+    mtime: number,
     snippet?: string,
-    height?: string,
     onClick?: (id: number) => void,
-    lineClamp?: number,
     uuid: string,
 }
 /**
- * 搜索结果
+ * 列表页笔记条目：标题（左）+ 修改时间（右）+ 内容预览，行间分割线
  */
 const DraftItem: React.FC<Props> = ({
     id,
     title,
-    content,
+    mtime,
     snippet,
-    height = '160px',
     onClick,
-    lineClamp = 8,
     uuid,
     ...rest
 }) => {
 
     const { loadStickys$ } = useEvent()
     const theme = useTheme()
+    const { t, currentLanguage } = useTranslation()
 
-    const clampClass = (lineClampMap as Record<number, string>)[lineClamp] ?? 'line-clamp-6'
-
-    // 点击卡片
+    // 点击条目
     const handleClick = () => {
         onClick?.(id)
-        loadStickys$.emit({ ...rest, content, id, uuid } as DraftResult)
+        // 列表项不含正文，由编辑器收到事件后按需调 getDraftByUuid 取 content
+        loadStickys$.emit({ ...rest, id, uuid, title, mtime } as DraftResult)
         console.log('点击草稿', uuid)
-        // 压栈
-        // historyStack.push(uuid);
     }
 
-    return <Card className="cursor-pointer  border  "
+    return <div
+        className="cursor-pointer py-5 border-b last:border-b-0"
+        style={{ borderColor: '#E1E0DA' }}
         onClick={handleClick}
-        sx={{
-            height,
-            borderColor: `${theme.palette.primary.main}40`, // 25% 透明度
-        }}
     >
-        <Stack spacing={1} >
-            <Typography fontWeight={700} variant='bodyMedium'>
-                {title}
-            </Typography>
-            <Typography variant='bodyMedium' color={theme.palette.text.primary!}
-                className={`${clampClass} overflow-hidden`}
+        {/* 标题 + 修改时间 */}
+        <div className="flex items-baseline justify-between gap-4">
+            <span
+                className="text-2xl font-bold truncate"
+                style={{ color: theme.palette.text.primary }}
             >
-                {snippet ? (
-                    // 这里要注意，显示的是snippet片段，而不是content，内容数量要在搜索器中调整 snippet现在已经没有用
-                    <span
-                        dangerouslySetInnerHTML={{
-                            __html: snippet.replace(/<mark>/g,
-                                `<mark class="bg-yellow-200 font-medium px-1" 
-                                style="color: ${theme.palette.text.primary} opacity: 0.65">`)
-                        }}
-                    />
-                ) : (
-                    <span className="block" color={theme.palette.text.primary} style={{ opacity: 0.85 }}>{content}</span>
-                )}
-            </Typography>
-        </Stack>
-    </Card>
+                {title}
+            </span>
+            <span
+                className="text-base whitespace-nowrap select-none flex-none"
+                style={{ color: alpha(theme.palette.text.primary, 0.45) }}
+            >
+                {formatModifiedTime(mtime, t, currentLanguage)}
+            </span>
+        </div>
+        {/* 内容预览（两行截断） */}
+        {snippet && (
+            <div
+                className="mt-1 text-lg leading-snug line-clamp-2 overflow-hidden"
+                style={{ color: alpha(theme.palette.text.primary, 0.75) }}
+            >
+                <span
+                    dangerouslySetInnerHTML={{
+                        __html: snippet.replace(/<mark>/g,
+                            `<mark class="bg-yellow-200 font-medium px-1"
+                            style="color: ${theme.palette.text.primary}">`)
+                    }}
+                />
+            </div>
+        )}
+    </div>
 }
 
 

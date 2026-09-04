@@ -1,3 +1,14 @@
 {
-    "placeholder": "Input any keyword"
+    "placeholder": "Search notes",
+    "myNotes": "My Notes",
+    "end": "-- END --",
+    "newNote": "new note",
+    "totalItem": "Total {{count}} item",
+    "justNow": "Just now",
+    "minuteAgo": "Modified 1 minute ago",
+    "minutesAgo": "Modified {{count}} minutes ago",
+    "hourAgo": "Modified 1 hour ago",
+    "hoursAgo": "Modified {{count}} hours ago",
+    "yesterday": "Modified yesterday",
+    "daysAgo": "Modified {{count}} days ago"
 }

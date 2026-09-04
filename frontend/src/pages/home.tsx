@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { EditorContext } from '@/components'
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material';
@@ -6,15 +6,9 @@ import { useGlobal } from '@/contexts/GlobalContext';
 
 const Editor: React.FC = () => {
 
-    const [showTips, setShowTips] = useState(true);
     const theme = useTheme();
     const navigate = useNavigate();
     const { setTrialEndDate } = useGlobal()
-
-    useEffect(() => {
-        const t = setTimeout(() => setShowTips(false), 5000)
-        return () => clearTimeout(t)
-    }, [])
 
     // 监听主题变化，设置窗口背景颜色
     useEffect(() => {
@@ -24,7 +18,7 @@ const Editor: React.FC = () => {
     }, [window.electronAPI.getConfig('theme')])
 
 
-    // 初始化路由
+    // 初始化路由（开屏引导由 App.tsx 路由门控处理，这里只做激活/协议/快捷键检查）
     useEffect(() => {
         const init = async () => {
             // 检查是否有激活，进入激活码环节
@@ -53,10 +47,7 @@ const Editor: React.FC = () => {
                 navigate('/hotkeys')
             }
         }
-        // 稍等200ms
-        setTimeout(() => {
-            init()
-        }, 200)
+        init()
     }, [])
 
     return <div className="overflow-hidden" >

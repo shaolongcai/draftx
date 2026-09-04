@@ -4,13 +4,13 @@ const { contextBridge, ipcRenderer } = require('electron'); //沙箱环境，这
 contextBridge.exposeInMainWorld('electronAPI', {
   getAppVersion: () => ipcRenderer.invoke('get-app-version'),
 
-  // 便利贴相关
-  saveSticky: (stickyNote: StickyParmas) => ipcRenderer.send('save-sticky', stickyNote), // 保存 stickyNote API
-  getDraft: (query: string, limit: number, timeFilter?: { createdAfter?: string; createdBefore?: string; modifiedAfter?: string; modifiedBefore?: string }) => ipcRenderer.invoke('get-draft', query, limit, timeFilter),   // 搜索 stickyNote API
-  getDraftByUuid: (uuid: string) => ipcRenderer.invoke('get-draft-by-uuid', uuid), // 根据ID获取草稿
-  refreshDeleteDay: (id: number) => ipcRenderer.send('refresh-delete-day', id), // 点击刷新删除时间
-  /** @deprecated 使用 getDraftByUuid 替代 */
-  getGuideMemo: () => ipcRenderer.invoke('get-guide-memo'), // 获取引导memo
+  // 笔记相关（md 文件为事实来源）
+  saveSticky: (note: NoteParmas) => ipcRenderer.send('save-sticky', note), // 保存笔记（新笔记内容为空则不落盘）
+  deleteNote: (uuid: string) => ipcRenderer.invoke('delete-note', uuid), // 删除笔记（文件 + 元数据 + 索引）
+  getDraft: (query: string, limit: number, timeFilter?: { createdAfter?: string; createdBefore?: string; modifiedAfter?: string; modifiedBefore?: string }) => ipcRenderer.invoke('get-draft', query, limit, timeFilter),   // 搜索/获取笔记列表（仅元数据）
+  getDraftByUuid: (uuid: string) => ipcRenderer.invoke('get-draft-by-uuid', uuid), // 根据 UUID 获取笔记（含 md 正文）
+  saveImageAsset: (data: ArrayBuffer, ext?: string) => ipcRenderer.invoke('save-image-asset', data, ext), // 保存图片到 notes/.asset/，返回相对路径
+  getNotesDir: () => ipcRenderer.invoke('get-notes-dir'), // 获取笔记根目录绝对路径
 
   // 系统相关
   setConfig: (params: ConfigParams) => ipcRenderer.invoke('set-config', params.key, params.value, params.type), // 设置用户配置

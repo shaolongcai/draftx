@@ -1,0 +1,8 @@
+{
+    "placeholder": "すべてのノートを検索…",
+    "noResults": "結果がありません",
+    "untitled": "無題",
+    "global": "すべてのノート",
+    "inNote": "このノート",
+    "matches": "{{count}} 件の一致"
+}

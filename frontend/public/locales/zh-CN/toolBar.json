@@ -19,5 +19,26 @@
     },
     "exportMarkdown": "导出为 Markdown",
     "downloading": "下载中...",
-    "updateAvailable": "有可用更新"
+    "updateAvailable": "有可用更新",
+    "formatBold": {
+        "mac": "加粗 ( ⌘ + B )",
+        "win": "加粗 ( Ctrl + B )"
+    },
+    "formatItalic": {
+        "mac": "斜体 ( ⌘ + I )",
+        "win": "斜体 ( Ctrl + I )"
+    },
+    "formatList": {
+        "mac": "待办列表 ( ⌘ + T )",
+        "win": "待办列表 ( Ctrl + T )"
+    },
+    "insertImage": "插入图片",
+    "searchDrafts": {
+        "mac": "搜索草稿 ( ⌘ + F )",
+        "win": "搜索草稿 ( Ctrl + F )"
+    },
+    "deleteDraft": "删除当前草稿",
+    "deleteConfirmTitle": "确认删除这篇草稿？删除后不可恢复。",
+    "deleteCancel": "取消",
+    "deleteConfirm": "删除"
 }

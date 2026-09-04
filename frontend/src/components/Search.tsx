@@ -1,7 +1,8 @@
 import { useEvent } from "@/contexts/EvenContext";
-import { Card,  TextField, useTheme } from "@mui/material"
-import {  useRef, useState } from "react";
 import { useTranslation } from '@/contexts/I18nContext';
+import { Search as SearchIcon } from "@mui/icons-material";
+import { useTheme } from "@mui/material";
+import { useRef, useState } from "react";
 
 interface Props {
     onSearch: (keyword: string) => void;
@@ -13,7 +14,7 @@ const Search: React.FC<Props> = ({
 
     const [searchValue, setSearchValue] = useState(''); //搜索的关键词
     const { t } = useTranslation();
-    
+
     const theme = useTheme()
     const inputRef = useRef<HTMLInputElement | null>(null);
     const { loadStickys$ } = useEvent();
@@ -29,49 +30,27 @@ const Search: React.FC<Props> = ({
         onSearch(value);
     }
 
-    return <Card
+    // 圆角胶囊搜索框：放大镜图标 + 无边框输入
+    return <div
         id='search-panel'
-        elevation={0}
-        className="px-0 py-0  border "
+        className="flex items-center gap-2 rounded-full px-4"
         style={{
-            borderColor: `${theme.palette.primary.main}40`
+            border: '1px solid #E1E0DA',
+            height: '44px',
         }}
     >
-            <TextField
-                inputRef={inputRef}
-                slotProps={{
-                    htmlInput: {
-                        autoComplete: 'off',
-                        autoFocus: true,
-                    }
-                }}
-                fullWidth
-                placeholder={t('app.list.placeholder')}
-                variant="outlined"
-                value={searchValue}
-                onChange={(event) => handleSearch(event.target.value)}
-                sx={{
-                    flex: 1,
-                    '& .MuiOutlinedInput-root': {
-                        fontSize: '14px',
-                        height: '56px',
-                        '& fieldset': {
-                            borderWidth: '0px',
-                        },
-                        '&:hover fieldset': {
-                            borderColor: '#0f5baa',
-                        },
-                        '&.Mui-focused fieldset': {
-                            borderWidth: '0px',
-                        },
-                        '& .MuiOutlinedInput-input': {
-                            color: theme.palette.text.primary,
-                        }
-                    },
-                }}
-            />
-      
-    </Card>
+        <SearchIcon sx={{ fontSize: 20, color: '#867A6C', flexShrink: 0 }} />
+        <input
+            ref={inputRef}
+            autoComplete="off"
+            autoFocus
+            className="flex-1 min-w-0 bg-transparent outline-none text-base placeholder:text-[#867A6C99]"
+            style={{ color: theme.palette.text.primary }}
+            placeholder={t('app.list.placeholder')}
+            value={searchValue}
+            onChange={(event) => handleSearch(event.target.value)}
+        />
+    </div>
 }
 
 export default Search

@@ -1,0 +1,8 @@
+{
+    "placeholder": "全文搜索…",
+    "noResults": "无匹配结果",
+    "untitled": "无标题",
+    "global": "全局搜索",
+    "inNote": "当前笔记",
+    "matches": "共 {{count}} 处匹配"
+}

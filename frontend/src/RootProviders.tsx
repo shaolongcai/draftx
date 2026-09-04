@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Theme, ThemeProvider } from '@mui/material'
-import { I18nProvider, useI18n } from '@/contexts/I18nContext';
+import { I18nProvider } from '@/contexts/I18nContext';
 import { NotificationsProvider } from '@toolpad/core/useNotifications';
 import { EventProvider } from './contexts/EvenContext'
 import { forestTheme, darkTheme, defaultTheme, whiteTheme } from './theme'
@@ -13,9 +13,26 @@ function RootProviders({ children }) {
     const [currentTheme, setCurrentTheme] = useState<Theme>(defaultTheme)
 
     useEffect(() => {
-        window.electronAPI.getConfig('app_language').then(setLang);
+        window.electronAPI.getConfig('app_language').then((l) => {
+            if (l) setLang(l);
+        });
         return () => { /* 如果暴露了移除监听就调用 */ };
     }, []);
+
+    // 主题变更器
+    const getTheme = (name: string) => {
+        if (name === 'forest') {
+            return forestTheme
+        } else if (name === 'dark') {
+            return darkTheme
+        } else if (name === 'default') {
+            return defaultTheme
+        } else if (name === 'white') {
+            return whiteTheme
+        } else {
+            return defaultTheme
+        }
+    }
 
     const setTheme = (themeName: string) => {
         console.log('setTheme', themeName)
@@ -56,24 +73,11 @@ function RootProviders({ children }) {
         };
     }, [])
 
-    // 主题变更器
-    const getTheme = (name: string) => {
-        if (name === 'forest') {
-            return forestTheme
-        } else if (name === 'dark') {
-            return darkTheme
-        } else if (name === 'default') {
-            return defaultTheme
-        } else if (name === 'white') {
-            return whiteTheme
-        } else {
-            return defaultTheme
-        }
-    }
-
     return (
         <I18nProvider defaultLanguage={lang} language={lang}>
-            <ThemeProvider theme={currentTheme}>
+            <ThemeProvider 
+            theme={currentTheme}
+            >
                 <GlobalContext.Provider value={{
                     setTheme,
                     trialEndDate: null,

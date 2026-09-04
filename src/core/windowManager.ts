@@ -37,24 +37,24 @@ class WindowManager {
     // 初始化main窗口
     private initMainWindow() {
         this.mainWindow = new BrowserWindow({
-            width: 460,
-            height: 500,
-            minWidth: 360,
-            minHeight: 360,
+            width: 770,
+            height: 770,
+            minWidth: 770,
+            minHeight: 770,
             x: 0,               // 后面会计算居中
             y: 0,
             frame: true,       // 有无边框
             resizable: true, // 是否可调整大小
             movable: true,
-            alwaysOnTop: true,  // 总在最前
+            alwaysOnTop: false,  // 总在最前
             skipTaskbar: true,  // 不占用任务栏
             show: false,        // 先不显示
             // transparent: true,
             // backgroundColor: '#00000000',
             roundedCorners: true,
             hasShadow: true,
-            backgroundColor: '#F9F3E5',
-            // vibrancy: 'under-window', // macOS 模糊效果，增强边框层次
+            backgroundColor: '#F5F4EF',
+            vibrancy: 'under-window', // macOS 模糊效果，增强边框层次
             titleBarStyle: process.platform === 'darwin' ? 'customButtonsOnHover' : 'hidden', // 隐藏原生标题栏，保留边框
             // titleBarStyle: 'hiddenInset',
             webPreferences: {
@@ -102,15 +102,15 @@ class WindowManager {
             minHeight: 360,
             x: 0,               // 后面会计算居中
             y: 0,
-            frame: true,       // 无边框
+            frame: false,       // 无边框（不透明），Windows 下 DWM 直接为无边框窗口绘制阴影
             resizable: true,
             movable: true,
-            alwaysOnTop: true,  // 总在最前
+            alwaysOnTop: false,  // 总在最前
             skipTaskbar: true,  // 不占用任务栏
             show: false,        // 先不显示
             roundedCorners: true,
-            hasShadow: true,
-            backgroundColor: '#F9F3E5',
+            hasShadow: true,    // 系统原生阴影（Windows 仅对无边框窗口生效）
+            backgroundColor: '#F5F4EF',
             transparent: false,
             titleBarStyle: process.platform === 'darwin' ? 'customButtonsOnHover' : 'hidden', // 隐藏原生标题栏，保留边框
             // backgroundColor: '#E92828', //测试大小专用色
@@ -143,8 +143,8 @@ class WindowManager {
     // 为窗口加载内容
     private loadWindows() {
         if (isDev) {
-            this.mainWindow.loadURL('http://localhost:5173');   // 加载搜索条HTML
-            this.settingsWindow.loadURL('http://localhost:5173/setting.html');   // 加载设置条HTML
+            this.mainWindow.loadURL('http://localhost:5174');   // 加载搜索条HTML
+            this.settingsWindow.loadURL('http://localhost:5174/setting.html');   // 加载设置条HTML
             this.mainWindow.webContents.openDevTools(); //打开开发者工具        
             this.settingsWindow.webContents.openDevTools(); //打开开发者工具
         } else {

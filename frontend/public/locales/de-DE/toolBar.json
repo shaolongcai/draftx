@@ -19,5 +19,26 @@
     },
     "exportMarkdown": "Als Markdown exportieren",
     "downloading": "Herunterladen...",
-    "updateAvailable": "Update verfügbar"
+    "updateAvailable": "Update verfügbar",
+    "formatBold": {
+        "mac": "Fett ( ⌘ + B )",
+        "win": "Fett ( Ctrl + B )"
+    },
+    "formatItalic": {
+        "mac": "Kursiv ( ⌘ + I )",
+        "win": "Kursiv ( Ctrl + I )"
+    },
+    "formatList": {
+        "mac": "Aufgabenliste ( ⌘ + T )",
+        "win": "Aufgabenliste ( Ctrl + T )"
+    },
+    "insertImage": "Bild einfügen",
+    "searchDrafts": {
+        "mac": "Entwürfe suchen ( ⌘ + F )",
+        "win": "Entwürfe suchen ( Ctrl + F )"
+    },
+    "deleteDraft": "Diesen Entwurf löschen",
+    "deleteConfirmTitle": "Diesen Entwurf löschen? Dies kann nicht rückgängig gemacht werden.",
+    "deleteCancel": "Abbrechen",
+    "deleteConfirm": "Löschen"
 }

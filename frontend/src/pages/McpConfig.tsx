@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button, Paper, Stack, Typography } from "@mui/material"
 import { useNotifications } from "@toolpad/core/useNotifications";
-import { useNavigate } from "react-router-dom";
 import { SettingTitle } from "@/components";
 import { useTranslation } from "@/contexts/I18nContext";
 import { useEffect, useMemo, useState } from "react";
@@ -8,7 +8,6 @@ import { useEffect, useMemo, useState } from "react";
 const AIToolConfig: React.FC = () => {
     const { t } = useTranslation();
     const notifications = useNotifications();
-    const navigate = useNavigate();
     const [mcpEntryPath, setMcpEntryPath] = useState('');
 
     useEffect(() => {
@@ -55,34 +54,55 @@ const AIToolConfig: React.FC = () => {
         }
     }
 
-    return <>
-        <SettingTitle title={t('app.settings.mcpProvider')} />
-        <Stack spacing={2} className="mt-6">
-            <Typography variant="bodyMedium" color="textPrimary">
-                {t('app.settings.mcpCommandDesc' as any)}
-            </Typography>
-            <Paper variant="outlined" className="rounded-2xl p-4 bg-black/70 border-white/20">
-                <Typography
-                    component="pre"
-                    variant="bodyMedium"
-                    className="whitespace-pre-wrap break-all text-green-300 font-mono"
-                >
-                    {mcpConfigSnippet}
+    return (
+        <div className="h-full px-[48px] py-[32px] flex flex-col">
+            <SettingTitle title="MCP" />
+            <Paper
+                elevation={0}
+                className="mt-6 flex-1 rounded-2xl p-6 flex flex-col bg-[#EBE1D3]"
+            >
+                <Typography variant="titleLarge" color="textPrimary">
+                    AI Sever
                 </Typography>
-            </Paper>
-            <Typography variant="bodySmall" color="textSecondary">
-                {t('app.settings.mcpPathTip' as any)}
-            </Typography>
-            <Stack direction="row" spacing={1} justifyContent="center">
-                <Button variant="contained" onClick={() => handleCopy(mcpConfigSnippet)}>
+                <Stack spacing={0.5} className="mt-3">
+                    <Typography variant="bodyMedium" color="textPrimary">
+                        {t('app.settings.mcpCommandDesc' as any)}
+                    </Typography>
+                    <Typography variant="bodyMedium" color="textPrimary">
+                        {t('app.settings.mcpPathTip' as any)}
+                    </Typography>
+                </Stack>
+                <Paper
+                    elevation={0}
+                    className="mt-4 rounded-xl p-4 bg-[#DCD9CC]"
+                >
+                    <Typography
+                        component="pre"
+                        variant="bodyMedium"
+                        color="textPrimary"
+                        className="whitespace-pre-wrap break-all font-mono"
+                    >
+                        {mcpConfigSnippet}
+                    </Typography>
+                </Paper>
+                <Button
+                    variant="contained"
+                    fullWidth
+                    onClick={() => handleCopy(mcpConfigSnippet)}
+                    className="mt-6"
+                    sx={{
+                        bgcolor: '#8D8577',
+                        borderRadius: '12px',
+                        py: 1.5,
+                        boxShadow: 'none',
+                        '&:hover': { bgcolor: '#7C7466', boxShadow: 'none' },
+                    }}
+                >
                     {t('app.settings.mcpCopyCommand' as any)}
                 </Button>
-                {/* <Button variant="outlined" onClick={() => navigate(-1)}>
-                    {t('app.common.close')}
-                </Button> */}
-            </Stack>
-        </Stack>
-    </>
+            </Paper>
+        </div>
+    )
 }
 
 export default AIToolConfig

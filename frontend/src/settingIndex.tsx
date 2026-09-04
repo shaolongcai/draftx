@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import ReactDOM from 'react-dom/client';
 import Setting from '@/pages/setting';
 import RootProviders from './RootProviders';
@@ -20,12 +21,12 @@ const APP = () => {
     return (
         <RootProviders>
             <HashRouter>
-                <div ref={rootRef} >
+                <div ref={rootRef} className="relative h-screen w-screen bg-[#F5F4EF]">
                     {/* 顶部拖拽条 */}
                     <div
                         className="drag absolute top-0 left-0 right-0 h-8 z-10 "
                     />
-                    <style>{`
+                        <style>{`
                 /* root隐藏滚动条但保持可滚动 */
                 ::-webkit-scrollbar {
                     display: none;
@@ -37,17 +38,16 @@ const APP = () => {
                     -ms-overflow-style: none;
                 }
             `}</style>
-                    <Routes>
-                        <Route path="/" element={<Setting />} />
-                        <Route path="/AIProvider" element={<AIProvider />} />
-                        <Route path="/AIToolConfig" element={<McpConfig />} />
-                        <Route path="/ActivationCode" element={<ActivationCode />} />
-                        <Route path="/ProTips" element={<ProTips />} />
-                        <Route path="/hotkeys" element={<HotkeysConfig />} />
-                        <Route path="/improveTips" element={<ImproveTips />} />
-                        <Route path="/ThemeSelect" element={<ThemeSelect />} />
-                    </Routes>
-                    <div />
+                        <Routes>
+                            <Route path="/" element={<Setting />} />
+                            <Route path="/AIProvider" element={<AIProvider />} />
+                            <Route path="/AIToolConfig" element={<McpConfig />} />
+                            <Route path="/ActivationCode" element={<ActivationCode />} />
+                            <Route path="/ProTips" element={<ProTips />} />
+                            <Route path="/hotkeys" element={<HotkeysConfig />} />
+                            <Route path="/improveTips" element={<ImproveTips />} />
+                            <Route path="/ThemeSelect" element={<ThemeSelect />} />
+                        </Routes>
                 </div>
             </HashRouter>
         </RootProviders>

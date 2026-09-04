@@ -1,0 +1,8 @@
+{
+    "placeholder": "Rechercher dans toutes les notes…",
+    "noResults": "Aucun résultat",
+    "untitled": "Sans titre",
+    "global": "Toutes les notes",
+    "inNote": "Cette note",
+    "matches": "{{count}} correspondances"
+}

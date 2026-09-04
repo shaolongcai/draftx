@@ -148,6 +148,7 @@ export class ModuleParser {
  */
 export interface ModuleHandler {
     type: ModuleType;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     process: (content: string) => any;
 }
 

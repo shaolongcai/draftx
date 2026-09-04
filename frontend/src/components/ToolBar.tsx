@@ -1,17 +1,27 @@
-import { Divider, IconButton, Stack, Tooltip, Typography, useColorScheme, useTheme } from "@mui/material";
+import { Divider, IconButton, Stack, Tooltip, Typography, useTheme, alpha } from "@mui/material";
 import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import {
-    AddCircleOutline as AddIcon,
+    Add as AddIcon,
     Assistant as AIChatIcon,
     GridView as AllIcon,
     Mode as DraftIcon,
-    KeyboardArrowLeft as BackIcon,
-    KeyboardArrowRight as ForwardIcon,
+    ChevronLeft as BackIcon,
+    ChevronRight as ForwardIcon,
     ArrowCircleUp as UpdateIcon,
-    FileDownload as ExportIcon,
+    IosShare as ExportIcon,
+    FormatBold as BoldIcon,
+    FormatItalic as ItalicIcon,
+    Checklist as CheckListIcon,
+    InsertPhoto as ImageIcon,
+    Search as SearchIcon,
+    DeleteOutline as DeleteIcon,
 } from "@mui/icons-material";
 import { useEvent } from "@/contexts/EvenContext";
+import { useEditor } from "@/contexts/EditorContext";
 import ChatInput from "./ChatInput";
+import SearchPanel from "./SearchPanel";
+import { Popover, PopoverContent, PopoverHeader, PopoverTitle, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
 import { useKeyPress, useRequest } from "ahooks";
 import { historyStack } from "@/utils/histroyStack";
 import { useTranslation } from "@/contexts/I18nContext";
@@ -34,12 +44,31 @@ const ToolButton: React.FC<ToolButtonProps> = ({
 }) => {
     return (
         <Tooltip title={tip}>
-            <IconButton size="small" className={`text-white ${className}`}
-                onClick={onClick}
-                disabled={disabled}
-            >
-                {icon}
-            </IconButton>
+            {/* span 包裹使禁用状态下 Tooltip 仍可用 */}
+            <span>
+                <IconButton size="small" className={className}
+                    onClick={onClick}
+                    disabled={disabled}
+                    // 阻止 mousedown 默认行为，保持编辑器选区不因点击按钮而丢失
+                    onMouseDown={(e) => e.preventDefault()}
+                    sx={(theme) => ({
+                        p: '4px',
+                        color: '#867A6C',
+                        '&:hover': {
+                            color: '#867A6C',
+                            bgcolor: alpha('#867A6C', 0.12),
+                        },
+                        '&.Mui-disabled': {
+                            color: alpha('#867A6C', 0.3),
+                        },
+                        '& .MuiSvgIcon-root': {
+                            fontSize: '24px',
+                        },
+                    })}
+                >
+                    {icon}
+                </IconButton>
+            </span>
         </Tooltip>
     )
 }
@@ -57,18 +86,22 @@ const ToolBar: React.FC<Props> = ({
 
     const [active, setActive] = useState(false);
     const [isChatMode, setIsChatMode] = useState(false);
+    const [isSearchMode, setIsSearchMode] = useState(false); // 站内搜索面板开关
     const [historyVersion, setHistoryVersion] = useState(0); // 历史版本号，用于刷新按钮状态
     const [downloadProgress, setDownloadProgress] = useState(0);
     const [isDownloading, setIsDownloading] = useState(false);
+    const [deletePopoverOpen, setDeletePopoverOpen] = useState(false); // 删除笔记确认气泡
 
     const inputRef = useRef<HTMLDivElement>(null);
+    const imageInputRef = useRef<HTMLInputElement>(null);
     const { handleOnclickTool$, loadStickys$ } = useEvent();
+    const { vditorRef } = useEditor();
     const isMac = window.electronUtils?.platform === 'darwin' || /macintosh|mac os x/i.test(navigator.userAgent);
 
     // 引入 MUI 主题
     const theme = useTheme();
     // const { setMode, mode } = useColorScheme() //调用 setMode('主题色的键，例如red') 即可调用对应主题颜色
-    const { t } = useTranslation();
+    const { t, currentLanguage } = useTranslation();
 
     // 检查更新
     const { data: updateInfo } = useRequest(async () => {
@@ -86,15 +119,100 @@ const ToolBar: React.FC<Props> = ({
         }
     };
 
+    // 删除当前选区内容（insertValue 在光标处插入，需先清空选区避免重复）
+    const deleteCurrentSelection = () => {
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0 && !selection.getRangeAt(0).collapsed) {
+            selection.getRangeAt(0).deleteContents();
+        }
+    };
+
+    // 用标记包裹选中文本（加粗/斜体）
+    const wrapSelection = (mark: string) => {
+        const vditor = vditorRef.current;
+        if (!vditor) return;
+        vditor.focus();
+        const sel = vditor.getSelection();
+        if (sel) {
+            deleteCurrentSelection();
+            vditor.insertValue(`${mark}${sel}${mark}`);
+        } else {
+            // 无选区时插入成对标记，<wbr> 会被 IR 渲染流程识别为光标锚点，使光标停留在两个标记中间
+            vditor.insertValue(`${mark}<wbr>${mark}`);
+        }
+    };
+
+    // 任务列表：选区逐行加 '- [ ] '，无选区则插入 '- [ ] '
+    const insertList = () => {
+        const vditor = vditorRef.current;
+        if (!vditor) return;
+        vditor.focus();
+        const sel = vditor.getSelection();
+        if (sel) {
+            deleteCurrentSelection();
+            vditor.insertValue(sel.split('\n').map((line) => `- [ ] ${line}`).join('\n'));
+        } else {
+            vditor.insertValue('- [ ] ');
+        }
+    };
+
+    // 选择图片后保存为 .asset 并插入编辑器（与 Editor 上传逻辑一致）
+    const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const vditor = vditorRef.current;
+        // 注意：input.files 是活的 FileList 引用，必须先拷贝再清空 value，
+        // 否则 e.target.value = '' 会把 files 一并清空，导致后续循环拿不到任何文件
+        const files = Array.from(e.target.files ?? []);
+        e.target.value = '';
+        if (!vditor || files.length === 0) return;
+        vditor.focus();
+        for (const file of files) {
+            const buf = await file.arrayBuffer();
+            const ext = file.name.includes('.') ? file.name.slice(file.name.lastIndexOf('.')) : '.png';
+            const relPath = await window.electronAPI.saveImageAsset(buf, ext);
+            vditor.insertValue(`![${file.name}](${relPath})\n`);
+        }
+    };
+
     // 获取工具栏按钮
     const toolButtons = useMemo<(ToolButtonProps | { isDivider: boolean })[]>(() => {
         const buttons: (ToolButtonProps | { isDivider: boolean })[] = [];
 
         // 开始配置toolbar
         if (currentPage === 'draft') {
+            // 格式化：加粗 / 斜体 / 任务列表 / 图片 / 搜索
+            buttons.push({
+                icon: <BoldIcon />,
+                tip: t('app.toolBar.formatBold.' + (isMac ? 'mac' : 'win')),
+                onClick: () => wrapSelection('**'),
+            });
+            buttons.push({
+                icon: <ItalicIcon />,
+                tip: t('app.toolBar.formatItalic.' + (isMac ? 'mac' : 'win')),
+                onClick: () => wrapSelection('*'),
+            });
+            buttons.push({
+                icon: <CheckListIcon />,
+                tip: t('app.toolBar.formatList.' + (isMac ? 'mac' : 'win')),
+                onClick: insertList,
+            });
+            buttons.push({
+                icon: <ImageIcon />,
+                tip: t('app.toolBar.insertImage'),
+                onClick: () => imageInputRef.current?.click(),
+            });
+            buttons.push({
+                icon: <SearchIcon />,
+                tip: t('app.toolBar.searchDrafts.' + (isMac ? 'mac' : 'win')),
+                onClick: () => setIsSearchMode(true),
+            });
+
+            buttons.push({
+                isDivider: true,
+            });
+
             // 回退到上一个草稿
             buttons.push({
-                icon: <BackIcon className={!historyStack.canBack() ? 'text-white/40!' : ''} />,
+                icon: <BackIcon />,
                 disabled: !historyStack.canBack(),
                 tip: t('app.toolBar.navDraftBack.' + (isMac ? 'mac' : 'win')),
                 onClick: () => handleForwardOrBack('back'),
@@ -102,14 +220,10 @@ const ToolBar: React.FC<Props> = ({
 
             // 前进到下一个草稿
             buttons.push({
-                icon: <ForwardIcon className={!historyStack.canForward() ? 'text-white/40!' : ''} />,
+                icon: <ForwardIcon />,
                 disabled: !historyStack.canForward(),
                 tip: t('app.toolBar.navDraftForward.' + (isMac ? 'mac' : 'win')),
                 onClick: () => handleForwardOrBack('forward'),
-            });
-
-            buttons.push({
-                isDivider: true,
             });
         }
 
@@ -123,12 +237,23 @@ const ToolBar: React.FC<Props> = ({
             },
         });
 
+        buttons.push({
+            isDivider: true,
+        });
+
         // 显示所有草稿与搜索
         if (currentPage === 'draft') {
+            // buttons.push({
+            //     icon: <AllIcon />,
+            //     tip: t('app.toolBar.showAllDrafts'),
+            //     onClick: () => setCurrentPage('list'),
+            // });
+
+            // 导出 Markdown
             buttons.push({
-                icon: <AllIcon />,
-                tip: t('app.toolBar.showAllDrafts'),
-                onClick: () => setCurrentPage('list'),
+                icon: <ExportIcon />,
+                tip: t('app.toolBar.exportMarkdown'),
+                onClick: () => handleOnclickTool$.emit('exportMarkdown'),
             });
         }
 
@@ -141,26 +266,6 @@ const ToolBar: React.FC<Props> = ({
             });
         }
 
-        // 对话
-        if (currentPage === 'draft') {
-            buttons.push({
-                icon: <AIChatIcon />,
-                tip: t('app.toolBar.chatAI.' + (isMac ? 'mac' : 'win')),
-                onClick: () => setIsChatMode(true),
-            });
-
-            buttons.push({
-                isDivider: true,
-            });
-
-            // 导出 Markdown
-            buttons.push({
-                icon: <ExportIcon />,
-                tip: t('app.toolBar.exportMarkdown'),
-                onClick: () => handleOnclickTool$.emit('exportMarkdown'),
-            });
-        }
-
         // 检查是否有更新
         if (updateInfo?.isUpdateAvailable) {
             buttons.push({
@@ -170,7 +275,7 @@ const ToolBar: React.FC<Props> = ({
             if (isDownloading) {
                 // 显示下载进度
                 buttons.push({
-                    icon: <Typography variant='body2' className="text-white text-xs font-mono">{`${Math.round(downloadProgress)}%`}</Typography>,
+                    icon: <Typography variant='body2' className="text-xs font-mono">{`${Math.round(downloadProgress)}%`}</Typography>,
                     tip: `Downloading... ${Math.round(downloadProgress)}%`,
                     disabled: true
                 });
@@ -179,7 +284,7 @@ const ToolBar: React.FC<Props> = ({
                 buttons.push({
                     icon: <UpdateIcon />,
                     tip: t('app.toolBar.updateAvailable'),
-                    className: 'animate-pulse text-green-400 hover:text-green-300',
+                    className: 'animate-pulse',
                     onClick: handleUpdate,
                 });
             }
@@ -187,6 +292,14 @@ const ToolBar: React.FC<Props> = ({
 
         return buttons;
     }, [currentPage, setCurrentPage, historyVersion, isMac, updateInfo, isDownloading, downloadProgress, t]);
+
+    // 当前日期（如 Oct 26, 2024. Wednesday）
+    const dateText = useMemo(() => {
+        const now = new Date();
+        const date = new Intl.DateTimeFormat(currentLanguage, { month: 'short', day: 'numeric', year: 'numeric' }).format(now);
+        const weekday = new Intl.DateTimeFormat(currentLanguage, { weekday: 'long' }).format(now);
+        return `${date}. ${weekday}`;
+    }, [currentLanguage]);
 
 
 
@@ -219,6 +332,33 @@ const ToolBar: React.FC<Props> = ({
         handleForwardOrBack('back');
     })
 
+    // 加粗快捷键（Win: Ctrl+B，Mac: ⌘+B）
+    useKeyPress((e) => (isMac ? e.metaKey : e.ctrlKey) && e.key.toLowerCase() === 'b', (e) => {
+        if (currentPage !== 'draft' || isChatMode) return;
+        e.preventDefault();
+        wrapSelection('**');
+    })
+
+    // 斜体快捷键（Win: Ctrl+I，Mac: ⌘+I）
+    useKeyPress((e) => (isMac ? e.metaKey : e.ctrlKey) && e.key.toLowerCase() === 'i', (e) => {
+        if (currentPage !== 'draft' || isChatMode) return;
+        e.preventDefault();
+        wrapSelection('*');
+    })
+
+    // 任务列表快捷键（Win: Ctrl+T，Mac: ⌘+T）
+    useKeyPress((e) => (isMac ? e.metaKey : e.ctrlKey) && e.key.toLowerCase() === 't', (e) => {
+        if (currentPage !== 'draft' || isChatMode) return;
+        e.preventDefault();
+        insertList();
+    })
+
+    // 站内搜索快捷键（Win: Ctrl+F，Mac: ⌘+F），任意页面可用；面板已打开时再次按下则关闭
+    useKeyPress((e) => (isMac ? e.metaKey : e.ctrlKey) && e.key.toLowerCase() === 'f', (e) => {
+        e.preventDefault();
+        setIsSearchMode(v => !v);
+    })
+
     // 前进或后退草稿
     const handleForwardOrBack = (type: 'forward' | 'back') => {
         // 判断能否触发
@@ -230,7 +370,7 @@ const ToolBar: React.FC<Props> = ({
             // 获取草稿详情
             window.electronAPI.getDraftByUuid(uuid).then(draft => {
                 if (draft) {
-                    loadStickys$.emit({ ...draft, content: draft.content_json } as DraftResult)
+                    loadStickys$.emit(draft)
                 }
                 // 如果已删掉，则跳过一个,并且把这个uuid从历史堆栈中删除
                 else {
@@ -251,41 +391,58 @@ const ToolBar: React.FC<Props> = ({
 
 
     if (isChatMode) {
-        return <ChatInput
-            onClose={() => {
-                setIsChatMode(false)
-                setActive(false);
-            }} />;
+        return <>
+            <ChatInput
+                onClose={() => {
+                    setIsChatMode(false)
+                    setActive(false);
+                }} />
+            {isSearchMode && (
+                <SearchPanel
+                    onClose={() => setIsSearchMode(false)}
+                    onSelectDraft={() => {
+                        setIsSearchMode(false);
+                        setCurrentPage('draft');
+                    }}
+                    onEnterNoteMode={() => setCurrentPage('draft')}
+                />
+            )}
+        </>;
     }
 
 
     return (
-        <div className="mx-auto w-fit">
+        <>
+        <div
+            className="draftx-toolbar-root w-full"
+            onMouseEnter={() => setActive(true)}
+            onMouseLeave={() => setActive(false)}
+        >
+            {/* 隐藏的图片选择 input */}
+            <input
+                ref={imageInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={handleImageSelect}
+            />
+            {/* 底部通栏：悬停显示，离开直接整体隐藏（外层保持占位以接收 hover） */}
             <div
-                className={`mx-auto rounded-xl overflow-hidden origin-center  transition-all duration-300 ease-out`}
+                className={`transition-opacity duration-150 ${active ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
                 style={{
-                    width: active ? '100%' : '5rem',
-                    height: '2.25rem',
-                    paddingLeft: active ? '0.5rem' : 0,
-                    paddingRight: active ? '0.5rem' : 0,
-                    background: active   // 展开：固定高度 + 中心缩放到 1 (B3、D9是AI换算的)
-                        ? `linear-gradient(to right, ${theme.palette.primary.main}B3, ${theme.palette.primary.main}D9, ${theme.palette.primary.main})`
-                        : `${theme.palette.primary.main}`,
-                    transform: `scaleY(${active ? 1 : 0.12})`,  // 收起：保持高度为展开值，使用 scaleY 压到近似 1px（对称收缩）
-                    transition: 'all 300ms ease-out',
-                    transformOrigin: 'center',
+                    borderTop: '1px solid #E1E0DA',
+                    background: theme.palette.background.default,
                 }}
-                onMouseEnter={() => setActive(true)}
-                onMouseLeave={() => setActive(false)}
             >
                 <Stack
                     alignItems="center"
                     direction="row"
-                    justifyContent="space-between"
-                    className={`items-center gap-1 px-2 transition-opacity duration-300 ${active ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                    className="items-center gap-0.5 overflow-hidden"
+                    sx={{ padding: '16px 24px' }}
                 >
                     {toolButtons.map((button, index) => {
-                        if ((button as any).isDivider) {
+                        if ('isDivider' in button) {
                             return (
                                 <Divider
                                     key={index}
@@ -293,18 +450,69 @@ const ToolBar: React.FC<Props> = ({
                                     variant="middle"
                                     flexItem
                                     sx={{
-                                        bgcolor: 'rgba(255,255,255,0.3)',
+                                        bgcolor: '#E1E0DA',
                                         my: 1,
-                                        mx: 0.5,
+                                        mx: 0.75,
                                     }}
                                 />
                             )
                         }
                         return <ToolButton key={index} {...button as ToolButtonProps} />
                     })}
+                    {/* 删除当前笔记：shadcn Popover 气泡二次确认（仅草稿页） */}
+                    {currentPage === 'draft' && (
+                        <Popover open={deletePopoverOpen} onOpenChange={setDeletePopoverOpen}>
+                            <PopoverTrigger render={<span className="inline-flex" />}>
+                                <ToolButton
+                                    icon={<DeleteIcon />}
+                                    tip={t('app.toolBar.deleteDraft')}
+                                />
+                            </PopoverTrigger>
+                            <PopoverContent side="top" sideOffset={8} className="w-60 bg-[#F5F4EF] ring-[#e3dcc9]">
+                                <PopoverHeader>
+                                    <PopoverTitle>{t('app.toolBar.deleteConfirmTitle')}</PopoverTitle>
+                                </PopoverHeader>
+                                <div className="flex justify-end gap-2">
+                                    <Button variant="outline" size="sm" onClick={() => setDeletePopoverOpen(false)}>
+                                        {t('app.toolBar.deleteCancel')}
+                                    </Button>
+                                    <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        onClick={() => {
+                                            setDeletePopoverOpen(false);
+                                            handleOnclickTool$.emit('deleteDraft');
+                                        }}
+                                    >
+                                        {t('app.toolBar.deleteConfirm')}
+                                    </Button>
+                                </div>
+                            </PopoverContent>
+                        </Popover>
+                    )}
+                    {/* 右侧当前日期 */}
+                    <Typography
+                        variant="body2"
+                        className="ml-auto select-none whitespace-nowrap pl-2"
+                        sx={{ color: alpha(theme.palette.text.primary, 0.45), fontSize: '20px', flexShrink: 0 }}
+                    >
+                        {dateText}
+                    </Typography>
                 </Stack>
             </div>
         </div>
+        {/* 站内全文搜索面板（右上角浮层） */}
+        {isSearchMode && (
+            <SearchPanel
+                onClose={() => setIsSearchMode(false)}
+                onSelectDraft={() => {
+                    setIsSearchMode(false);
+                    setCurrentPage('draft');
+                }}
+                onEnterNoteMode={() => setCurrentPage('draft')}
+            />
+        )}
+        </>
     )
 }
 

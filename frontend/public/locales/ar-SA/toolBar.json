@@ -19,5 +19,26 @@
     },
     "exportMarkdown": "تصدير كـ Markdown",
     "downloading": "جاري التنزيل...",
-    "updateAvailable": "تحديث متاح"
+    "updateAvailable": "تحديث متاح",
+    "formatBold": {
+        "mac": "غامق ( ⌘ + B )",
+        "win": "غامق ( Ctrl + B )"
+    },
+    "formatItalic": {
+        "mac": "مائل ( ⌘ + I )",
+        "win": "مائل ( Ctrl + I )"
+    },
+    "formatList": {
+        "mac": "قائمة المهام ( ⌘ + T )",
+        "win": "قائمة المهام ( Ctrl + T )"
+    },
+    "insertImage": "إدراج صورة",
+    "searchDrafts": {
+        "mac": "البحث في المسودات ( ⌘ + F )",
+        "win": "البحث في المسودات ( Ctrl + F )"
+    },
+    "deleteDraft": "حذف هذه المسودة",
+    "deleteConfirmTitle": "هل تريد حذف هذه المسودة؟ لا يمكن التراجع عن هذا الإجراء.",
+    "deleteCancel": "إلغاء",
+    "deleteConfirm": "حذف"
 }

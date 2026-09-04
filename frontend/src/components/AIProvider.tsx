@@ -1,5 +1,5 @@
 import { ConfigParams } from "@/type/electron";
-import { Autocomplete, Button, Card, MenuItem, Paper, Stack, TextField, Typography } from "@mui/material"
+import { Autocomplete, Button, Stack, TextField, Typography } from "@mui/material"
 import { useRequest } from "ahooks";
 import { useEffect, useState } from "react";
 import SettingTitle from "./SettingTitle";
@@ -41,7 +41,7 @@ const AIProvider: React.FC = () => {
             try {
                 const res = await fetch(`${apiHost}/api/tags`);
                 const json = await res.json();
-                const names: string[] = Array.isArray(json?.models) ? json.models.map((m: any) => m.name) : [];
+                const names: string[] = Array.isArray(json?.models) ? json.models.map((m: { name: string }) => m.name) : [];
                 if (names.length) {
                     setModelOptions(Array.from(new Set([...DEFAULT_OLLAMA_MODELS, ...names])));
                 }

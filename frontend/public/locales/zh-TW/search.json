@@ -1,0 +1,8 @@
+{
+    "placeholder": "全文搜尋…",
+    "noResults": "沒有符合的結果",
+    "untitled": "無標題",
+    "global": "全域搜尋",
+    "inNote": "目前筆記",
+    "matches": "共 {{count}} 處符合"
+}

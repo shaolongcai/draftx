@@ -40,7 +40,7 @@ class HistoryStack {
         try {
             const data = localStorage.getItem(STORAGE_KEY_INDEX);
             return data ? parseInt(data, 10) : -1;
-        } catch (e) {
+        } catch {
             return -1;
         }
     }

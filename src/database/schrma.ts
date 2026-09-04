@@ -1,87 +1,72 @@
 /**
  * 负责数据库的表定义以及创建、添加字段
+ *
+ * 存储设计（见 Agent.md）：
+ * - 笔记内容以 .md 文件为事实来源（~/.draftx/notes/）
+ * - SQLite 仅存储元数据（path/title/mtime/hash）+ FTS5 全文索引（fts_index）
  */
 import { Database } from 'better-sqlite3'
 
 
 /**
- * 存储便利贴的标题、内容、创建时间、修改时间、删除时间、最后访问时间、点击次数、标签
- * @param db 
+ * 删除旧版 stickys 相关表（不再兼容旧数据）
+ * @param db
  */
-export const createStickysDb = (db: Database) => {
+export const dropLegacyStickysDb = (db: Database) => {
   db.exec(`
-            CREATE TABLE IF NOT EXISTS stickys (
+    DROP TRIGGER IF EXISTS stickys_fts_ai;
+    DROP TRIGGER IF EXISTS stickys_fts_au;
+    DROP TRIGGER IF EXISTS stickys_fts_delete;
+    DROP TABLE IF EXISTS stickys_fts;
+    DROP TABLE IF EXISTS stickys;
+  `)
+}
+
+
+/**
+ * 笔记元数据表：仅存储 md 文件的元数据，内容以 .md 文件为事实来源
+ * - path: 相对 notes 目录的路径，如 "guide.md"、"2026/我的笔记.md"
+ * - title: 笔记标题（取第一个 h1 或文件名）
+ * - mtime: 文件修改时间（毫秒时间戳）
+ * - hash:  内容 sha1，用于检测外部修改
+ * @param db
+ */
+export const createNotesDb = (db: Database) => {
+  db.exec(`
+            CREATE TABLE IF NOT EXISTS notes (
               id INTEGER PRIMARY KEY AUTOINCREMENT,
               uuid TEXT UNIQUE,
+              path TEXT NOT NULL UNIQUE,
               title TEXT,
-              content TEXT NOT NULL,
-              content_json TEXT NOT NULL,
-              created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-              modified_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-              deleted_at DATETIME ,
-              last_access_time DATETIME,
-              click_count INTEGER,
-              tags TEXT DEFAULT '[]'
+              mtime INTEGER NOT NULL,
+              hash TEXT NOT NULL,
+              created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );
-            CREATE UNIQUE INDEX IF NOT EXISTS idx_stickys_uuid ON stickys (uuid);
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_notes_uuid ON notes (uuid);
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_notes_path ON notes (path);
           `)
 }
 
 
 /**
- * 创建文件全文搜索FTS5虚拟表（影子表）
- * 用于倒排索引和全文内容搜索
- * @param db 
+ * 全文搜索索引（FTS5 虚拟表）
+ * - rowid 与 notes.id 对应（由 repositories 在写入时手动同步，不使用触发器）
+ * - 使用 trigram tokenizer：按三字符切片索引，天然支持中文等 CJK 语言的子串检索
+ *   （better-sqlite3 捆绑的 SQLite 版本 >= 3.34，内置支持）
+ * - 注意：trigram 仅支持长度 >= 3 个字符的查询，更短的查询由上层回退到文件扫描
+ * @param db
  */
-export const createStickysFtsDb = (db: Database) => {
+export const createFtsIndexDb = (db: Database) => {
   try {
-    // 1) 清理旧 FTS 与触发器，避免历史残留导致冲突（数据重建时使用）
-    // db.exec(`
-    // DROP TRIGGER IF EXISTS files_fts_ai;
-    // DROP TRIGGER IF EXISTS files_fts_au;
-    // DROP TRIGGER IF EXISTS files_fts_delete;
-    // DROP TABLE IF EXISTS files_fts;
-    // `);
-
-
-    // 2) 重建 FTS（修正 tokenize 写法，去掉 IF NOT EXISTS 以提升兼容） content为便利贴的全文内容
     db.exec(`
-        CREATE VIRTUAL TABLE IF NOT EXISTS stickys_fts USING fts5(
+        CREATE VIRTUAL TABLE IF NOT EXISTS fts_index USING fts5(
+            title,
             content,
-            content=stickys,
-            content_rowid=id,
-            tokenize='unicode61 remove_diacritics 2'
+            tokenize='trigram'
         );
         `);
-
-    // 3) 触发器采用 delete 哨兵 + insert 的推荐写法（不使用任何表别名）
-    db.exec(`
-        CREATE TRIGGER IF NOT EXISTS stickys_fts_ai AFTER INSERT ON stickys FOR EACH ROW BEGIN
-          INSERT INTO stickys_fts(rowid, content)
-          VALUES (new.id, new.content);
-        END;
-        `);
-
-    db.exec(`
-        CREATE TRIGGER IF NOT EXISTS stickys_fts_au AFTER UPDATE ON stickys FOR EACH ROW BEGIN
-          INSERT INTO stickys_fts(stickys_fts, rowid) VALUES('delete', old.id);
-          INSERT INTO stickys_fts(rowid, content) VALUES (new.id, new.content);
-        END;
-        `);
-
-    db.exec(`
-        CREATE TRIGGER IF NOT EXISTS stickys_fts_delete AFTER DELETE ON stickys FOR EACH ROW BEGIN
-          INSERT INTO stickys_fts(stickys_fts, rowid) VALUES('delete', old.id);
-        END;
-        `);
-
-    // 4) 初始化回填，确保 FTS 与 stickys 同步，避免空索引或歧义（能够回填数据）
-    db.exec(`
-        INSERT INTO stickys_fts(rowid, content)
-        SELECT id, content FROM stickys WHERE content IS NOT NULL;
-        `);
   } catch (error) {
-    console.error('创建FTS表失败:', error);
+    console.error('创建FTS索引表失败:', error);
   }
 }
 

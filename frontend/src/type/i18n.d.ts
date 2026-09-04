@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // 翻譯系統類型定義
 
 // 從統一配置文件導入語言類型
@@ -14,6 +15,12 @@ export interface TranslationKeys {
     edit: {
       test: string;
       placeholder: string;
+      titlePlaceholder: string;
+      imageMenu: {
+        copy: string;
+        shrink: string;
+        enlarge: string;
+      };
     };
     // 新增模塊：工具欄
     toolBar: {
@@ -30,12 +37,37 @@ export interface TranslationKeys {
       exportMarkdown: string;
       downloading: string;
       updateAvailable: string;
+      formatBold: {
+        mac: string;
+        win: string;
+      };
+      formatItalic: {
+        mac: string;
+        win: string;
+      };
+      formatList: {
+        mac: string;
+        win: string;
+      };
+      insertImage: string;
+      searchDrafts: {
+        mac: string;
+        win: string;
+      };
+      deleteDraft: string;
+      deleteConfirmTitle: string;
+      deleteCancel: string;
+      deleteConfirm: string;
     };
     search: {
       placeholder: string;
       button: string;
       results: string;
       noResults: string;
+      untitled: string;
+      global: string;
+      inNote: string;
+      matches: string;
       noKeyword: string;
       start: string;
     };
@@ -132,6 +164,10 @@ export type TranslationKeyPath =
   | 'app.title'
   | 'app.edit.test'
   | 'app.edit.placeholder'
+  | 'app.edit.titlePlaceholder'
+  | 'app.edit.imageMenu.copy'
+  | 'app.edit.imageMenu.shrink'
+  | 'app.edit.imageMenu.enlarge'
 
   // 新增模塊：工具欄
   | 'app.toolBar.addDraft.mac'
@@ -143,6 +179,25 @@ export type TranslationKeyPath =
   | 'app.toolBar.exportMarkdown'
   | 'app.toolBar.downloading'
   | 'app.toolBar.updateAvailable'
+  | 'app.toolBar.formatBold.mac'
+  | 'app.toolBar.formatBold.win'
+  | 'app.toolBar.formatItalic.mac'
+  | 'app.toolBar.formatItalic.win'
+  | 'app.toolBar.formatList.mac'
+  | 'app.toolBar.formatList.win'
+  | 'app.toolBar.insertImage'
+  | 'app.toolBar.searchDrafts.mac'
+  | 'app.toolBar.searchDrafts.win'
+  | 'app.toolBar.deleteDraft'
+  | 'app.toolBar.deleteConfirmTitle'
+  | 'app.toolBar.deleteCancel'
+  | 'app.toolBar.deleteConfirm'
+  | 'app.search.placeholder'
+  | 'app.search.noResults'
+  | 'app.search.untitled'
+  | 'app.search.global'
+  | 'app.search.inNote'
+  | 'app.search.matches'
   // 设置
   | 'app.settings.title'
   | 'app.settings.visualIndex'

@@ -1,0 +1,238 @@
+/* DraftX — Vditor 编辑器主题覆盖
+ * 设计规范：
+ *  文字 #3A332C（占位符 45% 透明）
+ *  主色 #867A6C（按钮 / icon / 卡片）
+ *  背景 #F5F4EF、边框 #E1E0DA
+ *  圆角仅 8px / 16px / 24px
+ *  字体：拉丁 Cormorant Garamond、中文 LXGW WenKai Mono TC
+ */
+
+/* 变量覆盖：注意 Vditor 会把 .vditor 类直接加到容器元素上，
+ * 且其默认变量也声明在 .vditor（优先级 0,1,0）上，
+ * 所以这里必须用 .draftx-vditor.vditor（0,2,0）才能稳定压过默认值 */
+.draftx-vditor.vditor {
+    --border-color: #E1E0DA;
+    --second-color: #867A6C;
+    --hover: #867A6C;
+    --toolbar-background-color: #F5F4EF;
+    --toolbar-icon-color: #867A6C;
+    --toolbar-icon-hover-color: #3A332C;
+    --toolbar-height: 36px;
+    --toolbar-divider-margin-top: 8px;
+    --textarea-background-color: transparent;
+    --textarea-text-color: #3A332C;
+    --panel-background-color: #F5F4EF;
+    --count-background-color: #F5F4EF;
+    --ir-heading-color: #3A332C;
+    --ir-title-color: #867A6C;
+    --ir-link-color: #867A6C;
+    --ir-bracket-color: #867A6C;
+    --ir-paren-color: #867A6C;
+    --ir-bi-color: #867A6C;
+    --blockquote-color: rgba(58, 51, 44, 0.75);
+    --heading-border-color: #E1E0DA;
+    --resize-background-color: #E1E0DA;
+    --resize-icon-color: #867A6C;
+}
+
+/* 容器（无边框、无底色。注意：Vditor 会把 .vditor 类直接加到容器元素上，
+ * 所以必须用 .draftx-vditor.vditor 命中容器本身，而不是后代选择器） */
+.draftx-vditor.vditor {
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+    color: #3A332C;
+}
+
+/* 编辑区（pre.vditor-reset 即整个 IR 编辑面，同样无边框无底色、内边距清零与标题左对齐）
+ * 注意：Vditor 运行时会通过内联样式动态设置 padding（setPadding），必须用 !important 压过 */
+.draftx-vditor pre.vditor-reset,
+.draftx-vditor .vditor-ir pre.vditor-reset {
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0 !important;
+    /* 编辑器已延伸到底部，底部工具栏为悬浮覆盖；预留滚动余量让最后一行能滚出工具栏遮挡区 */
+    padding-bottom: 80px !important;
+    margin: 0;
+}
+
+/* 不使用自带工具栏：隐藏空工具栏（否则 border-bottom 会显示一条横线） */
+.draftx-vditor .vditor-toolbar {
+    display: none;
+}
+
+/* 聚焦时同样保持透明（Vditor 默认 focus 会应用 --textarea-background-color） */
+.draftx-vditor pre.vditor-reset:focus,
+.draftx-vditor .vditor-ir pre.vditor-reset:focus {
+    background-color: transparent;
+}
+
+/* 隐藏 IR 模式下标题左侧的 H1~H6 标记（保持设计稿的干净排版） */
+.draftx-vditor .vditor-ir .vditor-reset > h1:before,
+.draftx-vditor .vditor-ir .vditor-reset > h2:before,
+.draftx-vditor .vditor-ir .vditor-reset > h3:before,
+.draftx-vditor .vditor-ir .vditor-reset > h4:before,
+.draftx-vditor .vditor-ir .vditor-reset > h5:before,
+.draftx-vditor .vditor-ir .vditor-reset > h6:before {
+    display: none;
+}
+
+/* 标题输入框（无边框、无底色） */
+.draftx-title-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #3A332C;
+    font-family: 'Digits', 'Cormorant Garamond', 'LXGW WenKai Mono TC', 'Roboto', 'Noto Sans SC', serif;
+    font-size: 40px;
+    font-weight: 600;
+    line-height: 1.4;
+    padding: 0;
+    margin: 0 0 16px 0;
+}
+
+.draftx-title-input::placeholder {
+    color: rgba(58, 51, 44, 0.45);
+}
+
+/* 编辑区 */
+.draftx-vditor .vditor-content {
+    background-color: transparent;
+}
+
+.draftx-vditor .vditor-ir,
+.draftx-vditor .vditor-reset {
+    color: #3A332C;
+    font-family: 'Digits', 'Cormorant Garamond', 'LXGW WenKai Mono TC', 'Roboto', 'Noto Sans SC', serif;
+    font-size: 20px;
+    line-height: 1.5;
+    background-color: transparent;
+}
+
+/* 占位符（45% 透明） */
+.draftx-vditor pre.vditor-reset:empty::before {
+    color: rgba(58, 51, 44, 0.45);
+}
+
+/* 代码块 / 行内代码（注意排除 pre.vditor-reset——它是整个编辑面，不是代码块） */
+.draftx-vditor .vditor-ir pre:not(.vditor-reset),
+.draftx-vditor .vditor-reset pre {
+    background-color: #F5F4EF;
+    border: 1px solid #E1E0DA;
+    border-radius: 8px;
+}
+
+.draftx-vditor .vditor-ir code:not(pre code),
+.draftx-vditor .vditor-reset code:not(pre code) {
+    background-color: #F5F4EF;
+    border-radius: 8px;
+    color: #3A332C;
+}
+
+/* 引用块 */
+.draftx-vditor .vditor-ir blockquote,
+.draftx-vditor .vditor-reset blockquote {
+    border-left: 4px solid #867A6C;
+    background-color: rgba(134, 122, 108, 0.08);
+    border-radius: 0 8px 8px 0;
+}
+
+/* 表格 */
+.draftx-vditor .vditor-ir table th,
+.draftx-vditor .vditor-ir table td,
+.draftx-vditor .vditor-reset table th,
+.draftx-vditor .vditor-reset table td {
+    border-color: #E1E0DA;
+}
+
+/* 链接 */
+.draftx-vditor .vditor-ir a,
+.draftx-vditor .vditor-reset a {
+    color: #867A6C;
+}
+
+/* 图片圆角，宽度固定为编辑区的一半（百分比宽度，随窗口 resize 等比缩放） */
+.draftx-vditor .vditor-ir img,
+.draftx-vditor .vditor-reset img {
+    border-radius: 8px;
+    max-width: 100%;
+    width: 50%;
+    height: auto;
+}
+
+/* Tailwind v4 preflight 局部修复：列表与标题 */
+.draftx-vditor .vditor-reset ol {
+    list-style: decimal;
+    padding-left: 1.5em;
+}
+
+.draftx-vditor .vditor-reset ul {
+    list-style: disc;
+    padding-left: 1.5em;
+}
+
+/* 待办列表 checkbox：自定义外观（原生样式无法设置背景色，appearance: none 后重绘） */
+.draftx-vditor .vditor-reset .vditor-task input {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    border: 1px solid #867A6C;
+    border-radius: 4px;
+    background-color: transparent;
+    font-size: 1em;
+    margin: 0 0.3em 0.25em -1.4em;
+    vertical-align: middle;
+    cursor: pointer;
+    position: relative;
+}
+
+/* 选中态：#867A6C 背景 + 对勾 */
+.draftx-vditor .vditor-reset .vditor-task input:checked {
+    background-color: #867A6C;
+}
+
+.draftx-vditor .vditor-reset .vditor-task input:checked::after {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 4px;
+    width: 6px;
+    height: 11px;
+    border: solid #F5F4EF;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* 待办列表：勾选后对应文案加删除线（1px 细线） */
+.draftx-vditor .vditor-reset .vditor-task:has(> input:checked) {
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+}
+
+.draftx-vditor .vditor-reset h1,
+.draftx-vditor .vditor-reset h2,
+.draftx-vditor .vditor-reset h3,
+.draftx-vditor .vditor-reset h4,
+.draftx-vditor .vditor-reset h5,
+.draftx-vditor .vditor-reset h6 {
+    color: #3A332C;
+    font-weight: 700;
+}
+
+/* 一级、二级标题不显示下方横线（Vditor 默认为 h1/h2 添加 border-bottom） */
+.draftx-vditor .vditor-reset h1,
+.draftx-vditor .vditor-reset h2 {
+    border-bottom: none;
+}
+
+/* 弹层（提示、emoji、上传等） */
+.draftx-vditor .vditor-panel,
+.draftx-vditor .vditor-hint {
+    background-color: #F5F4EF;
+    border: 1px solid #E1E0DA;
+    border-radius: 8px;
+    color: #3A332C;
+}

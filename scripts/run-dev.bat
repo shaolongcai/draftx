@@ -193,7 +193,7 @@ if %errorlevel% equ 0 (
 %log_success% Environment setup complete!
 %log_info% Starting Electron in development mode...
 echo.
-%log_info% Frontend will be available at: http://localhost:5173
+%log_info% Frontend will be available at: http://localhost:5174
 %log_info% Electron app will launch automatically
 echo.
 

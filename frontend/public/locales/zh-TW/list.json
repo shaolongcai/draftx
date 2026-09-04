@@ -1,3 +1,14 @@
 {
-    "placeholder": "輸入關鍵字"
+    "placeholder": "搜尋筆記",
+    "myNotes": "我的筆記",
+    "end": "-- 結束 --",
+    "newNote": "新建筆記",
+    "totalItem": "共 {{count}} 條筆記",
+    "justNow": "剛剛",
+    "minuteAgo": "1 分鐘前修改",
+    "minutesAgo": "{{count}} 分鐘前修改",
+    "hourAgo": "1 小時前修改",
+    "hoursAgo": "{{count}} 小時前修改",
+    "yesterday": "昨天修改",
+    "daysAgo": "{{count}} 天前修改"
 }

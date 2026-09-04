@@ -1,3 +1,9 @@
 {
-    "placeholder": "Drücken Sie / für Schnelleingabe"
+    "placeholder": "Hier mit dem Schreiben beginnen",
+    "titlePlaceholder": "Titel eingeben",
+    "imageMenu": {
+        "copy": "Bild kopieren",
+        "shrink": "Bild verkleinern",
+        "enlarge": "Bild vergrößern"
+    }
 }

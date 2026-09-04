@@ -1,3 +1,14 @@
 {
-    "placeholder": "输入关键字"
+    "placeholder": "搜索笔记",
+    "myNotes": "我的笔记",
+    "end": "-- 结束 --",
+    "newNote": "新建笔记",
+    "totalItem": "共 {{count}} 条笔记",
+    "justNow": "刚刚",
+    "minuteAgo": "1 分钟前修改",
+    "minutesAgo": "{{count}} 分钟前修改",
+    "hourAgo": "1 小时前修改",
+    "hoursAgo": "{{count}} 小时前修改",
+    "yesterday": "昨天修改",
+    "daysAgo": "{{count}} 天前修改"
 }
